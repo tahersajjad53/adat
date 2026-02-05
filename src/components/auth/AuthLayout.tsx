@@ -1,0 +1,44 @@
+import React from 'react';
+import adatLogo from '@/assets/adat-logo.svg';
+import splashImage from '@/assets/splash-image.png';
+
+interface AuthLayoutProps {
+  children: React.ReactNode;
+}
+
+const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
+  return (
+    <div className="flex min-h-screen">
+      {/* Left side - Splash image */}
+      <div className="hidden lg:flex lg:w-1/2 relative bg-foreground">
+        <img
+          src={splashImage}
+          alt="Spiritual sanctuary"
+          className="absolute inset-0 w-full h-full object-cover opacity-90"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        <div className="relative z-10 flex flex-col justify-between p-12 text-primary-foreground">
+          <img src={adatLogo} alt="Adat" className="w-24 h-auto invert" />
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold mb-3">Your Spiritual Life, Organized</h2>
+            <p className="text-lg opacity-90">
+              Track prayers, manage dues, and cultivate daily habits with intention.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Right side - Form */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-16 bg-background">
+        <div className="lg:hidden mb-8">
+          <img src={adatLogo} alt="Adat" className="w-20 h-auto" />
+        </div>
+        <div className="w-full max-w-md mx-auto">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AuthLayout;
