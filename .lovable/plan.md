@@ -1,31 +1,19 @@
 
-# Fix Timezone Handling for Maghrib-Based Date Transitions
+# Fix Hijri Date Not Advancing After Maghrib
 
-## Problem Analysis
+## Problem
 
-The current `isAfterMaghrib()` function in `src/lib/hijri.ts` has a bug: it compares the browser's local time directly against a Maghrib time string, but doesn't account for the user's **stored timezone** (e.g., `Asia/Colombo`).
+The display shows "18 Shaban 1447" with "New Islamic day began" message, but it should show **19 Shaban 1447** since it's after Maghrib.
 
-**Current buggy flow:**
-```text
-1. User is in Colombo (UTC+5:30), it's 18:45 local time
-2. Maghrib time is fetched as "18:30" (for Colombo)
-3. isAfterMaghrib() creates a Date using browser's local time methods
-4. If browser timezone differs from user's stored timezone, comparison fails
-```
+## Root Cause
 
-The issue is especially problematic when:
-- The browser's system timezone differs from the user's saved location
-- The `new Date()` uses the browser's local timezone, not the user's intended timezone
+The `gregorianToHijri()` function in `src/lib/hijri.ts` uses `Intl.DateTimeFormat` without specifying a timezone. This causes the date conversion to use UTC interpretation, which can lead to off-by-one errors when the local time crosses midnight in a different timezone than the browser.
 
----
+When we do `dateForConversion.setDate(getDate() + 1)`, the date is modified in local time, but the Intl formatter may interpret it differently.
 
-## Solution Overview
+## Solution
 
-Update the calendar system to use **timezone-aware comparisons** by:
-
-1. Passing the user's timezone through the system
-2. Using timezone-aware time parsing in `isAfterMaghrib()`
-3. Ensuring the Aladhan API request includes the timezone parameter
+Pass the user's timezone to `gregorianToHijri()` so the Intl formatter converts the date in the correct timezone context.
 
 ---
 
@@ -34,48 +22,31 @@ Update the calendar system to use **timezone-aware comparisons** by:
 ### 1. `src/lib/hijri.ts`
 
 **Changes:**
-- Update `isAfterMaghrib()` to accept an optional timezone parameter
-- Create current time in the user's timezone for comparison
-- Update `getAdjustedHijriDate()` to pass timezone through
+
+1. Update `gregorianToHijri()` to accept an optional timezone parameter
+2. Pass the timezone to `Intl.DateTimeFormat` for accurate conversion
+3. Update `getAdjustedHijriDate()` to pass timezone through to conversion
 
 ```typescript
-// Updated signature
-export function isAfterMaghrib(
-  currentTime: Date, 
-  maghribTime: string,
-  timezone?: string
-): boolean {
-  // Parse maghrib time
-  const [hours, minutes] = maghribTime.split(':').map(Number);
-  
-  // Get current time in user's timezone
-  let currentHours: number;
-  let currentMinutes: number;
-  
-  if (timezone) {
-    // Use Intl to get time in user's timezone
-    const formatter = new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: false,
-      timeZone: timezone,
-    });
-    const parts = formatter.formatToParts(currentTime);
-    currentHours = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
-    currentMinutes = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
-  } else {
-    // Fallback to local time
-    currentHours = currentTime.getHours();
-    currentMinutes = currentTime.getMinutes();
-  }
-  
-  const currentTotalMinutes = currentHours * 60 + currentMinutes;
-  const maghribTotalMinutes = hours * 60 + minutes;
-  
-  return currentTotalMinutes >= maghribTotalMinutes;
-}
+// Updated function signature
+export function gregorianToHijri(date: Date, timezone?: string): HijriDate {
+  // Use Intl.DateTimeFormat with islamic-umalqura calendar
+  // Include timezone for accurate date interpretation
+  const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    timeZone: timezone, // Add timezone parameter
+  });
 
-// Updated signature
+  const parts = formatter.formatToParts(date);
+  // ... rest unchanged
+}
+```
+
+Update `getAdjustedHijriDate()`:
+
+```typescript
 export function getAdjustedHijriDate(
   currentTime: Date, 
   maghribTime: string | null,
@@ -84,118 +55,40 @@ export function getAdjustedHijriDate(
   const afterMaghrib = maghribTime 
     ? isAfterMaghrib(currentTime, maghribTime, timezone) 
     : false;
-  // ... rest unchanged
-}
-```
-
-### 2. `src/lib/prayerTimes.ts`
-
-**Changes:**
-- Add timezone parameter to the Aladhan API call
-- This ensures the API returns times in the correct timezone
-
-```typescript
-export async function fetchPrayerTimes(
-  date: Date,
-  location: Location,
-  method: number = 1
-): Promise<PrayerTimes> {
-  // ... existing code ...
   
-  // Add timezone if available
-  if (location.timezone) {
-    url.searchParams.set('timezone', location.timezone);
+  let dateForConversion = currentTime;
+  if (afterMaghrib) {
+    dateForConversion = new Date(currentTime);
+    dateForConversion.setDate(dateForConversion.getDate() + 1);
   }
   
-  // ... rest unchanged
-}
-```
-
-### 3. `src/contexts/CalendarContext.tsx`
-
-**Changes:**
-- Pass the timezone from location to `getAdjustedHijriDate()`
-
-```typescript
-const refreshDate = useCallback(async () => {
-  if (!location) return;
-
-  try {
-    setIsLoading(true);
-    setError(null);
-
-    const now = new Date();
-    const maghrib = await fetchMaghribTime(now, location);
-    setMaghribTime(maghrib);
-
-    // Pass timezone for accurate Maghrib comparison
-    const dualDate = getAdjustedHijriDate(now, maghrib, location.timezone);
-    setCurrentDate(dualDate);
-  } catch (err) {
-    // ... error handling
-  }
-}, [location]);
-```
-
-### 4. `src/lib/prayerTimes.ts` - `getCurrentLocation()` enhancement
-
-**Changes:**
-- When getting browser location, also detect timezone using `Intl.DateTimeFormat`
-
-```typescript
-export function getCurrentLocation(): Promise<Location> {
-  return new Promise((resolve, reject) => {
-    // ... existing geolocation code ...
-    
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        // Detect browser timezone
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        
-        resolve({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          timezone, // Include detected timezone
-        });
-      },
-      // ... error handling
-    );
-  });
+  // Pass timezone to ensure correct conversion
+  const hijri = gregorianToHijri(dateForConversion, timezone);
+  
+  return {
+    gregorian: currentTime,
+    hijri,
+    isAfterMaghrib: afterMaghrib,
+  };
 }
 ```
 
 ---
 
-## Technical Details
+## Why This Fixes the Issue
 
-### Why Intl.DateTimeFormat?
-The `Intl.DateTimeFormat` API is the standard way to handle timezone conversions in JavaScript:
-- `formatToParts()` extracts hour/minute in the target timezone
-- No external libraries needed (date-fns or luxon)
-- Works in all modern browsers
+By passing `timezone: 'Asia/Colombo'` to the Intl formatter:
 
-### Cache Invalidation
-The existing cache in `prayerTimes.ts` should work correctly since:
-- Cache key includes location coordinates
-- If timezone changes, we should clear cache (add timezone to cache key)
+- **Before fix:** `Intl.DateTimeFormat` interprets Feb 6, 2026 in an undefined timezone context
+- **After fix:** `Intl.DateTimeFormat` explicitly interprets Feb 6, 2026 as a date in Colombo timezone
 
-### Update Cache Key
-```typescript
-interface CachedPrayerTimes {
-  date: string;
-  location: { latitude: number; longitude: number };
-  timezone?: string;  // Add timezone to cache validation
-  timings: PrayerTimes;
-  fetchedAt: number;
-}
-```
+This ensures the Gregorian→Hijri conversion happens in the user's local context, giving the correct result of **19 Shaban 1447**.
 
 ---
 
-## Testing Checklist
+## Testing
 
 After implementation:
-1. Verify Hijri date shows as 19th Shaban 1447 after Maghrib
-2. Test with different browser timezones (dev tools override)
-3. Verify prayer logs save to correct Hijri date
-4. Confirm "New Islamic day began" message appears after Maghrib
+1. Verify the dashboard shows "19 Shaban 1447" (after Maghrib)
+2. Verify the Arabic date also shows "19 شعبان 1447"
+3. Test by refreshing before/after Maghrib to see the date transition
