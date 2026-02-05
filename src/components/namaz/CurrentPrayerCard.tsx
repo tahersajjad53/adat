@@ -4,11 +4,11 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { Clock, Check, SunLight, HalfMoon } from 'iconoir-react';
-import { PrayerName } from '@/hooks/usePrayerTimes';
+import { AllPrayerName } from '@/hooks/usePrayerTimes';
 
 interface CurrentPrayerCardProps {
   prayer: {
-    name: PrayerName;
+    name: AllPrayerName;
     displayName: string;
     time: string;
     isCompleted: boolean;
@@ -18,12 +18,13 @@ interface CurrentPrayerCardProps {
   label?: string;
 }
 
-const PRAYER_ICONS: Record<PrayerName, React.ComponentType<{ className?: string }>> = {
+const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
   fajr: SunLight,
   dhuhr: SunLight,
   asr: SunLight,
   maghrib: HalfMoon,
   isha: HalfMoon,
+  nisfulLayl: HalfMoon,
 };
 
 export const CurrentPrayerCard: React.FC<CurrentPrayerCardProps> = ({

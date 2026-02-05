@@ -1,12 +1,12 @@
 import React from 'react';
 import { PrayerCard } from './PrayerCard';
 import { PrayerStatus } from '@/hooks/usePrayerLog';
-import { PrayerName } from '@/hooks/usePrayerTimes';
+import { AllPrayerName } from '@/hooks/usePrayerTimes';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface PrayerListProps {
   prayers: PrayerStatus[];
-  onToggle: (prayer: PrayerName) => void;
+  onToggle: (prayer: AllPrayerName) => void;
   isLoading?: boolean;
   compact?: boolean;
 }
@@ -39,6 +39,7 @@ export const PrayerList: React.FC<PrayerListProps> = ({
           isCompleted={prayer.isCompleted}
           onToggle={() => onToggle(prayer.name)}
           compact={compact}
+          isOptional={prayer.isOptional}
         />
       ))}
     </div>

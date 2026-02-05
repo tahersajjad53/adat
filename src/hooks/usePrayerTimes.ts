@@ -3,19 +3,25 @@ import { useCalendar } from '@/contexts/CalendarContext';
 import { fetchPrayerTimes, PrayerTimes } from '@/lib/prayerTimes';
 
 export type PrayerName = 'fajr' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
+export type OptionalPrayerName = 'nisfulLayl';
+export type AllPrayerName = PrayerName | OptionalPrayerName;
 
-export const PRAYER_DISPLAY_NAMES: Record<PrayerName, string> = {
+export const PRAYER_DISPLAY_NAMES: Record<AllPrayerName, string> = {
   fajr: 'Fajr',
-  dhuhr: 'Dhuhr',
+  dhuhr: 'Zuhr',
   asr: 'Asr',
   maghrib: 'Maghrib',
   isha: 'Isha',
+  nisfulLayl: 'Nisful Layl',
 };
 
 export const PRAYER_ORDER: PrayerName[] = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+export const OPTIONAL_PRAYERS: OptionalPrayerName[] = ['nisfulLayl'];
+export const ALL_PRAYER_ORDER: AllPrayerName[] = [...PRAYER_ORDER, ...OPTIONAL_PRAYERS];
 
 interface UsePrayerTimesReturn {
   prayerTimes: Record<PrayerName, string> | null;
+  allPrayerTimes: Record<AllPrayerName, string> | null;
   isLoading: boolean;
   error: Error | null;
   refetch: () => void;
@@ -91,6 +97,7 @@ export function getPrayerStatus(
 export function usePrayerTimes(): UsePrayerTimesReturn {
   const { location } = useCalendar();
   const [prayerTimes, setPrayerTimes] = useState<Record<PrayerName, string> | null>(null);
+  const [allPrayerTimes, setAllPrayerTimes] = useState<Record<AllPrayerName, string> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -109,12 +116,19 @@ export function usePrayerTimes(): UsePrayerTimesReturn {
         const times = await fetchPrayerTimes(new Date(), location);
         
         // Extract just the 5 daily prayers and clean up time strings
-        setPrayerTimes({
+        const requiredTimes: Record<PrayerName, string> = {
           fajr: times.Fajr.split(' ')[0],
           dhuhr: times.Dhuhr.split(' ')[0],
           asr: times.Asr.split(' ')[0],
           maghrib: times.Maghrib.split(' ')[0],
           isha: times.Isha.split(' ')[0],
+        };
+        setPrayerTimes(requiredTimes);
+        
+        // Include optional prayers (Nisful Layl uses Midnight from API)
+        setAllPrayerTimes({
+          ...requiredTimes,
+          nisfulLayl: times.Midnight.split(' ')[0],
         });
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Failed to fetch prayer times'));
@@ -128,5 +142,5 @@ export function usePrayerTimes(): UsePrayerTimesReturn {
 
   const refetch = () => setRefreshKey((k) => k + 1);
 
-  return { prayerTimes, isLoading, error, refetch };
+  return { prayerTimes, allPrayerTimes, isLoading, error, refetch };
 }
