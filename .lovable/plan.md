@@ -1,114 +1,115 @@
 
-# Theme Overhaul: Cogo-Inspired Teal & Sage Palette
 
-## Color Analysis from Inspiration
+# Color Refinement: Warmer Cream & Forest Green Palette
 
-From the uploaded image, I've identified a sophisticated, calming color palette:
+## Color Analysis from New Reference
 
-| Role | Color | HSL Value | Usage |
-|------|-------|-----------|-------|
-| **Deep Teal** | Dark petrol blue | `185 45% 25%` | Primary, backgrounds, text |
-| **Sage Green** | Soft mint/sage | `100 35% 88%` | Cards, secondary surfaces |
-| **Dark Teal Text** | Navy-teal | `185 50% 20%` | Headings on light backgrounds |
-| **Off-White** | Cream/white | `30 20% 97%` | Light background, contrast |
+| Role | Current | Refined HSL | Description |
+|------|---------|-------------|-------------|
+| **Background** | `100 35% 88%` | `45 30% 92%` | Warm cream (less green, more beige) |
+| **Primary** | `185 45% 25%` | `160 45% 22%` | Deep forest green (less blue) |
+| **Accent** | `185 40% 30%` | `75 70% 50%` | Lime/chartreuse highlight |
+| **Card** | `100 30% 94%` | `45 25% 96%` | Lighter warm cream |
+| **Muted** | `100 20% 90%` | `45 20% 88%` | Subtle cream variation |
 
-## Design Philosophy
-
-This palette conveys:
-- **Calm & Spiritual**: The teal and sage evoke tranquility, appropriate for a prayer app
-- **Natural**: Earthy greens connect to nature and growth
-- **Premium**: Sophisticated color pairing feels modern yet timeless
-- **High Contrast**: Dark teal on sage maintains excellent readability
-
-## Implementation Plan
+## Implementation
 
 ### File: `src/index.css`
 
-Update the CSS custom properties with the new color scheme:
-
-**Light Mode:**
+**Light Mode Updates:**
 ```css
 :root {
-  --background: 100 35% 88%;        /* Sage green - main background */
-  --foreground: 185 50% 20%;        /* Dark teal - text */
+  --background: 45 30% 92%;         /* Warm cream */
+  --foreground: 160 50% 18%;        /* Dark forest green text */
   
-  --card: 100 30% 94%;              /* Lighter sage - cards */
-  --card-foreground: 185 50% 20%;   /* Dark teal */
+  --card: 45 25% 96%;               /* Lighter cream */
+  --card-foreground: 160 50% 18%;
   
-  --primary: 185 45% 25%;           /* Deep teal - buttons, accents */
-  --primary-foreground: 100 35% 95%;/* Light sage for contrast */
+  --popover: 45 25% 96%;
+  --popover-foreground: 160 50% 18%;
   
-  --secondary: 100 25% 92%;         /* Subtle sage variation */
-  --secondary-foreground: 185 45% 25%;
+  --primary: 160 45% 22%;           /* Deep forest green */
+  --primary-foreground: 45 30% 96%;
   
-  --muted: 100 20% 90%;             /* Muted sage */
-  --muted-foreground: 185 30% 40%;  /* Medium teal */
+  --secondary: 45 20% 90%;          /* Subtle cream */
+  --secondary-foreground: 160 45% 22%;
   
-  --accent: 185 40% 30%;            /* Teal accent */
-  --accent-foreground: 100 35% 95%;
+  --muted: 45 15% 88%;
+  --muted-foreground: 160 30% 35%;
   
-  --border: 185 20% 75%;            /* Soft teal-tinted border */
-  --input: 185 20% 80%;
-  --ring: 185 45% 25%;              /* Deep teal focus ring */
+  --accent: 75 70% 50%;             /* Lime accent */
+  --accent-foreground: 160 50% 15%;
+  
+  --border: 160 15% 80%;
+  --input: 160 15% 85%;
+  --ring: 160 45% 22%;
+  
+  --sidebar-background: 160 45% 22%;
+  --sidebar-foreground: 45 25% 94%;
+  --sidebar-primary: 45 30% 92%;
+  --sidebar-primary-foreground: 160 45% 18%;
+  --sidebar-accent: 160 40% 28%;
+  --sidebar-accent-foreground: 45 30% 96%;
+  --sidebar-border: 160 35% 28%;
+  --sidebar-ring: 75 70% 50%;
 }
 ```
 
-**Dark Mode:**
+**Dark Mode Updates:**
 ```css
 .dark {
-  --background: 185 45% 12%;        /* Very dark teal */
-  --foreground: 100 30% 92%;        /* Light sage text */
+  --background: 160 45% 10%;        /* Very dark forest */
+  --foreground: 45 25% 92%;         /* Cream text */
   
-  --card: 185 40% 16%;              /* Slightly lighter dark teal */
-  --card-foreground: 100 30% 92%;
+  --card: 160 40% 14%;
+  --card-foreground: 45 25% 92%;
   
-  --primary: 100 35% 75%;           /* Sage accent in dark mode */
-  --primary-foreground: 185 45% 15%;
+  --popover: 160 40% 14%;
+  --popover-foreground: 45 25% 92%;
   
-  --secondary: 185 35% 20%;
-  --secondary-foreground: 100 30% 88%;
+  --primary: 75 60% 55%;            /* Lime in dark mode */
+  --primary-foreground: 160 45% 12%;
   
-  --muted: 185 30% 18%;
-  --muted-foreground: 100 20% 65%;
+  --secondary: 160 35% 18%;
+  --secondary-foreground: 45 25% 88%;
   
-  --accent: 100 30% 70%;
-  --accent-foreground: 185 45% 12%;
+  --muted: 160 30% 16%;
+  --muted-foreground: 45 15% 60%;
   
-  --border: 185 30% 22%;
-  --input: 185 30% 22%;
-  --ring: 100 35% 75%;
+  --accent: 75 65% 45%;
+  --accent-foreground: 160 45% 10%;
+  
+  --border: 160 30% 20%;
+  --input: 160 30% 20%;
+  --ring: 75 60% 55%;
+  
+  --sidebar-background: 160 40% 14%;
+  --sidebar-foreground: 45 25% 92%;
+  --sidebar-primary: 75 60% 55%;
+  --sidebar-primary-foreground: 160 45% 12%;
+  --sidebar-accent: 160 35% 20%;
+  --sidebar-accent-foreground: 45 25% 92%;
+  --sidebar-border: 160 30% 20%;
+  --sidebar-ring: 75 60% 55%;
 }
 ```
 
-**Sidebar (matching theme):**
-```css
---sidebar-background: 185 45% 25%;     /* Deep teal sidebar */
---sidebar-foreground: 100 30% 92%;     /* Sage text */
---sidebar-primary: 100 35% 88%;
---sidebar-primary-foreground: 185 45% 20%;
---sidebar-accent: 185 40% 30%;
---sidebar-accent-foreground: 100 35% 95%;
---sidebar-border: 185 35% 30%;
---sidebar-ring: 100 35% 75%;
-```
+## Visual Comparison
 
-## Visual Impact
-
-| Element | Before (B&W) | After (Teal & Sage) |
-|---------|--------------|---------------------|
-| Background | Pure white | Soft sage green |
-| Text | Black | Deep teal |
-| Cards | White with gray border | Lighter sage with teal-tinted border |
-| Buttons | Black | Deep teal |
-| Sidebar | Light gray | Rich deep teal |
+| Element | Before (Teal & Sage) | After (Forest & Cream) |
+|---------|---------------------|------------------------|
+| Background | Cool minty sage | Warm cream/beige |
+| Primary buttons | Blue-teal | Rich forest green |
+| Accent/highlights | Teal | Vibrant lime |
+| Sidebar | Teal | Deep forest green |
 
 ## Files to Modify
 
-1. **`src/index.css`** - Update all CSS custom properties in `:root` and `.dark` with the new palette
+1. **`src/index.css`** - Update all CSS variables with warmer, forest-green palette
 
-## Contextual Considerations
+## Design Rationale
 
-- **Prayer App Context**: Teal and sage evoke calmness, suitable for spiritual reflection
-- **Readability**: Dark teal on sage maintains WCAG AA contrast ratios
-- **Existing Components**: All Shadcn UI components will automatically inherit the new theme via CSS variables
-- **Progress Bar**: The DailyMeter will use the primary teal color, standing out against sage backgrounds
+- **Warmer tones**: Cream background feels more inviting than cool sage
+- **True green**: Forest green (hue 160) is more natural than teal (hue 185)
+- **Lime accent**: Adds energy and modern pop, matching the reference's bright accent
+- **Better contrast**: Dark forest on cream maintains excellent readability
