@@ -3,6 +3,7 @@
  * 
  * Provides global access to current Hijri/Gregorian dates
  * with automatic Maghrib-based day transition handling
+ * Uses Aladhan API for accurate Hijri dates with Bohra sunset rule
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
