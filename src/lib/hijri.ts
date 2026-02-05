@@ -6,6 +6,18 @@
  * (used by Dawoodi Bohra community)
  */
 
+/**
+ * Bohra Calendar Offset
+ * 
+ * The Dawoodi Bohra community uses the Misri/Fatimid calendar
+ * which often differs from the Saudi (HJCoSA/Umm al-Qura) calendar
+ * by 1-2 days. This offset aligns the API output with Bohra dates.
+ * 
+ * Set to 1 to add one day to the base Aladhan date before
+ * applying the sunset rule.
+ */
+export const BOHRA_CALENDAR_OFFSET = 1;
+
 export interface HijriDate {
   day: number;
   month: number;
