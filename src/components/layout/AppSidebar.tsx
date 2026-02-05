@@ -56,7 +56,11 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4">
-        <img src={adatLogo} alt="Adat" className="h-8 w-auto" />
+        <img 
+          src={adatLogo} 
+          alt="Adat" 
+          className="h-8 w-auto brightness-0 invert md:invert-0 md:sepia md:saturate-[10] md:hue-rotate-[50deg] md:brightness-[0.85]" 
+        />
       </SidebarHeader>
 
       <SidebarContent>
