@@ -111,12 +111,12 @@ const Profile: React.FC = () => {
 
     const { error } = await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: user.id,
         full_name: fullName,
         ...locationData,
         updated_at: new Date().toISOString(),
-      })
-      .eq('id', user.id);
+      });
 
     setSaving(false);
 
