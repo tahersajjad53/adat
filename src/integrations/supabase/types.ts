@@ -14,10 +14,44 @@ export type Database = {
   }
   public: {
     Tables: {
+      prayer_logs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          gregorian_date: string
+          id: string
+          prayer: string
+          prayer_date: string
+          qaza_completed_at: string | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          gregorian_date: string
+          id?: string
+          prayer: string
+          prayer_date: string
+          qaza_completed_at?: string | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          gregorian_date?: string
+          id?: string
+          prayer?: string
+          prayer_date?: string
+          qaza_completed_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
           city: string | null
+          created_at: string | null
           full_name: string | null
           id: string
           latitude: number | null
@@ -30,6 +64,7 @@ export type Database = {
         Insert: {
           avatar_url?: string | null
           city?: string | null
+          created_at?: string | null
           full_name?: string | null
           id: string
           latitude?: number | null
@@ -42,6 +77,7 @@ export type Database = {
         Update: {
           avatar_url?: string | null
           city?: string | null
+          created_at?: string | null
           full_name?: string | null
           id?: string
           latitude?: number | null
