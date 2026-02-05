@@ -1,115 +1,100 @@
 
+# Add Nisful Layl & Rename Dhuhr to Zuhr
 
-# Color Refinement: Warmer Cream & Forest Green Palette
+## Changes Overview
 
-## Color Analysis from New Reference
+1. **Rename "Dhuhr" → "Zuhr"** in the display name
+2. **Add "Nisful Layl"** as an optional night prayer that doesn't affect the daily percentage
 
-| Role | Current | Refined HSL | Description |
-|------|---------|-------------|-------------|
-| **Background** | `100 35% 88%` | `45 30% 92%` | Warm cream (less green, more beige) |
-| **Primary** | `185 45% 25%` | `160 45% 22%` | Deep forest green (less blue) |
-| **Accent** | `185 40% 30%` | `75 70% 50%` | Lime/chartreuse highlight |
-| **Card** | `100 30% 94%` | `45 25% 96%` | Lighter warm cream |
-| **Muted** | `100 20% 90%` | `45 20% 88%` | Subtle cream variation |
+## Technical Details
 
-## Implementation
+### 1. Rename Dhuhr to Zuhr
 
-### File: `src/index.css`
+**File: `src/hooks/usePrayerTimes.ts`**
+- Update `PRAYER_DISPLAY_NAMES` to show "Zuhr" instead of "Dhuhr"
 
-**Light Mode Updates:**
-```css
-:root {
-  --background: 45 30% 92%;         /* Warm cream */
-  --foreground: 160 50% 18%;        /* Dark forest green text */
-  
-  --card: 45 25% 96%;               /* Lighter cream */
-  --card-foreground: 160 50% 18%;
-  
-  --popover: 45 25% 96%;
-  --popover-foreground: 160 50% 18%;
-  
-  --primary: 160 45% 22%;           /* Deep forest green */
-  --primary-foreground: 45 30% 96%;
-  
-  --secondary: 45 20% 90%;          /* Subtle cream */
-  --secondary-foreground: 160 45% 22%;
-  
-  --muted: 45 15% 88%;
-  --muted-foreground: 160 30% 35%;
-  
-  --accent: 75 70% 50%;             /* Lime accent */
-  --accent-foreground: 160 50% 15%;
-  
-  --border: 160 15% 80%;
-  --input: 160 15% 85%;
-  --ring: 160 45% 22%;
-  
-  --sidebar-background: 160 45% 22%;
-  --sidebar-foreground: 45 25% 94%;
-  --sidebar-primary: 45 30% 92%;
-  --sidebar-primary-foreground: 160 45% 18%;
-  --sidebar-accent: 160 40% 28%;
-  --sidebar-accent-foreground: 45 30% 96%;
-  --sidebar-border: 160 35% 28%;
-  --sidebar-ring: 75 70% 50%;
-}
+```typescript
+export const PRAYER_DISPLAY_NAMES: Record<PrayerName, string> = {
+  fajr: 'Fajr',
+  dhuhr: 'Zuhr',  // Changed from 'Dhuhr'
+  asr: 'Asr',
+  maghrib: 'Maghrib',
+  isha: 'Isha',
+};
 ```
 
-**Dark Mode Updates:**
-```css
-.dark {
-  --background: 160 45% 10%;        /* Very dark forest */
-  --foreground: 45 25% 92%;         /* Cream text */
-  
-  --card: 160 40% 14%;
-  --card-foreground: 45 25% 92%;
-  
-  --popover: 160 40% 14%;
-  --popover-foreground: 45 25% 92%;
-  
-  --primary: 75 60% 55%;            /* Lime in dark mode */
-  --primary-foreground: 160 45% 12%;
-  
-  --secondary: 160 35% 18%;
-  --secondary-foreground: 45 25% 88%;
-  
-  --muted: 160 30% 16%;
-  --muted-foreground: 45 15% 60%;
-  
-  --accent: 75 65% 45%;
-  --accent-foreground: 160 45% 10%;
-  
-  --border: 160 30% 20%;
-  --input: 160 30% 20%;
-  --ring: 75 60% 55%;
-  
-  --sidebar-background: 160 40% 14%;
-  --sidebar-foreground: 45 25% 92%;
-  --sidebar-primary: 75 60% 55%;
-  --sidebar-primary-foreground: 160 45% 12%;
-  --sidebar-accent: 160 35% 20%;
-  --sidebar-accent-foreground: 45 25% 92%;
-  --sidebar-border: 160 30% 20%;
-  --sidebar-ring: 75 60% 55%;
-}
+### 2. Add Nisful Layl (Optional Prayer)
+
+**What is Nisful Layl?**
+- Night prayer performed at the midpoint between Maghrib and Fajr
+- Time calculation: `(Maghrib + Fajr next day) / 2` or use API's `Midnight` value
+
+**File: `src/hooks/usePrayerTimes.ts`**
+- Add new type for all prayers including optional ones
+- Create separate arrays for required vs optional prayers
+- Include Midnight time from API
+
+```typescript
+export type PrayerName = 'fajr' | 'dhuhr' | 'asr' | 'maghrib' | 'isha';
+export type OptionalPrayerName = 'nisfulLayl';
+export type AllPrayerName = PrayerName | OptionalPrayerName;
+
+export const PRAYER_DISPLAY_NAMES: Record<AllPrayerName, string> = {
+  fajr: 'Fajr',
+  dhuhr: 'Zuhr',
+  asr: 'Asr',
+  maghrib: 'Maghrib',
+  isha: 'Isha',
+  nisfulLayl: 'Nisful Layl',
+};
+
+export const PRAYER_ORDER: PrayerName[] = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+export const OPTIONAL_PRAYERS: OptionalPrayerName[] = ['nisfulLayl'];
+export const ALL_PRAYER_ORDER: AllPrayerName[] = [...PRAYER_ORDER, ...OPTIONAL_PRAYERS];
 ```
 
-## Visual Comparison
+**File: `src/hooks/usePrayerLog.ts`**
+- Include Nisful Layl in prayers list with `isOptional: true` flag
+- Only count required prayers (5) for percentage calculation
+- Calculate Nisful Layl time from Midnight API response
 
-| Element | Before (Teal & Sage) | After (Forest & Cream) |
-|---------|---------------------|------------------------|
-| Background | Cool minty sage | Warm cream/beige |
-| Primary buttons | Blue-teal | Rich forest green |
-| Accent/highlights | Teal | Vibrant lime |
-| Sidebar | Teal | Deep forest green |
+```typescript
+export interface PrayerStatus {
+  name: AllPrayerName;
+  displayName: string;
+  time: string;
+  isCompleted: boolean;
+  completedAt: Date | null;
+  status: 'upcoming' | 'current' | 'completed' | 'missed';
+  isOptional: boolean;  // New field
+}
+
+// Percentage calculation (unchanged - only counts 5 required prayers)
+const completedRequired = prayers.filter(p => !p.isOptional && p.isCompleted).length;
+const percentage = Math.round((completedRequired / 5) * 100);
+```
+
+**File: `src/components/namaz/PrayerCard.tsx`**
+- Add visual indicator for optional prayers (e.g., "(Optional)" label or different styling)
+
+**File: `src/components/namaz/PrayerList.tsx`**
+- Render optional prayers with distinct styling (slightly muted or with badge)
+
+## Visual Design
+
+| Prayer | Time | Style |
+|--------|------|-------|
+| Fajr | 05:30 | Normal card |
+| Zuhr | 12:15 | Normal card |
+| Asr | 15:45 | Normal card |
+| Maghrib | 18:30 | Normal card |
+| Isha | 20:00 | Normal card |
+| Nisful Layl | 00:15 | Muted/optional style + badge |
 
 ## Files to Modify
 
-1. **`src/index.css`** - Update all CSS variables with warmer, forest-green palette
-
-## Design Rationale
-
-- **Warmer tones**: Cream background feels more inviting than cool sage
-- **True green**: Forest green (hue 160) is more natural than teal (hue 185)
-- **Lime accent**: Adds energy and modern pop, matching the reference's bright accent
-- **Better contrast**: Dark forest on cream maintains excellent readability
+1. `src/hooks/usePrayerTimes.ts` - Add types, rename Dhuhr, add Midnight/Nisful Layl
+2. `src/hooks/usePrayerLog.ts` - Add optional prayer handling, exclude from percentage
+3. `src/components/namaz/PrayerCard.tsx` - Add optional prayer styling
+4. `src/components/namaz/PrayerList.tsx` - Render optional prayers with distinction
+5. `src/lib/prayerTimes.ts` - Ensure Midnight is available in the response
