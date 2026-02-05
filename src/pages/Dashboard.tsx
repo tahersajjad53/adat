@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
       {/* Main content */}
       <main className="container py-12">
         <div className="max-w-2xl mx-auto text-center space-y-6">
-          <h1 className="text-4xl font-bold tracking-tight">
+          <h1 className="text-4xl font-bold tracking-tight font-display">
             Assalamu Alaikum, {displayName}
           </h1>
           <p className="text-lg text-muted-foreground">

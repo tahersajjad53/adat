@@ -60,7 +60,7 @@ const Auth: React.FC = () => {
     <AuthLayout>
       <div className="space-y-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight">Welcome Back</h1>
+          <h1 className="text-3xl font-bold tracking-tight font-display">Welcome Back</h1>
           <p className="text-muted-foreground">
             Enter your credentials to access your account
           </p>

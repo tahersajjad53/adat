@@ -13,7 +13,8 @@ export default {
       },
     },
     fontFamily: {
-      sans: ['"Zilla Slab"', 'Georgia', 'serif'],
+      sans: ['Inter', 'system-ui', 'sans-serif'],
+      display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
     },
     extend: {
       colors: {

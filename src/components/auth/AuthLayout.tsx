@@ -20,7 +20,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
         <div className="relative z-10 flex flex-col justify-between p-12 text-primary-foreground">
           <img src={adatLogo} alt="Adat" className="w-24 h-auto invert" />
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-3">Your Spiritual Life, Organized</h2>
+            <h2 className="text-3xl font-bold mb-3 font-display">Your Spiritual Life, Organized</h2>
             <p className="text-lg opacity-90">
               Track prayers, manage dues, and cultivate daily habits with intention.
             </p>
