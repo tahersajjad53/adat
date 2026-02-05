@@ -77,8 +77,11 @@ const Onboarding: React.FC = () => {
 
     const { error } = await supabase
       .from('profiles')
-      .update(locationData)
-      .eq('id', user.id);
+      .upsert({ 
+        id: user.id,
+        ...locationData,
+        updated_at: new Date().toISOString()
+      });
 
     setSaving(false);
 
@@ -110,13 +113,14 @@ const Onboarding: React.FC = () => {
 
     await supabase
       .from('profiles')
-      .update({
+      .upsert({
+        id: user.id,
         latitude: mecca.latitude,
         longitude: mecca.longitude,
         city: mecca.name,
         timezone: mecca.timezone,
-      })
-      .eq('id', user.id);
+        updated_at: new Date().toISOString()
+      });
 
     setSaving(false);
     navigate('/dashboard');
