@@ -45,9 +45,13 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
         .from('profiles')
         .select('latitude, longitude, city, timezone')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (fetchError) throw fetchError;
+      if (fetchError) {
+        console.error('Error fetching profile location:', fetchError);
+        setLocationState(DEFAULT_LOCATION);
+        return;
+      }
 
       if (data?.latitude && data?.longitude) {
         setLocationState({

@@ -18,11 +18,18 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       if (user) {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from('profiles')
           .select('full_name, latitude')
           .eq('id', user.id)
-          .single();
+          .maybeSingle();
+        
+        if (error) {
+          console.error('Error fetching profile:', error);
+          // If profile doesn't exist, user needs onboarding
+          setNeedsOnboarding(true);
+          return;
+        }
         
         if (data) {
           if (data.full_name) {
@@ -30,6 +37,9 @@ const Dashboard: React.FC = () => {
           }
           // Check if user needs onboarding (no location set)
           setNeedsOnboarding(data.latitude === null);
+        } else {
+          // No profile found, needs onboarding
+          setNeedsOnboarding(true);
         }
       }
     };
