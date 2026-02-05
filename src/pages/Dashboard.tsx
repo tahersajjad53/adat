@@ -3,13 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { MapPin, NavArrowRight, WarningCircle } from 'iconoir-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { MapPin, SunLight, HalfMoon, Check } from 'iconoir-react';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { DailyMeter } from '@/components/namaz/DailyMeter';
-import { CurrentPrayerCard } from '@/components/namaz/CurrentPrayerCard';
+import { TimeOfDayCard } from '@/components/namaz/TimeOfDayCard';
 import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
+import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/usePrayerTimes';
+
+const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
+  fajr: SunLight,
+  dhuhr: SunLight,
+  asr: SunLight,
+  maghrib: HalfMoon,
+  isha: HalfMoon,
+  nisfulLayl: HalfMoon,
+};
 
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
@@ -20,6 +31,11 @@ const Dashboard: React.FC = () => {
 
   const { prayers, togglePrayer, percentage, completedCount, totalCount, currentPrayer, nextPrayer, isLoading: prayersLoading } = usePrayerLog();
   const { unfulfilledCount } = useMissedPrayers();
+  const { prayerTimes } = usePrayerTimes();
+
+  // Get current prayer window for theming
+  const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
+  const currentPrayerName = currentPrayerWindow?.current || null;
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -55,10 +71,9 @@ const Dashboard: React.FC = () => {
     }
   }, [needsOnboarding, navigate]);
 
-  const displayName = fullName || user?.email?.split('@')[0] || 'User';
-
   // Determine which prayer to show (current or next upcoming)
   const prayerToShow = currentPrayer || nextPrayer;
+  const PrayerIcon = prayerToShow ? PRAYER_ICONS[prayerToShow.name] : SunLight;
 
   if (needsOnboarding === null) {
     return (
@@ -71,45 +86,69 @@ const Dashboard: React.FC = () => {
   return (
     <div className="container py-8">
       <div className="max-w-2xl mx-auto space-y-8">
-        {/* Date Display */}
-        <div className="flex flex-col items-center space-y-4">
-          <DateDisplay showLocation className="text-center" />
+        {/* Unified Time-Aware Card */}
+        <TimeOfDayCard currentPrayer={currentPrayerName}>
+          {/* Top row: Date + Progress */}
+          <div className="flex items-start justify-between">
+            <DateDisplay showLocation compact variant="light" />
+            <DailyMeter percentage={percentage} compact variant="light" />
+          </div>
+
+          {/* Location prompt if needed */}
           {!location?.city && (
             <Button
               variant="outline"
               size="sm"
               onClick={requestLocationPermission}
-              className="gap-2"
+              className="mt-3 gap-2 border-white/30 text-white hover:bg-white/10 hover:text-white"
             >
               <MapPin className="h-4 w-4" />
               Set your location
             </Button>
           )}
-        </div>
 
-        {/* Daily Meter */}
-        <div className="p-6 border border-border rounded-xl bg-card">
-          <DailyMeter percentage={percentage} />
-        </div>
+          {/* Divider */}
+          <div className="my-4 border-t border-white/20" />
 
-        {/* Current Prayer */}
-        {prayerToShow && (
-          <CurrentPrayerCard
-            prayer={prayerToShow}
-            onToggle={() => togglePrayer(prayerToShow.name)}
-            label={currentPrayer ? 'Current Prayer' : 'Next Prayer'}
-          />
-        )}
+          {/* Next Namaz section */}
+          {prayerToShow ? (
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-sm text-white/70">
+                  {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
+                </span>
+                <div className="flex items-center gap-3 mt-1">
+                  <div className="rounded-full p-2 bg-white/20">
+                    <PrayerIcon className="h-5 w-5 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-white font-display">
+                      {prayerToShow.displayName}
+                    </h3>
+                    <span className="text-sm text-white/80">{prayerToShow.time}</span>
+                  </div>
+                </div>
+              </div>
 
-        {/* View All Link */}
-        <Button
-          variant="outline"
-          className="w-full justify-between"
-          onClick={() => navigate('/namaz')}
-        >
-          <span>View all prayers</span>
-          <NavArrowRight className="h-4 w-4" />
-        </Button>
+              {/* Checkbox with completion indicator */}
+              <div className="flex items-center gap-2">
+                {prayerToShow.isCompleted && (
+                  <div className="flex items-center gap-1 text-white/80 text-sm">
+                    <Check className="h-4 w-4" />
+                    <span>Done</span>
+                  </div>
+                )}
+                <Checkbox
+                  checked={prayerToShow.isCompleted}
+                  onCheckedChange={() => togglePrayer(prayerToShow.name)}
+                  className="h-6 w-6 border-white/50 data-[state=checked]:bg-white/30 data-[state=checked]:text-white"
+                />
+              </div>
+            </div>
+          ) : (
+            <p className="text-white/70 text-sm">No prayer information available</p>
+          )}
+        </TimeOfDayCard>
 
         {/* Coming Soon Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
