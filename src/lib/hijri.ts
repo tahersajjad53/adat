@@ -72,6 +72,39 @@ export function gregorianToHijri(date: Date, timezone?: string): HijriDate {
 }
 
 /**
+ * Advance a Hijri date by 1 day, handling month/year rollovers
+ * Used for Bohra sunset rule: Islamic day begins at Maghrib
+ */
+function advanceHijriDay(hijri: HijriDate): HijriDate {
+  // Hijri months alternate between 30 and 29 days
+  // Odd months (1,3,5,7,9,11) = 30 days
+  // Even months (2,4,6,8,10,12) = 29 days (Dhul Hijjah can be 30 in leap years)
+  const daysInMonth = hijri.month % 2 === 1 ? 30 : 29;
+  
+  let newDay = hijri.day + 1;
+  let newMonth = hijri.month;
+  let newYear = hijri.year;
+  
+  if (newDay > daysInMonth) {
+    newDay = 1;
+    newMonth += 1;
+    
+    if (newMonth > 12) {
+      newMonth = 1;
+      newYear += 1;
+    }
+  }
+  
+  return {
+    day: newDay,
+    month: newMonth,
+    year: newYear,
+    monthName: HIJRI_MONTHS[newMonth - 1]?.name || '',
+    monthNameArabic: HIJRI_MONTHS[newMonth - 1]?.arabic || '',
+  };
+}
+
+/**
  * Check if current time is after Maghrib
  * @param currentTime - Current time as Date
  * @param maghribTime - Maghrib time as "HH:MM" string (24-hour format)
@@ -115,6 +148,10 @@ export function isAfterMaghrib(
  * Get the adjusted Hijri date based on Maghrib time
  * If current time is after Maghrib, the Hijri date advances by 1 day
  * 
+ * This implements the Bohra sunset rule: the Islamic day begins at Maghrib,
+ * not at midnight. Instead of relying on Intl's calendar for +1 day,
+ * we manually increment the Hijri date to ensure consistent advancement.
+ * 
  * @param currentTime - Current local time
  * @param maghribTime - Maghrib time as "HH:MM" string (24-hour format)
  * @param timezone - Optional IANA timezone string for accurate comparison
@@ -128,15 +165,14 @@ export function getAdjustedHijriDate(
     ? isAfterMaghrib(currentTime, maghribTime, timezone) 
     : false;
   
-  // If after Maghrib, we need to add 1 day to get the "Islamic day"
-  // Use millisecond-based addition to avoid browser timezone quirks with setDate()
-  let dateForConversion = currentTime;
-  if (afterMaghrib) {
-    // Add exactly 24 hours in milliseconds for timezone-safe day advancement
-    dateForConversion = new Date(currentTime.getTime() + 24 * 60 * 60 * 1000);
-  }
+  // Get base Hijri date for the current moment (no +24h adjustment)
+  let hijri = gregorianToHijri(currentTime, timezone);
   
-  const hijri = gregorianToHijri(dateForConversion, timezone);
+  // Bohra sunset rule: If after Maghrib, the Islamic day advances
+  // Manually increment the Hijri day by 1 (handles month/year rollovers)
+  if (afterMaghrib) {
+    hijri = advanceHijriDay(hijri);
+  }
   
   return {
     gregorian: currentTime,
