@@ -1,119 +1,134 @@
 
+# Fix: Onboarding Loop - Profile Row Not Being Created
 
-# Onboarding & Profile Management Implementation
+## Problem Summary
 
-## Overview
-
-Adding location selection during onboarding and a profile management page, using a curated list of major cities including Sri Lanka.
-
----
-
-## Files to Create
-
-| File | Purpose |
-|------|---------|
-| `src/data/cities.ts` | Curated city list with coordinates (including Sri Lanka) |
-| `src/pages/Onboarding.tsx` | Post-signup location selection step |
-| `src/pages/Profile.tsx` | Profile settings page |
-| `src/components/profile/LocationSelector.tsx` | Searchable city selector with GPS option |
+Users cannot access the dashboard after completing onboarding. They are redirected back to the onboarding page with an empty city field in an infinite loop.
 
 ---
 
-## Cities Data (src/data/cities.ts)
+## Root Cause Analysis
 
-Curated list organized by region, including:
+After investigating the network requests and database state, I identified the following chain of issues:
 
-**India:** Mumbai, Surat, Ahmedabad, Vadodara, Udaipur, Ujjain, Indore, Delhi, Bangalore, Chennai, Hyderabad, Kolkata, Pune
+1. **Missing profile rows**: The `handle_new_user` trigger was created AFTER users had already signed up. The profiles table is empty despite having 2 users in `auth.users`.
 
-**Pakistan:** Karachi
+2. **Onboarding uses UPDATE instead of UPSERT**: The current code attempts to update a profile row that doesn't exist. PostgreSQL's UPDATE on non-existent rows returns success (0 rows affected), so no error is thrown but no data is saved.
 
-**Sri Lanka:** Colombo, Kandy
-
-**Middle East:** Dubai, Abu Dhabi, Sharjah, Muscat, Bahrain, Kuwait City, Doha, Riyadh, Jeddah
-
-**Africa:** Nairobi, Mombasa, Dar es Salaam, Cairo
-
-**UK/Europe:** London, Manchester, Birmingham, Paris
-
-**North America:** New York, Chicago, Los Angeles, Houston, Toronto, Vancouver
-
-**Asia Pacific:** Singapore, Hong Kong, Sydney, Melbourne
-
-**Holy Cities:** Mecca, Medina
-
-Each city includes: `id`, `name`, `country`, `countryCode`, `latitude`, `longitude`, `timezone`
+3. **Dashboard redirect logic**: When the dashboard fetches the profile and gets an empty result, it sets `needsOnboarding = true`, redirecting back to onboarding.
 
 ---
 
-## LocationSelector Component
+## Evidence from Investigation
 
-Features:
-- Uses existing Command component (cmdk) for searchable dropdown
-- Groups cities by country with flag emoji
-- "Use my current location" button with GPS icon
-- Loading state while fetching GPS coordinates
-- Shows selected city prominently
+**Network Request Evidence:**
+- PATCH to `/profiles` returns status 204 (success) but updates 0 rows
+- Subsequent GET to `/profiles` returns `[]` (empty array)
+- Dashboard sees no profile data and redirects to onboarding
 
----
-
-## Onboarding Page (src/pages/Onboarding.tsx)
-
-Design:
-- Reuses AuthLayout for consistent styling with login/signup
-- Welcome message with user's name
-- Clear explanation: "Select your location for accurate prayer times"
-- LocationSelector component
-- "Continue to Dashboard" button
-- Optional "Skip" link (defaults to Mecca)
+**Database Evidence:**
+- `auth.users` table has 2 users (including `8367e76f-fbcf-4e09-aab7-4d662c0101ed`)
+- `profiles` table has 0 rows
+- Trigger `on_auth_user_created` exists but only fires for NEW users
 
 ---
 
-## Profile Page (src/pages/Profile.tsx)
+## Solution
 
-Sections:
-1. **Personal Info** - Full name (editable)
-2. **Location Settings** - LocationSelector component
-3. **Prayer Times Preview** - Shows current Maghrib time for selected location
-4. **Account Info** - Email (read-only)
+### Part 1: Fix Onboarding Page
 
-Features:
-- Save button with loading state
-- Success toast on save
-- Navigation back to dashboard
+Change from `.update()` to `.upsert()` so the profile row is created if it doesn't exist.
 
----
+**File:** `src/pages/Onboarding.tsx`
 
-## Routing Updates (src/App.tsx)
+**Changes:**
+- Replace `.update(locationData).eq('id', user.id)` with `.upsert({ id: user.id, ...locationData })`
+- This creates the row if it doesn't exist, or updates it if it does
+- Apply the same fix to the `handleSkip` function
 
-New routes:
-- `/auth/onboarding` - Protected, shows after signup
-- `/profile` - Protected, accessible from dashboard
+### Part 2: Database Migration for Existing Users
 
----
+Create a one-time migration to insert profile rows for any existing users who don't have profiles. This ensures existing users aren't stuck.
 
-## Onboarding Redirect Logic
-
-Update Dashboard.tsx to check if user needs onboarding:
-- Fetch profile on load
-- If `latitude` is null/undefined, redirect to `/auth/onboarding`
-- This ensures new users complete location setup
+**SQL Migration:**
+```sql
+INSERT INTO public.profiles (id, updated_at)
+SELECT id, now()
+FROM auth.users
+WHERE id NOT IN (SELECT id FROM public.profiles)
+ON CONFLICT (id) DO NOTHING;
+```
 
 ---
 
-## Dashboard Header Update
+## Files to Modify
 
-Add profile link:
-- User icon/avatar next to sign out button
-- Links to `/profile` page
+| File | Change |
+|------|--------|
+| `src/pages/Onboarding.tsx` | Change `.update()` to `.upsert()` in `handleContinue` and `handleSkip` |
+| New migration file | Insert missing profile rows for existing users |
 
 ---
 
-## Implementation Order
+## Code Changes
 
-1. Create `src/data/cities.ts` with curated city list
-2. Create `src/components/profile/LocationSelector.tsx` 
-3. Create `src/pages/Onboarding.tsx`
-4. Create `src/pages/Profile.tsx`
-5. Update `src/App.tsx` with new routes
-6. Update `src/pages/Dashboard.tsx` with onboarding check and profile link
+### Onboarding.tsx - handleContinue function
 
+```typescript
+// Before (line 78-81):
+const { error } = await supabase
+  .from('profiles')
+  .update(locationData)
+  .eq('id', user.id);
+
+// After:
+const { error } = await supabase
+  .from('profiles')
+  .upsert({ 
+    id: user.id,
+    ...locationData,
+    updated_at: new Date().toISOString()
+  });
+```
+
+### Onboarding.tsx - handleSkip function
+
+```typescript
+// Before (line 111-119):
+await supabase
+  .from('profiles')
+  .update({...})
+  .eq('id', user.id);
+
+// After:
+await supabase
+  .from('profiles')
+  .upsert({
+    id: user.id,
+    latitude: mecca.latitude,
+    longitude: mecca.longitude,
+    city: mecca.name,
+    timezone: mecca.timezone,
+    updated_at: new Date().toISOString()
+  });
+```
+
+---
+
+## Why This Fix Works
+
+1. **UPSERT creates or updates**: Unlike UPDATE which only modifies existing rows, UPSERT will INSERT the row if it doesn't exist, or UPDATE if it does.
+
+2. **Migration backfills existing users**: The one-time migration ensures all existing users get profile rows, even if they signed up before the trigger was created.
+
+3. **Future users are covered**: The existing `handle_new_user` trigger will create profiles for new signups automatically.
+
+---
+
+## Testing After Fix
+
+1. Refresh the onboarding page
+2. Select a city (e.g., Colombo, Sri Lanka)
+3. Click "Continue to Dashboard"
+4. Verify you land on the dashboard and stay there
+5. Verify the date display shows your location
