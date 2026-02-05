@@ -46,6 +46,7 @@ export interface Location {
 interface CachedPrayerTimes {
   date: string; // YYYY-MM-DD format
   location: { latitude: number; longitude: number };
+  timezone?: string; // IANA timezone for cache validation
   timings: PrayerTimes;
   fetchedAt: number;
 }
@@ -68,9 +69,10 @@ function getCachedPrayerTimes(date: string, location: Location): PrayerTimes | n
     const isSameLocation = 
       Math.abs(data.location.latitude - location.latitude) < 0.01 &&
       Math.abs(data.location.longitude - location.longitude) < 0.01;
+    const isSameTimezone = data.timezone === location.timezone;
     const isNotExpired = Date.now() - data.fetchedAt < CACHE_DURATION_MS;
 
-    if (isSameDate && isSameLocation && isNotExpired) {
+    if (isSameDate && isSameLocation && isSameTimezone && isNotExpired) {
       return data.timings;
     }
 
@@ -88,6 +90,7 @@ function cachePrayerTimes(date: string, location: Location, timings: PrayerTimes
     const data: CachedPrayerTimes = {
       date,
       location: { latitude: location.latitude, longitude: location.longitude },
+      timezone: location.timezone,
       timings,
       fetchedAt: Date.now(),
     };
@@ -140,6 +143,11 @@ export async function fetchPrayerTimes(
   url.searchParams.set('latitude', location.latitude.toString());
   url.searchParams.set('longitude', location.longitude.toString());
   url.searchParams.set('method', method.toString());
+  
+  // Add timezone if available for accurate local times
+  if (location.timezone) {
+    url.searchParams.set('timezone', location.timezone);
+  }
 
   const response = await fetch(url.toString());
   
@@ -177,9 +185,13 @@ export function getCurrentLocation(): Promise<Location> {
 
     navigator.geolocation.getCurrentPosition(
       (position) => {
+        // Detect browser timezone
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        
         resolve({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
+          timezone,
         });
       },
       (error) => {

@@ -116,14 +116,15 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
       const maghrib = await fetchMaghribTime(now, location);
       setMaghribTime(maghrib);
 
-      const dualDate = getAdjustedHijriDate(now, maghrib);
+      // Pass timezone for accurate Maghrib comparison
+      const dualDate = getAdjustedHijriDate(now, maghrib, location.timezone);
       setCurrentDate(dualDate);
     } catch (err) {
       console.error('Failed to refresh date:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch prayer times');
       
       // Fallback: show date without Maghrib adjustment
-      const dualDate = getAdjustedHijriDate(new Date(), null);
+      const dualDate = getAdjustedHijriDate(new Date(), null, location?.timezone);
       setCurrentDate(dualDate);
     } finally {
       setIsLoading(false);

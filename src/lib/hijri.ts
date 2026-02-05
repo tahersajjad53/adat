@@ -66,14 +66,40 @@ export function gregorianToHijri(date: Date): HijriDate {
  * Check if current time is after Maghrib
  * @param currentTime - Current time as Date
  * @param maghribTime - Maghrib time as "HH:MM" string (24-hour format)
+ * @param timezone - Optional IANA timezone string (e.g., "Asia/Colombo")
  */
-export function isAfterMaghrib(currentTime: Date, maghribTime: string): boolean {
+export function isAfterMaghrib(
+  currentTime: Date, 
+  maghribTime: string,
+  timezone?: string
+): boolean {
   const [hours, minutes] = maghribTime.split(':').map(Number);
   
-  const maghribDate = new Date(currentTime);
-  maghribDate.setHours(hours, minutes, 0, 0);
+  // Get current time in user's timezone
+  let currentHours: number;
+  let currentMinutes: number;
   
-  return currentTime >= maghribDate;
+  if (timezone) {
+    // Use Intl to get time in user's timezone
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+      timeZone: timezone,
+    });
+    const parts = formatter.formatToParts(currentTime);
+    currentHours = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
+    currentMinutes = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
+  } else {
+    // Fallback to browser's local time
+    currentHours = currentTime.getHours();
+    currentMinutes = currentTime.getMinutes();
+  }
+  
+  const currentTotalMinutes = currentHours * 60 + currentMinutes;
+  const maghribTotalMinutes = hours * 60 + minutes;
+  
+  return currentTotalMinutes >= maghribTotalMinutes;
 }
 
 /**
@@ -82,9 +108,16 @@ export function isAfterMaghrib(currentTime: Date, maghribTime: string): boolean 
  * 
  * @param currentTime - Current local time
  * @param maghribTime - Maghrib time as "HH:MM" string (24-hour format)
+ * @param timezone - Optional IANA timezone string for accurate comparison
  */
-export function getAdjustedHijriDate(currentTime: Date, maghribTime: string | null): DualDate {
-  const afterMaghrib = maghribTime ? isAfterMaghrib(currentTime, maghribTime) : false;
+export function getAdjustedHijriDate(
+  currentTime: Date, 
+  maghribTime: string | null,
+  timezone?: string
+): DualDate {
+  const afterMaghrib = maghribTime 
+    ? isAfterMaghrib(currentTime, maghribTime, timezone) 
+    : false;
   
   // If after Maghrib, we need to add 1 day to get the "Islamic day"
   let dateForConversion = currentTime;
