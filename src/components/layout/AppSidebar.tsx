@@ -87,32 +87,30 @@ export function AppSidebar() {
       <SidebarFooter>
         <SidebarSeparator />
         <div className="p-2 space-y-2">
-          {!isCollapsed && (
-            <div className="px-2 py-1">
-              <p className="font-medium text-sm truncate">{displayName}</p>
-              <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-            </div>
-          )}
-          <div className={isCollapsed ? 'space-y-1' : 'flex gap-1'}>
-            <Button
-              variant="ghost"
-              size={isCollapsed ? 'icon' : 'sm'}
-              onClick={() => navigate('/profile')}
-              className={isCollapsed ? 'w-full' : 'flex-1 justify-start gap-2'}
-            >
-              <User className="h-4 w-4" />
-              {!isCollapsed && <span>Profile</span>}
-            </Button>
-            <Button
-              variant="ghost"
-              size={isCollapsed ? 'icon' : 'sm'}
-              onClick={signOut}
-              className={isCollapsed ? 'w-full' : 'flex-1 justify-start gap-2'}
-            >
-              <LogOut className="h-4 w-4" />
-              {!isCollapsed && <span>Sign out</span>}
-            </Button>
-          </div>
+          {/* Clickable user info - navigates to profile */}
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-full flex items-center gap-3 px-2 py-2 rounded-md hover:bg-sidebar-accent transition-colors text-left"
+          >
+            <User className="h-5 w-5 shrink-0" />
+            {!isCollapsed && (
+              <div className="min-w-0">
+                <p className="font-medium text-sm truncate">{displayName}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+              </div>
+            )}
+          </button>
+          
+          {/* Sign out button - full width */}
+          <Button
+            variant="ghost"
+            size={isCollapsed ? 'icon' : 'sm'}
+            onClick={signOut}
+            className="w-full justify-start gap-2"
+          >
+            <LogOut className="h-4 w-4" />
+            {!isCollapsed && <span>Sign out</span>}
+          </Button>
         </div>
       </SidebarFooter>
     </Sidebar>
