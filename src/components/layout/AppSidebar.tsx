@@ -58,12 +58,7 @@ export function AppSidebar() {
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3">
-          <img src={adatLogo} alt="Adat" className="h-8 w-auto" />
-          {!isCollapsed && (
-            <span className="font-display font-bold text-lg">Adat</span>
-          )}
-        </div>
+        <img src={adatLogo} alt="Adat" className="h-8 w-auto" />
       </SidebarHeader>
 
       <SidebarContent>
