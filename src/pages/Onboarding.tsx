@@ -7,7 +7,7 @@ import LocationSelector from '@/components/profile/LocationSelector';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { type City, findCityById } from '@/data/cities';
-import { Loader2 } from 'lucide-react';
+import { Refresh } from 'iconoir-react';
 
 const Onboarding: React.FC = () => {
   const { user } = useAuth();
@@ -161,7 +161,7 @@ const Onboarding: React.FC = () => {
           >
             {saving ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                <Refresh className="mr-2 h-4 w-4 animate-spin" />
                 Saving...
               </>
             ) : (

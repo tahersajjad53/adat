@@ -3,7 +3,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { Clock, Check, Sunrise, Sun, Sunset, Moon } from 'lucide-react';
+import { Clock, Check, SunLight, HalfMoon } from 'iconoir-react';
 import { PrayerName } from '@/hooks/usePrayerTimes';
 
 interface CurrentPrayerCardProps {
@@ -19,11 +19,11 @@ interface CurrentPrayerCardProps {
 }
 
 const PRAYER_ICONS: Record<PrayerName, React.ComponentType<{ className?: string }>> = {
-  fajr: Sunrise,
-  dhuhr: Sun,
-  asr: Sun,
-  maghrib: Sunset,
-  isha: Moon,
+  fajr: SunLight,
+  dhuhr: SunLight,
+  asr: SunLight,
+  maghrib: HalfMoon,
+  isha: HalfMoon,
 };
 
 export const CurrentPrayerCard: React.FC<CurrentPrayerCardProps> = ({

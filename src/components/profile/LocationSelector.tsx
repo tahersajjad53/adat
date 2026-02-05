@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, ChevronsUpDown, MapPin, Loader2 } from 'lucide-react';
+import { Check, NavArrowDown, MapPin, Refresh } from 'iconoir-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -83,7 +83,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ value, onChange, cl
             ) : (
               <span className="text-muted-foreground">Select your city...</span>
             )}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+            <NavArrowDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[var(--radix-popover-trigger-width)] p-0 bg-popover z-50" align="start">
@@ -127,7 +127,7 @@ const LocationSelector: React.FC<LocationSelectorProps> = ({ value, onChange, cl
       >
         {gpsLoading ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Refresh className="mr-2 h-4 w-4 animate-spin" />
             Getting location...
           </>
         ) : (

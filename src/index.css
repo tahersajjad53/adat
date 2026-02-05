@@ -100,3 +100,9 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
