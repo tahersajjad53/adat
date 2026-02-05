@@ -1,152 +1,157 @@
 
+# Unify Dashboard with Time-Aware Visual Card
 
-# Time-Aware Visual Card with Geometric Design
+## Overview
 
-## Concept
+Bring the same dynamic, time-aware visual card design from the Namaz page to the Dashboard. Merge the date/location, progress meter, and next prayer information into a single unified card experience with dynamic gradient backgrounds and geometric shapes.
 
-Create an immersive header card that dynamically changes its visual identity based on the current prayer window. Using abstract geometric shapes and gradient backgrounds inspired by the reference image - creating a premium, modern aesthetic.
+## Current Dashboard Layout
 
-## Visual Design
+```text
+        [Sun] 12 Rajab 1447
+         Wednesday, Feb 5
+             [📍 London]
+    
+    ┌──────────────────────────┐
+    │  40%      Daily Progress │
+    │  ████████░░░░░░░░░░░░░░░ │
+    │  You're on track         │
+    └──────────────────────────┘
+
+    ┌──────────────────────────┐
+    │  Next Prayer             │
+    │  [☀] Zuhr      12:15  ☐  │
+    └──────────────────────────┘
+
+    [ View all prayers → ]        ← REMOVE THIS
+
+    [Coming Soon Cards...]
+```
+
+## New Dashboard Layout
 
 ```text
 ┌─────────────────────────────────────────────────┐
-│                  ╔═══════╗                      │
-│   ☀ 19 Shaban   ║░░░░░░░║              40%     │
-│   Feb 6 · Colombo╚═══════╝        Daily Progress│
-│              ◇◇◇◇◇◇                            │
-│           ◇◇◇◇◇◇◇◇◇                            │
+│  ☀ 19 Shaban 1447                        40%   │
+│  Wed, Feb 6 · Colombo            Daily Progress │
+│                                                 │
+│  ─────────────────────────────────────────────  │
+│                                                 │
+│  Next Namaz                                     │
+│  [☀] Zuhr                          12:15   ☐   │
+│                              ◇◇◇                │
+│                           ◇◇◇◇◇◇                │
 └─────────────────────────────────────────────────┘
+
+[Coming Soon Cards...]
 ```
 
-Each prayer period has a unique:
-- **Gradient background** (subtle, flowing colors)
-- **Geometric shape** (positioned decoratively)
-- **Icon color** that matches the theme
+**Key changes:**
+1. Wrap everything in `TimeOfDayCard` with dynamic gradients
+2. Merge date/location, progress, and next prayer into one card
+3. Remove "View all prayers" button
+4. Rename "Next Prayer" to "Next Namaz"
+5. Keep the current prayer formatting (icon, name, time, checkbox)
 
-## Prayer Period Color Scheme
+## Files to Modify
 
-| Period | Time | Colors | Shape |
-|--------|------|--------|-------|
-| **Fajr** | Dawn | Steel grey → Slate blue | Diamond/star shape |
-| **Dhuhr/Zuhr** | Midday | Warm yellow → Amber | Angular sun rays |
-| **Asr** | Afternoon | Golden → Orange tint | Chevron angles |
-| **Maghrib** | Sunset | Orange → Coral → Pink | Overlapping circles |
-| **Isha** | Night | Deep purple → Indigo | Crescent form |
-| **Nisful Layl** | Midnight | Indigo → Deep blue | Geometric stars |
+### 1. `src/pages/Dashboard.tsx`
 
-## Implementation
+Major refactor to use the unified card design:
 
-### New Component: `src/components/namaz/TimeOfDayCard.tsx`
+**Imports to add:**
+- `TimeOfDayCard` from components
+- `usePrayerTimes`, `getCurrentPrayerWindow` from hooks
+- `Clock`, `Check` icons for inline prayer display
 
-A wrapper card component that:
-1. Determines current prayer window from prayer times
-2. Applies the appropriate gradient background
-3. Renders decorative geometric SVG shapes
-4. Contains the date display and progress meter
+**Remove:**
+- Separate DateDisplay section
+- Separate DailyMeter card
+- Separate CurrentPrayerCard component usage
+- "View all prayers" button
 
+**New structure:**
 ```tsx
-interface TimeOfDayCardProps {
-  currentPrayer: PrayerName | 'nisfulLayl' | null;
-  children: React.ReactNode;
-}
+// Get current prayer window for theming
+const { prayerTimes } = usePrayerTimes();
+const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
+const currentPrayerName = currentPrayerWindow?.current || null;
+
+// Determine which prayer to show
+const prayerToShow = currentPrayer || nextPrayer;
+
+return (
+  <TimeOfDayCard currentPrayer={currentPrayerName}>
+    {/* Top row: Date + Progress */}
+    <div className="flex items-start justify-between">
+      <DateDisplay showLocation compact variant="light" />
+      <DailyMeter percentage={percentage} compact variant="light" />
+    </div>
+    
+    {/* Divider */}
+    <div className="my-4 border-t border-white/20" />
+    
+    {/* Next Namaz section - inline within card */}
+    {prayerToShow && (
+      <div className="flex items-center justify-between">
+        <div>
+          <span className="text-sm text-white/70">
+            {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
+          </span>
+          <div className="flex items-center gap-3 mt-1">
+            <div className="rounded-full p-2 bg-white/20">
+              <PrayerIcon className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h3 className="text-xl font-bold text-white">
+                {prayerToShow.displayName}
+              </h3>
+              <span className="text-sm text-white/80">{prayerToShow.time}</span>
+            </div>
+          </div>
+        </div>
+        
+        {/* Checkbox */}
+        <Checkbox
+          checked={prayerToShow.isCompleted}
+          onCheckedChange={() => togglePrayer(prayerToShow.name)}
+          className="h-6 w-6 border-white/50 data-[state=checked]:bg-white/30"
+        />
+      </div>
+    )}
+  </TimeOfDayCard>
+);
 ```
 
-### Gradient Definitions (CSS)
+### 2. `src/components/ui/checkbox.tsx` (Minor update)
 
-Add to `src/index.css` or as Tailwind classes:
+May need to support light variant styling for the checkbox to look good on gradient backgrounds. The checkbox should have:
+- White/light border when unchecked
+- White/light checkmark when checked
+- Semi-transparent white background when checked
 
-```css
-/* Prayer-time gradients */
-.gradient-fajr {
-  background: linear-gradient(135deg, 
-    hsl(215 25% 35%) 0%, 
-    hsl(220 30% 45%) 100%);
-}
-
-.gradient-zuhr {
-  background: linear-gradient(135deg, 
-    hsl(45 85% 55%) 0%, 
-    hsl(35 80% 50%) 100%);
-}
-
-.gradient-asr {
-  background: linear-gradient(135deg, 
-    hsl(40 75% 50%) 0%, 
-    hsl(25 70% 50%) 100%);
-}
-
-.gradient-maghrib {
-  background: linear-gradient(135deg, 
-    hsl(20 85% 55%) 0%, 
-    hsl(350 60% 55%) 100%);
-}
-
-.gradient-isha {
-  background: linear-gradient(135deg, 
-    hsl(270 50% 35%) 0%, 
-    hsl(250 55% 30%) 100%);
-}
-
-.gradient-nisfulLayl {
-  background: linear-gradient(135deg, 
-    hsl(240 55% 25%) 0%, 
-    hsl(230 60% 20%) 100%);
-}
-```
-
-### Geometric SVG Shapes
-
-Create abstract decorative shapes for each period:
-- Positioned in bottom-right or corner
-- Low opacity (10-20%) to not distract from content
-- Subtle blur/glow effect
-
-Example shape component:
-```tsx
-const GeometricShape = ({ variant }: { variant: string }) => {
-  // Render different SVG paths based on prayer time
-  // Angular diamonds for fajr, sun rays for zuhr, etc.
-};
-```
-
-### Updated `src/pages/Namaz.tsx`
-
-Wrap the header content in the new TimeOfDayCard:
-
-```tsx
-<TimeOfDayCard currentPrayer={currentPrayer?.name || null}>
-  <div className="flex items-start justify-between">
-    <DateDisplay showLocation compact />
-    <DailyMeter percentage={percentage} compact />
-  </div>
-</TimeOfDayCard>
-```
-
-### Updated `src/components/calendar/DateDisplay.tsx`
-
-Add support for light text on dark gradient backgrounds:
-- Accept a `variant="light"` prop for white/light text
-- Adjust icon and text colors accordingly
-
-## Files to Create/Modify
-
-| File | Action |
-|------|--------|
-| `src/components/namaz/TimeOfDayCard.tsx` | **Create** - New card component with gradients and shapes |
-| `src/index.css` | **Modify** - Add gradient utility classes |
-| `src/pages/Namaz.tsx` | **Modify** - Use TimeOfDayCard wrapper |
-| `src/components/calendar/DateDisplay.tsx` | **Modify** - Add light variant for dark backgrounds |
-| `src/components/namaz/DailyMeter.tsx` | **Modify** - Add light variant support |
+This can be handled inline with className overrides or by adding a variant prop.
 
 ## Visual Result
 
-The card will smoothly transition its appearance throughout the day:
-- **Dawn (Fajr)**: Cool grey-blue with subtle star shapes
-- **Midday (Zuhr)**: Warm golden yellow with angular rays
-- **Afternoon (Asr)**: Deeper amber-orange with chevrons
-- **Sunset (Maghrib)**: Vibrant coral-pink with soft circles
-- **Night (Isha)**: Deep purple with crescent forms
-- **Midnight (Nisful Layl)**: Rich indigo with geometric stars
+The Dashboard will now feature a single, cohesive card that:
+- Changes gradient based on current prayer time (same as Namaz page)
+- Shows decorative geometric shapes (same as Namaz page)
+- Contains date/location (left) + progress % (right)
+- Has a subtle divider line
+- Shows next/current Namaz with icon, name, time, and toggle checkbox
+- Uses white/light text throughout for contrast on gradients
 
-This creates a living, breathing UI that connects users to the rhythm of Islamic prayer times while maintaining a clean, modern aesthetic inspired by the reference image.
+## Summary
 
+| File | Change |
+|------|--------|
+| `src/pages/Dashboard.tsx` | Major refactor: Use TimeOfDayCard, merge all info into one card, remove "View all prayers", rename to "Next Namaz" |
+| `src/components/ui/checkbox.tsx` | Optional: Add light variant support (or handle inline) |
+
+## Technical Notes
+
+- Reuse `usePrayerTimes` and `getCurrentPrayerWindow` for determining the gradient
+- Reuse `TimeOfDayCard` component as-is
+- Reuse `DateDisplay` and `DailyMeter` with `variant="light"` and `compact` props
+- The prayer icon mapping already exists in `CurrentPrayerCard.tsx` - will inline this in Dashboard
