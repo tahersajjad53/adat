@@ -7,7 +7,7 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
-import { DualDate, HijriDate, isAfterMaghrib, advanceHijriDay } from '@/lib/hijri';
+import { DualDate, HijriDate, isAfterMaghrib, advanceHijriDay, BOHRA_CALENDAR_OFFSET } from '@/lib/hijri';
 import { fetchPrayerTimesWithHijri, Location, DEFAULT_LOCATION, getCurrentLocation, AladhanHijriDate } from '@/lib/prayerTimes';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -143,6 +143,11 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
         monthName: aladhanHijri.monthNameEn,
         monthNameArabic: aladhanHijri.monthNameAr,
       };
+      
+      // Apply Bohra calendar base offset (aligns with Misri/Fatimid calendar)
+      for (let i = 0; i < BOHRA_CALENDAR_OFFSET; i++) {
+        hijri = advanceHijriDay(hijri);
+      }
       
       // Bohra sunset rule: If after Maghrib, advance the Hijri day by 1
       if (afterMaghrib) {
