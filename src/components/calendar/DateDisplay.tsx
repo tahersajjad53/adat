@@ -60,39 +60,23 @@ export function DateDisplay({ className, showLocation = false, compact = false }
   }
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn('flex flex-col items-center space-y-1', className)}>
       {/* Hijri Date - Prominent */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         {currentDate.isAfterMaghrib ? (
           <HalfMoon className="h-5 w-5 text-primary" />
         ) : (
           <SunLight className="h-5 w-5 text-accent-foreground" />
         )}
-        <div>
-          <p className="text-2xl font-display font-bold tracking-tight">
-            {hijriFormatted}
-          </p>
-          <p className="text-sm text-muted-foreground font-medium" dir="rtl">
-            {currentDate.hijri.day} {currentDate.hijri.monthNameArabic} {currentDate.hijri.year}
-          </p>
-        </div>
+        <p className="text-2xl font-display font-bold tracking-tight">
+          {hijriFormatted}
+        </p>
       </div>
 
-      {/* Gregorian Date - Secondary */}
+      {/* Gregorian Date */}
       <p className="text-sm text-muted-foreground">
         {gregorianFormatted}
       </p>
-
-      {/* Maghrib Status */}
-      {maghribTime && (
-        <p className="text-xs text-muted-foreground">
-          {currentDate.isAfterMaghrib ? (
-            <>Maghrib was at {maghribTime} · New Islamic day began</>
-          ) : (
-            <>Maghrib at {maghribTime}</>
-          )}
-        </p>
-      )}
 
       {/* Location */}
       {showLocation && location?.city && (
