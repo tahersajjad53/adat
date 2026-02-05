@@ -6,8 +6,8 @@
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
-import { DualDate, getAdjustedHijriDate } from '@/lib/hijri';
-import { fetchMaghribTime, Location, DEFAULT_LOCATION, getCurrentLocation } from '@/lib/prayerTimes';
+import { DualDate, HijriDate, isAfterMaghrib, advanceHijriDay } from '@/lib/hijri';
+import { fetchPrayerTimesWithHijri, Location, DEFAULT_LOCATION, getCurrentLocation, AladhanHijriDate } from '@/lib/prayerTimes';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -118,7 +118,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     }
   }, [setLocation]);
 
-  // Fetch Maghrib time and update current date
+  // Fetch prayer times with Hijri date and update current date
   const refreshDate = useCallback(async () => {
     if (!location) return;
 
@@ -127,17 +127,40 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
       setError(null);
 
       const now = new Date();
-      const maghrib = await fetchMaghribTime(now, location);
+      const { timings, hijri: aladhanHijri } = await fetchPrayerTimesWithHijri(now, location);
+      const maghrib = timings.Maghrib.split(' ')[0]; // Remove timezone info
       setMaghribTime(maghrib);
 
-      // Pass timezone for accurate Maghrib comparison
-      const dualDate = getAdjustedHijriDate(now, maghrib, location.timezone);
+      // Check if after Maghrib
+      const afterMaghrib = isAfterMaghrib(now, maghrib, location.timezone);
+      
+      // Convert Aladhan Hijri to our HijriDate format
+      let hijri: HijriDate = {
+        day: aladhanHijri.day,
+        month: aladhanHijri.month,
+        year: aladhanHijri.year,
+        monthName: aladhanHijri.monthNameEn,
+        monthNameArabic: aladhanHijri.monthNameAr,
+      };
+      
+      // Bohra sunset rule: If after Maghrib, advance the Hijri day by 1
+      if (afterMaghrib) {
+        hijri = advanceHijriDay(hijri);
+      }
+      
+      const dualDate: DualDate = {
+        gregorian: now,
+        hijri,
+        isAfterMaghrib: afterMaghrib,
+      };
+      
       setCurrentDate(dualDate);
     } catch (err) {
       console.error('Failed to refresh date:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch prayer times');
       
-      // Fallback: show date without Maghrib adjustment
+      // Fallback: show date without Maghrib adjustment (use Intl as fallback)
+      const { getAdjustedHijriDate } = await import('@/lib/hijri');
       const dualDate = getAdjustedHijriDate(new Date(), null, location?.timezone);
       setCurrentDate(dualDate);
     } finally {

@@ -43,11 +43,25 @@ export interface Location {
   timezone?: string;
 }
 
+export interface AladhanHijriDate {
+  day: number;
+  month: number;
+  monthNameEn: string;
+  monthNameAr: string;
+  year: number;
+}
+
+export interface PrayerTimesWithHijri {
+  timings: PrayerTimes;
+  hijri: AladhanHijriDate;
+}
+
 interface CachedPrayerTimes {
   date: string; // YYYY-MM-DD format
   location: { latitude: number; longitude: number };
   timezone?: string; // IANA timezone for cache validation
   timings: PrayerTimes;
+  hijri: AladhanHijriDate;
   fetchedAt: number;
 }
 
@@ -57,7 +71,7 @@ const CACHE_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
 /**
  * Get cached prayer times from localStorage
  */
-function getCachedPrayerTimes(date: string, location: Location): PrayerTimes | null {
+function getCachedPrayerTimes(date: string, location: Location): PrayerTimesWithHijri | null {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
     if (!cached) return null;
@@ -73,7 +87,7 @@ function getCachedPrayerTimes(date: string, location: Location): PrayerTimes | n
     const isNotExpired = Date.now() - data.fetchedAt < CACHE_DURATION_MS;
 
     if (isSameDate && isSameLocation && isSameTimezone && isNotExpired) {
-      return data.timings;
+      return { timings: data.timings, hijri: data.hijri };
     }
 
     return null;
@@ -85,13 +99,14 @@ function getCachedPrayerTimes(date: string, location: Location): PrayerTimes | n
 /**
  * Cache prayer times to localStorage
  */
-function cachePrayerTimes(date: string, location: Location, timings: PrayerTimes): void {
+function cachePrayerTimes(date: string, location: Location, timings: PrayerTimes, hijri: AladhanHijriDate): void {
   try {
     const data: CachedPrayerTimes = {
       date,
       location: { latitude: location.latitude, longitude: location.longitude },
       timezone: location.timezone,
       timings,
+      hijri,
       fetchedAt: Date.now(),
     };
     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
@@ -118,17 +133,17 @@ function formatDateForCache(date: Date): string {
 }
 
 /**
- * Fetch prayer times from Aladhan API
+ * Fetch prayer times and Hijri date from Aladhan API
  * 
  * @param date - The date to fetch prayer times for
  * @param location - User's location (latitude, longitude)
  * @param method - Calculation method (default: 1 = Shia Ithna-Ashari)
  */
-export async function fetchPrayerTimes(
+export async function fetchPrayerTimesWithHijri(
   date: Date,
   location: Location,
   method: number = 1
-): Promise<PrayerTimes> {
+): Promise<PrayerTimesWithHijri> {
   const dateStr = formatDateForApi(date);
   const cacheKey = formatDateForCache(date);
 
@@ -157,11 +172,32 @@ export async function fetchPrayerTimes(
 
   const data = await response.json();
   const timings = data.data.timings as PrayerTimes;
+  const hijriData = data.data.date.hijri;
+  
+  const hijri: AladhanHijriDate = {
+    day: parseInt(hijriData.day, 10),
+    month: hijriData.month.number,
+    monthNameEn: hijriData.month.en,
+    monthNameAr: hijriData.month.ar,
+    year: parseInt(hijriData.year, 10),
+  };
 
   // Cache the result
-  cachePrayerTimes(cacheKey, location, timings);
+  cachePrayerTimes(cacheKey, location, timings, hijri);
 
-  return timings;
+  return { timings, hijri };
+}
+
+/**
+ * Fetch prayer times from Aladhan API (legacy function for backwards compatibility)
+ */
+export async function fetchPrayerTimes(
+  date: Date,
+  location: Location,
+  method: number = 1
+): Promise<PrayerTimes> {
+  const result = await fetchPrayerTimesWithHijri(date, location, method);
+  return result.timings;
 }
 
 /**
