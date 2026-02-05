@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { LogOut } from 'lucide-react';
+import { LogOut, MapPin } from 'lucide-react';
 import adatLogo from '@/assets/adat-logo.svg';
+import { DateDisplay } from '@/components/calendar/DateDisplay';
+import { useCalendar } from '@/contexts/CalendarContext';
 
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
+  const { location, requestLocationPermission } = useCalendar();
   const [fullName, setFullName] = useState<string>('');
 
   useEffect(() => {
@@ -49,6 +52,22 @@ const Dashboard: React.FC = () => {
       {/* Main content */}
       <main className="container py-12">
         <div className="max-w-2xl mx-auto text-center space-y-6">
+          {/* Date Display */}
+          <div className="flex flex-col items-center space-y-4">
+            <DateDisplay showLocation className="text-center" />
+            {!location?.city && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={requestLocationPermission}
+                className="gap-2"
+              >
+                <MapPin className="h-4 w-4" />
+                Set your location
+              </Button>
+            )}
+          </div>
+
           <h1 className="text-4xl font-bold tracking-tight font-display">
             Assalamu Alaikum, {displayName}
           </h1>
