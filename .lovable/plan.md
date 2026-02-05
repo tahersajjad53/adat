@@ -1,97 +1,201 @@
 
-# Improve Sidebar Footer UI
+# Fix Timezone Handling for Maghrib-Based Date Transitions
 
-## Overview
+## Problem Analysis
 
-Simplify the sidebar footer by merging the user info with the Profile action, and stacking the buttons vertically instead of side-by-side.
+The current `isAfterMaghrib()` function in `src/lib/hijri.ts` has a bug: it compares the browser's local time directly against a Maghrib time string, but doesn't account for the user's **stored timezone** (e.g., `Asia/Colombo`).
 
----
-
-## Current vs Proposed Layout
-
+**Current buggy flow:**
 ```text
-CURRENT (Expanded)                   PROPOSED (Expanded)
-+---------------------------+        +---------------------------+
-| test                      |        | 👤 test                   | <- Clickable
-| test@test.com             |        |    test@test.com          |    (goes to Profile)
-+---------------------------+        +---------------------------+
-| [Profile]    [Sign out]   |        | [Sign out]                |
-+---------------------------+        +---------------------------+
-
-CURRENT (Collapsed)                  PROPOSED (Collapsed)
-+-------+                            +-------+
-| [👤]  |                            | [👤]  | <- Profile
-| [🚪]  |                            | [🚪]  | <- Sign out
-+-------+                            +-------+
+1. User is in Colombo (UTC+5:30), it's 18:45 local time
+2. Maghrib time is fetched as "18:30" (for Colombo)
+3. isAfterMaghrib() creates a Date using browser's local time methods
+4. If browser timezone differs from user's stored timezone, comparison fails
 ```
 
----
-
-## Changes
-
-### File: `src/components/layout/AppSidebar.tsx`
-
-1. **Merge user info with Profile action**: Make the user info block (name + email) clickable to navigate to `/profile`
-2. **Add User icon** next to the name when expanded
-3. **Remove separate Profile button**: No longer needed since clicking user info navigates to profile
-4. **Stack Sign out below**: Place the Sign out button in its own row below the user info
-5. **Collapsed mode**: Show User icon (for Profile) and LogOut icon stacked vertically
+The issue is especially problematic when:
+- The browser's system timezone differs from the user's saved location
+- The `new Date()` uses the browser's local timezone, not the user's intended timezone
 
 ---
 
-## Technical Implementation
+## Solution Overview
 
-### Expanded State
-- Clickable container with User icon, display name, and email
-- Hover effect to indicate interactivity
-- Sign out button below on its own row
+Update the calendar system to use **timezone-aware comparisons** by:
 
-### Collapsed State  
-- User icon button (navigates to profile)
-- LogOut icon button (signs out)
-- Both stacked vertically
+1. Passing the user's timezone through the system
+2. Using timezone-aware time parsing in `isAfterMaghrib()`
+3. Ensuring the Aladhan API request includes the timezone parameter
 
 ---
 
-## Code Structure
+## Files to Modify
+
+### 1. `src/lib/hijri.ts`
+
+**Changes:**
+- Update `isAfterMaghrib()` to accept an optional timezone parameter
+- Create current time in the user's timezone for comparison
+- Update `getAdjustedHijriDate()` to pass timezone through
 
 ```typescript
-<SidebarFooter>
-  <SidebarSeparator />
-  <div className="p-2 space-y-2">
-    {/* Clickable user info - navigates to profile */}
-    <button
-      onClick={() => navigate('/profile')}
-      className="w-full flex items-center gap-3 px-2 py-2 rounded-md hover:bg-sidebar-accent transition-colors text-left"
-    >
-      <User className="h-5 w-5 shrink-0" />
-      {!isCollapsed && (
-        <div className="min-w-0">
-          <p className="font-medium text-sm truncate">{displayName}</p>
-          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-        </div>
-      )}
-    </button>
+// Updated signature
+export function isAfterMaghrib(
+  currentTime: Date, 
+  maghribTime: string,
+  timezone?: string
+): boolean {
+  // Parse maghrib time
+  const [hours, minutes] = maghribTime.split(':').map(Number);
+  
+  // Get current time in user's timezone
+  let currentHours: number;
+  let currentMinutes: number;
+  
+  if (timezone) {
+    // Use Intl to get time in user's timezone
+    const formatter = new Intl.DateTimeFormat('en-US', {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: false,
+      timeZone: timezone,
+    });
+    const parts = formatter.formatToParts(currentTime);
+    currentHours = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
+    currentMinutes = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
+  } else {
+    // Fallback to local time
+    currentHours = currentTime.getHours();
+    currentMinutes = currentTime.getMinutes();
+  }
+  
+  const currentTotalMinutes = currentHours * 60 + currentMinutes;
+  const maghribTotalMinutes = hours * 60 + minutes;
+  
+  return currentTotalMinutes >= maghribTotalMinutes;
+}
+
+// Updated signature
+export function getAdjustedHijriDate(
+  currentTime: Date, 
+  maghribTime: string | null,
+  timezone?: string
+): DualDate {
+  const afterMaghrib = maghribTime 
+    ? isAfterMaghrib(currentTime, maghribTime, timezone) 
+    : false;
+  // ... rest unchanged
+}
+```
+
+### 2. `src/lib/prayerTimes.ts`
+
+**Changes:**
+- Add timezone parameter to the Aladhan API call
+- This ensures the API returns times in the correct timezone
+
+```typescript
+export async function fetchPrayerTimes(
+  date: Date,
+  location: Location,
+  method: number = 1
+): Promise<PrayerTimes> {
+  // ... existing code ...
+  
+  // Add timezone if available
+  if (location.timezone) {
+    url.searchParams.set('timezone', location.timezone);
+  }
+  
+  // ... rest unchanged
+}
+```
+
+### 3. `src/contexts/CalendarContext.tsx`
+
+**Changes:**
+- Pass the timezone from location to `getAdjustedHijriDate()`
+
+```typescript
+const refreshDate = useCallback(async () => {
+  if (!location) return;
+
+  try {
+    setIsLoading(true);
+    setError(null);
+
+    const now = new Date();
+    const maghrib = await fetchMaghribTime(now, location);
+    setMaghribTime(maghrib);
+
+    // Pass timezone for accurate Maghrib comparison
+    const dualDate = getAdjustedHijriDate(now, maghrib, location.timezone);
+    setCurrentDate(dualDate);
+  } catch (err) {
+    // ... error handling
+  }
+}, [location]);
+```
+
+### 4. `src/lib/prayerTimes.ts` - `getCurrentLocation()` enhancement
+
+**Changes:**
+- When getting browser location, also detect timezone using `Intl.DateTimeFormat`
+
+```typescript
+export function getCurrentLocation(): Promise<Location> {
+  return new Promise((resolve, reject) => {
+    // ... existing geolocation code ...
     
-    {/* Sign out button - full width */}
-    <Button
-      variant="ghost"
-      size={isCollapsed ? 'icon' : 'sm'}
-      onClick={signOut}
-      className="w-full justify-start gap-2"
-    >
-      <LogOut className="h-4 w-4" />
-      {!isCollapsed && <span>Sign out</span>}
-    </Button>
-  </div>
-</SidebarFooter>
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        // Detect browser timezone
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          timezone, // Include detected timezone
+        });
+      },
+      // ... error handling
+    );
+  });
+}
 ```
 
 ---
 
-## Benefits
+## Technical Details
 
-- Cleaner UI with less redundancy
-- Single tap/click to access profile
-- Consistent vertical stacking in both expanded and collapsed states
-- Better use of space
+### Why Intl.DateTimeFormat?
+The `Intl.DateTimeFormat` API is the standard way to handle timezone conversions in JavaScript:
+- `formatToParts()` extracts hour/minute in the target timezone
+- No external libraries needed (date-fns or luxon)
+- Works in all modern browsers
+
+### Cache Invalidation
+The existing cache in `prayerTimes.ts` should work correctly since:
+- Cache key includes location coordinates
+- If timezone changes, we should clear cache (add timezone to cache key)
+
+### Update Cache Key
+```typescript
+interface CachedPrayerTimes {
+  date: string;
+  location: { latitude: number; longitude: number };
+  timezone?: string;  // Add timezone to cache validation
+  timings: PrayerTimes;
+  fetchedAt: number;
+}
+```
+
+---
+
+## Testing Checklist
+
+After implementation:
+1. Verify Hijri date shows as 19th Shaban 1447 after Maghrib
+2. Test with different browser timezones (dev tools override)
+3. Verify prayer logs save to correct Hijri date
+4. Confirm "New Islamic day began" message appears after Maghrib
