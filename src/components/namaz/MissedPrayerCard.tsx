@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { Check, RotateCcw } from 'lucide-react';
+import { Check, Undo } from 'iconoir-react';
 import { MissedPrayer } from '@/hooks/useMissedPrayers';
 
 interface MissedPrayerCardProps {
@@ -60,7 +60,7 @@ export const MissedPrayerCard: React.FC<MissedPrayerCardProps> = ({
           onClick={onFulfill}
           className="shrink-0 gap-2"
         >
-          <RotateCcw className="h-3 w-3" />
+          <Undo className="h-3 w-3" />
           Make Up
         </Button>
       )}

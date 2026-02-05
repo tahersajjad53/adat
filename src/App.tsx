@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CalendarProvider } from "@/contexts/CalendarContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import { AppLayout } from "@/components/layout/AppLayout";
 import Auth from "./pages/Auth";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
@@ -40,7 +41,9 @@ const App = () => (
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
-                    <Dashboard />
+                    <AppLayout>
+                      <Dashboard />
+                    </AppLayout>
                   </ProtectedRoute>
                 }
               />
@@ -48,7 +51,9 @@ const App = () => (
                 path="/profile"
                 element={
                   <ProtectedRoute>
-                    <Profile />
+                    <AppLayout>
+                      <Profile />
+                    </AppLayout>
                   </ProtectedRoute>
                 }
               />
@@ -56,7 +61,9 @@ const App = () => (
                 path="/namaz"
                 element={
                   <ProtectedRoute>
-                    <Namaz />
+                    <AppLayout>
+                      <Namaz />
+                    </AppLayout>
                   </ProtectedRoute>
                 }
               />

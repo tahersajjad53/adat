@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { LogOut, MapPin, User, ChevronRight, AlertCircle } from 'lucide-react';
-import adatLogo from '@/assets/adat-logo.svg';
+import { MapPin, NavArrowRight, WarningCircle } from 'iconoir-react';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { DailyMeter } from '@/components/namaz/DailyMeter';
@@ -13,7 +12,7 @@ import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 
 const Dashboard: React.FC = () => {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const { location, requestLocationPermission } = useCalendar();
   const navigate = useNavigate();
   const [fullName, setFullName] = useState<string>('');
@@ -63,105 +62,83 @@ const Dashboard: React.FC = () => {
 
   if (needsOnboarding === null) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-background">
+      <div className="flex min-h-[50vh] items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border">
-        <div className="container flex h-16 items-center justify-between">
-          <img src={adatLogo} alt="Adat" className="h-8 w-auto" />
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-muted-foreground hidden sm:inline">
-              Welcome, <span className="font-medium text-foreground">{displayName}</span>
-            </span>
-            <Button variant="ghost" size="icon" onClick={() => navigate('/profile')}>
-              <User className="h-4 w-4" />
+    <div className="container py-8">
+      <div className="max-w-2xl mx-auto space-y-8">
+        {/* Date Display */}
+        <div className="flex flex-col items-center space-y-4">
+          <DateDisplay showLocation className="text-center" />
+          {!location?.city && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={requestLocationPermission}
+              className="gap-2"
+            >
+              <MapPin className="h-4 w-4" />
+              Set your location
             </Button>
-            <Button variant="ghost" size="sm" onClick={signOut}>
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign out
-            </Button>
-          </div>
+          )}
         </div>
-      </header>
 
-      {/* Main content */}
-      <main className="container py-8">
-        <div className="max-w-2xl mx-auto space-y-8">
-          {/* Date Display */}
-          <div className="flex flex-col items-center space-y-4">
-            <DateDisplay showLocation className="text-center" />
-            {!location?.city && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={requestLocationPermission}
-                className="gap-2"
-              >
-                <MapPin className="h-4 w-4" />
-                Set your location
-              </Button>
+        {/* Greeting */}
+        <h1 className="text-3xl font-bold tracking-tight font-display text-center">
+          Assalamu Alaikum, {displayName}
+        </h1>
+
+        {/* Daily Meter */}
+        <div className="p-6 border border-border rounded-xl bg-card">
+          <DailyMeter percentage={percentage} />
+          <div className="mt-4 pt-4 border-t border-border flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              {completedCount} of {totalCount} prayers completed
+            </span>
+            {unfulfilledCount > 0 && (
+              <span className="flex items-center gap-1 text-destructive">
+                <WarningCircle className="h-3 w-3" />
+                {unfulfilledCount} missed
+              </span>
             )}
           </div>
+        </div>
 
-          {/* Greeting */}
-          <h1 className="text-3xl font-bold tracking-tight font-display text-center">
-            Assalamu Alaikum, {displayName}
-          </h1>
+        {/* Current Prayer */}
+        {prayerToShow && (
+          <CurrentPrayerCard
+            prayer={prayerToShow}
+            onToggle={() => togglePrayer(prayerToShow.name)}
+            label={currentPrayer ? 'Current Prayer' : 'Next Prayer'}
+          />
+        )}
 
-          {/* Daily Meter */}
-          <div className="p-6 border border-border rounded-xl bg-card">
-            <DailyMeter percentage={percentage} />
-            <div className="mt-4 pt-4 border-t border-border flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">
-                {completedCount} of {totalCount} prayers completed
-              </span>
-              {unfulfilledCount > 0 && (
-                <span className="flex items-center gap-1 text-destructive">
-                  <AlertCircle className="h-3 w-3" />
-                  {unfulfilledCount} missed
-                </span>
-              )}
-            </div>
+        {/* View All Link */}
+        <Button
+          variant="outline"
+          className="w-full justify-between"
+          onClick={() => navigate('/namaz')}
+        >
+          <span>View all prayers</span>
+          <NavArrowRight className="h-4 w-4" />
+        </Button>
+
+        {/* Coming Soon Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-6 border border-border rounded-lg">
+            <h3 className="font-semibold mb-2">Dues & Khumus</h3>
+            <p className="text-sm text-muted-foreground">Coming soon</p>
           </div>
-
-          {/* Current Prayer */}
-          {prayerToShow && (
-            <CurrentPrayerCard
-              prayer={prayerToShow}
-              onToggle={() => togglePrayer(prayerToShow.name)}
-              label={currentPrayer ? 'Current Prayer' : 'Next Prayer'}
-            />
-          )}
-
-          {/* View All Link */}
-          <Button
-            variant="outline"
-            className="w-full justify-between"
-            onClick={() => navigate('/namaz')}
-          >
-            <span>View all prayers</span>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-
-          {/* Coming Soon Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="p-6 border border-border rounded-lg">
-              <h3 className="font-semibold mb-2">Dues & Khumus</h3>
-              <p className="text-sm text-muted-foreground">Coming soon</p>
-            </div>
-            <div className="p-6 border border-border rounded-lg">
-              <h3 className="font-semibold mb-2">Goals & Habits</h3>
-              <p className="text-sm text-muted-foreground">Coming soon</p>
-            </div>
+          <div className="p-6 border border-border rounded-lg">
+            <h3 className="font-semibold mb-2">Goals & Habits</h3>
+            <p className="text-sm text-muted-foreground">Coming soon</p>
           </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 };

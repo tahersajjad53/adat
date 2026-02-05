@@ -3,7 +3,7 @@ import { MissedPrayerCard } from './MissedPrayerCard';
 import { MissedPrayer } from '@/hooks/useMissedPrayers';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { Filter } from 'lucide-react';
+import { Filter } from 'iconoir-react';
 
 interface MissedPrayersListProps {
   prayers: MissedPrayer[];

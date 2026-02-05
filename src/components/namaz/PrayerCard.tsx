@@ -2,7 +2,7 @@ import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
-import { Check, Clock, AlertCircle } from 'lucide-react';
+import { Check, Clock, WarningCircle } from 'iconoir-react';
 import { PrayerName } from '@/hooks/usePrayerTimes';
 
 interface PrayerCardProps {
@@ -26,7 +26,7 @@ const STATUS_ICONS = {
   upcoming: Clock,
   current: Clock,
   completed: Check,
-  missed: AlertCircle,
+  missed: WarningCircle,
 };
 
 export const PrayerCard: React.FC<PrayerCardProps> = ({

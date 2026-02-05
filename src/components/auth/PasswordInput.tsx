@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeClosed } from 'iconoir-react';
 import { cn } from '@/lib/utils';
 
 interface PasswordInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
@@ -26,7 +26,7 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           tabIndex={-1}
         >
           {showPassword ? (
-            <EyeOff className="h-4 w-4" />
+            <EyeClosed className="h-4 w-4" />
           ) : (
             <Eye className="h-4 w-4" />
           )}
