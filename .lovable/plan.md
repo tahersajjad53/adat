@@ -1,263 +1,119 @@
 
 
-# Hijri Calendar Integration Plan for Adat
+# Onboarding & Profile Management Implementation
 
 ## Overview
 
-This plan outlines how to integrate a Hijri calendar system into Adat that respects the Dawoodi Bohra practice of considering Maghrib (sunset) as the start of a new day. This is foundational for all other features including prayer tracking, dues management, and goal setting.
+Adding location selection during onboarding and a profile management page, using a curated list of major cities including Sri Lanka.
 
 ---
 
-## Hijri Calendar Library Options
-
-After researching available options, here are the top candidates:
-
-### Option 1: Temporal API with Intl (Recommended)
-
-**Pros:**
-- Native browser support via `Intl.DateTimeFormat` with `calendar: 'islamic'`
-- No external dependencies
-- Accurate conversion maintained by browser vendors
-- Lightweight and performant
-
-**Cons:**
-- Requires manual implementation of Maghrib adjustment logic
-- Limited formatting options compared to dedicated libraries
-
-### Option 2: hijri-converter (npm package)
-
-**Pros:**
-- Dedicated Hijri-Gregorian conversion library
-- Simple API for date manipulation
-- Supports various Islamic calendar variants
-
-**Cons:**
-- Additional dependency
-- May need wrapper for Maghrib adjustment
-
-### Option 3: moment-hijri
-
-**Pros:**
-- Familiar moment.js API
-- Good formatting options
-
-**Cons:**
-- Moment.js is in maintenance mode
-- Larger bundle size
-- Not recommended for new projects
-
-### Recommended Approach
-
-Use the **native Intl API** combined with a **custom utility layer** for Maghrib-based day transitions. This gives us:
-- Zero additional dependencies for core conversion
-- Full control over the Maghrib sunset logic
-- Integration with an external API for accurate prayer times (needed anyway for Namaz tracking)
-
----
-
-## Architecture Design
-
-### Core Components
-
-```text
-+------------------------------------------+
-|           Calendar Context               |
-|  - Current Hijri/Gregorian date          |
-|  - User's location (for Maghrib time)    |
-|  - Maghrib time for today                |
-+------------------------------------------+
-            |
-            v
-+------------------------------------------+
-|        Hijri Date Utilities              |
-|  - gregorianToHijri(date, maghribTime)   |
-|  - hijriToGregorian(hijriDate)           |
-|  - formatHijriDate(date, format)         |
-|  - getAdjustedHijriDate(now, maghribTime)|
-+------------------------------------------+
-            |
-            v
-+------------------------------------------+
-|         Prayer Times API                 |
-|  - Fetch Maghrib time for location       |
-|  - Cache prayer times daily              |
-+------------------------------------------+
-```
-
-### Key Files to Create
+## Files to Create
 
 | File | Purpose |
 |------|---------|
-| `src/lib/hijri.ts` | Core Hijri conversion utilities with Maghrib adjustment |
-| `src/lib/prayerTimes.ts` | API integration for fetching prayer times |
-| `src/contexts/CalendarContext.tsx` | Global calendar state with current dates |
-| `src/components/calendar/DualCalendar.tsx` | Calendar component showing both systems |
-| `src/components/calendar/DateDisplay.tsx` | Reusable dual-date display widget |
+| `src/data/cities.ts` | Curated city list with coordinates (including Sri Lanka) |
+| `src/pages/Onboarding.tsx` | Post-signup location selection step |
+| `src/pages/Profile.tsx` | Profile settings page |
+| `src/components/profile/LocationSelector.tsx` | Searchable city selector with GPS option |
 
 ---
 
-## Maghrib Day Transition Logic
+## Cities Data (src/data/cities.ts)
 
-The core algorithm for determining the current Hijri date:
+Curated list organized by region, including:
 
-```text
-1. Get current local time
-2. Fetch today's Maghrib time for user's location
-3. If current time >= Maghrib time:
-   - Add 1 day to Gregorian date before conversion
-   - Convert to Hijri (this gives "tomorrow's" Hijri date)
-4. Else:
-   - Convert current Gregorian date to Hijri normally
-5. Display both dates with clear labeling
-```
+**India:** Mumbai, Surat, Ahmedabad, Vadodara, Udaipur, Ujjain, Indore, Delhi, Bangalore, Chennai, Hyderabad, Kolkata, Pune
 
-### Example Scenario
+**Pakistan:** Karachi
 
-> User's birthday: 15th Rabi al-Awwal
-> Actual event occurs: March 10th at 8:30 PM (after Maghrib at 6:15 PM)
-> 
-> - Gregorian shows: March 10th
-> - Hijri shows: 16th Rabi al-Awwal (because it's after Maghrib)
-> - The system correctly associates this with 16th Rabi al-Awwal
+**Sri Lanka:** Colombo, Kandy
 
----
+**Middle East:** Dubai, Abu Dhabi, Sharjah, Muscat, Bahrain, Kuwait City, Doha, Riyadh, Jeddah
 
-## Prayer Times API Integration
+**Africa:** Nairobi, Mombasa, Dar es Salaam, Cairo
 
-For accurate Maghrib times, we'll integrate with **Aladhan API** (free, no API key required):
+**UK/Europe:** London, Manchester, Birmingham, Paris
 
-**Endpoint:** `https://api.aladhan.com/v1/timings/{date}?latitude={lat}&longitude={lng}&method=1`
+**North America:** New York, Chicago, Los Angeles, Houston, Toronto, Vancouver
 
-- Method 1 = Shia Ithna-Ashari (closest to Dawoodi Bohra calculations)
-- Returns all 5 prayer times including Maghrib
-- Supports location-based calculations
+**Asia Pacific:** Singapore, Hong Kong, Sydney, Melbourne
 
-### Caching Strategy
+**Holy Cities:** Mecca, Medina
 
-- Cache prayer times for the current day in localStorage
-- Refresh at midnight or on location change
-- Fallback to approximate calculation if API unavailable
+Each city includes: `id`, `name`, `country`, `countryCode`, `latitude`, `longitude`, `timezone`
 
 ---
 
-## Database Schema Additions
+## LocationSelector Component
 
-We'll need to store user location preferences:
-
-```sql
-ALTER TABLE profiles ADD COLUMN latitude DECIMAL(10, 8);
-ALTER TABLE profiles ADD COLUMN longitude DECIMAL(11, 8);
-ALTER TABLE profiles ADD COLUMN city TEXT;
-ALTER TABLE profiles ADD COLUMN timezone TEXT;
-```
+Features:
+- Uses existing Command component (cmdk) for searchable dropdown
+- Groups cities by country with flag emoji
+- "Use my current location" button with GPS icon
+- Loading state while fetching GPS coordinates
+- Shows selected city prominently
 
 ---
 
-## UI Components
+## Onboarding Page (src/pages/Onboarding.tsx)
 
-### 1. Date Display Widget
-
-A compact widget showing both calendar systems:
-
-```text
-+--------------------------------+
-|  Thursday, March 10, 2025      |  <- Gregorian (smaller)
-|  16 Rabi al-Awwal 1446         |  <- Hijri (prominent)
-+--------------------------------+
-```
-
-### 2. Dual Calendar View
-
-A monthly calendar that displays:
-- Gregorian dates as primary grid
-- Hijri dates as secondary labels within each cell
-- Visual indicator for current day (both systems)
-- Maghrib transition indicator
-
-### 3. Location Setup
-
-A simple onboarding step or settings page to:
-- Request location permission (browser geolocation)
-- Or manually enter city/coordinates
-- Display detected Maghrib time for confirmation
+Design:
+- Reuses AuthLayout for consistent styling with login/signup
+- Welcome message with user's name
+- Clear explanation: "Select your location for accurate prayer times"
+- LocationSelector component
+- "Continue to Dashboard" button
+- Optional "Skip" link (defaults to Mecca)
 
 ---
 
-## Implementation Phases
+## Profile Page (src/pages/Profile.tsx)
 
-### Phase 1: Core Utilities
-- Create `src/lib/hijri.ts` with conversion functions
-- Create `src/lib/prayerTimes.ts` for API integration
-- Add location fields to profiles table
+Sections:
+1. **Personal Info** - Full name (editable)
+2. **Location Settings** - LocationSelector component
+3. **Prayer Times Preview** - Shows current Maghrib time for selected location
+4. **Account Info** - Email (read-only)
 
-### Phase 2: Calendar Context
-- Build `CalendarContext` with current date state
-- Auto-refresh on Maghrib transition
-- Handle location-based Maghrib time fetching
-
-### Phase 3: UI Components
-- Create `DateDisplay` widget for header
-- Build `DualCalendar` component
-- Add location setup in user settings
-
-### Phase 4: Dashboard Integration
-- Add date display to dashboard header
-- Show today's date prominently
-- Prepare foundation for goals/todos integration
+Features:
+- Save button with loading state
+- Success toast on save
+- Navigation back to dashboard
 
 ---
 
-## Technical Considerations
+## Routing Updates (src/App.tsx)
 
-### Hijri Month Names (Arabic/English)
-
-We'll support both Arabic and transliterated names:
-
-| # | Arabic | Transliterated |
-|---|--------|----------------|
-| 1 | محرم | Muharram |
-| 2 | صفر | Safar |
-| 3 | ربيع الأول | Rabi al-Awwal |
-| 4 | ربيع الآخر | Rabi al-Thani |
-| 5 | جمادى الأولى | Jumada al-Awwal |
-| 6 | جمادى الآخرة | Jumada al-Thani |
-| 7 | رجب | Rajab |
-| 8 | شعبان | Shaban |
-| 9 | رمضان | Ramadan |
-| 10 | شوال | Shawwal |
-| 11 | ذو القعدة | Dhul Qadah |
-| 12 | ذو الحجة | Dhul Hijjah |
-
-### Timezone Handling
-
-- All calculations use user's local timezone
-- Maghrib time is location-specific
-- Dates stored in database as UTC with timezone metadata
-
-### Edge Cases
-
-- Handle day transition exactly at Maghrib time
-- Account for DST changes in prayer time calculations
-- Graceful fallback when location unavailable
+New routes:
+- `/auth/onboarding` - Protected, shows after signup
+- `/profile` - Protected, accessible from dashboard
 
 ---
 
-## Dependencies
+## Onboarding Redirect Logic
 
-**No new npm packages required** for core functionality. We'll use:
-- Native `Intl.DateTimeFormat` for Hijri conversion
-- `date-fns` (already installed) for Gregorian date manipulation
-- Fetch API for Aladhan prayer times
+Update Dashboard.tsx to check if user needs onboarding:
+- Fetch profile on load
+- If `latitude` is null/undefined, redirect to `/auth/onboarding`
+- This ensures new users complete location setup
 
 ---
 
-## Summary
+## Dashboard Header Update
 
-This plan establishes a robust dual-calendar foundation that:
+Add profile link:
+- User icon/avatar next to sign out button
+- Links to `/profile` page
 
-1. Correctly handles the Maghrib-based day transition for Dawoodi Bohra practices
-2. Shows both Gregorian and Hijri dates throughout the app
-3. Integrates with a prayer times API for accurate Maghrib calculations
-4. Provides reusable components for the goals/todos system
-5. Stores user location for personalized prayer times
+---
+
+## Implementation Order
+
+1. Create `src/data/cities.ts` with curated city list
+2. Create `src/components/profile/LocationSelector.tsx` 
+3. Create `src/pages/Onboarding.tsx`
+4. Create `src/pages/Profile.tsx`
+5. Update `src/App.tsx` with new routes
+6. Update `src/pages/Dashboard.tsx` with onboarding check and profile link
 
