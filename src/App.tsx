@@ -9,6 +9,8 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Auth from "./pages/Auth";
 import Signup from "./pages/Signup";
 import Dashboard from "./pages/Dashboard";
+import Onboarding from "./pages/Onboarding";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,10 +28,26 @@ const App = () => (
               <Route path="/auth" element={<Auth />} />
               <Route path="/auth/signup" element={<Signup />} />
               <Route
+                path="/auth/onboarding"
+                element={
+                  <ProtectedRoute>
+                    <Onboarding />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
                 path="/dashboard"
                 element={
                   <ProtectedRoute>
                     <Dashboard />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <Profile />
                   </ProtectedRoute>
                 }
               />
