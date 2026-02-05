@@ -45,7 +45,7 @@ export function DateDisplay({ className, showLocation = false, compact = false }
 
   if (compact) {
     return (
-      <div className={cn('flex flex-col', className)}>
+      <div className={cn('flex flex-col items-start', className)}>
         <div className="flex items-center gap-2">
           {currentDate.isAfterMaghrib ? (
             <HalfMoon className="h-4 w-4 text-primary" />
@@ -54,7 +54,9 @@ export function DateDisplay({ className, showLocation = false, compact = false }
           )}
           <span className="font-display font-semibold">{hijriFormatted}</span>
         </div>
-        <span className="text-sm text-muted-foreground">{gregorianFormatted}</span>
+        <span className="text-sm text-muted-foreground">
+          {gregorianFormatted}{location?.city ? ` · ${location.city}` : ''}
+        </span>
       </div>
     );
   }

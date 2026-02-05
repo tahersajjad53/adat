@@ -14,11 +14,11 @@ const Namaz: React.FC = () => {
 
   return (
     <div className="container py-6 max-w-xl mx-auto space-y-6">
-      {/* Date Display */}
-      <DateDisplay showLocation className="text-center" />
-
-      {/* Daily Meter */}
-      <DailyMeter percentage={percentage} />
+      {/* Compact Header Row */}
+      <div className="flex items-start justify-between">
+        <DateDisplay showLocation compact />
+        <DailyMeter percentage={percentage} compact />
+      </div>
 
       {/* Tabs */}
       <Tabs defaultValue="today" className="w-full">

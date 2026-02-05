@@ -6,6 +6,7 @@ interface DailyMeterProps {
   percentage: number;
   className?: string;
   showMessage?: boolean;
+  compact?: boolean;
 }
 
 const ENCOURAGEMENT_MESSAGES: Record<number, string> = {
@@ -30,8 +31,20 @@ export const DailyMeter: React.FC<DailyMeterProps> = ({
   percentage,
   className,
   showMessage = true,
+  compact = false,
 }) => {
   const message = getEncouragementMessage(percentage);
+
+  if (compact) {
+    return (
+      <div className={cn('flex flex-col items-end', className)}>
+        <span className="text-3xl font-bold font-display text-foreground">
+          {percentage}%
+        </span>
+        <span className="text-xs text-muted-foreground">Daily Progress</span>
+      </div>
+    );
+  }
 
   return (
     <div className={cn('space-y-3', className)}>
