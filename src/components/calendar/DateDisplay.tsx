@@ -20,6 +20,17 @@ interface DateDisplayProps {
 export function DateDisplay({ className, showLocation = false, compact = false }: DateDisplayProps) {
   const { currentDate, location, maghribTime, isLoading } = useCalendar();
 
+  // DEV-only debug logging to verify timezone and date calculation
+  if (import.meta.env.DEV && currentDate) {
+    console.log('[DateDisplay] Debug:', {
+      timezone: location?.timezone,
+      maghribTime,
+      isAfterMaghrib: currentDate.isAfterMaghrib,
+      gregorianISO: currentDate.gregorian.toISOString(),
+      hijriDate: `${currentDate.hijri.day} ${currentDate.hijri.monthName} ${currentDate.hijri.year}`,
+    });
+  }
+
   if (isLoading || !currentDate) {
     return (
       <div className={cn('flex items-center gap-2 text-muted-foreground', className)}>

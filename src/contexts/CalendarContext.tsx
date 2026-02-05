@@ -54,11 +54,25 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
       }
 
       if (data?.latitude && data?.longitude) {
+        // Backfill timezone if missing - use browser's timezone as fallback
+        let timezone = data.timezone;
+        if (!timezone) {
+          timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+          // Persist the backfilled timezone to the profile
+          supabase
+            .from('profiles')
+            .update({ timezone })
+            .eq('id', user.id)
+            .then(({ error }) => {
+              if (error) console.error('Failed to backfill timezone:', error);
+            });
+        }
+        
         setLocationState({
           latitude: data.latitude,
           longitude: data.longitude,
           city: data.city || undefined,
-          timezone: data.timezone || undefined,
+          timezone,
         });
       } else {
         // No saved location, use default
