@@ -75,7 +75,7 @@ export function gregorianToHijri(date: Date, timezone?: string): HijriDate {
  * Advance a Hijri date by 1 day, handling month/year rollovers
  * Used for Bohra sunset rule: Islamic day begins at Maghrib
  */
-function advanceHijriDay(hijri: HijriDate): HijriDate {
+export function advanceHijriDay(hijri: HijriDate): HijriDate {
   // Hijri months alternate between 30 and 29 days
   // Odd months (1,3,5,7,9,11) = 30 days
   // Even months (2,4,6,8,10,12) = 29 days (Dhul Hijjah can be 30 in leap years)
