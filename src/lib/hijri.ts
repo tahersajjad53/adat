@@ -43,12 +43,18 @@ const HIJRI_MONTHS = [
  */
 export function gregorianToHijri(date: Date, timezone?: string): HijriDate {
   // Use Intl.DateTimeFormat with islamic-umalqura calendar for accurate conversion
-  const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
+  // Only pass timeZone if it's a valid, non-empty string
+  const formatOptions: Intl.DateTimeFormatOptions = {
     day: 'numeric',
     month: 'numeric',
     year: 'numeric',
-    timeZone: timezone,
-  });
+  };
+  
+  if (timezone && timezone.trim()) {
+    formatOptions.timeZone = timezone.trim();
+  }
+  
+  const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', formatOptions);
 
   const parts = formatter.formatToParts(date);
   
@@ -123,10 +129,11 @@ export function getAdjustedHijriDate(
     : false;
   
   // If after Maghrib, we need to add 1 day to get the "Islamic day"
+  // Use millisecond-based addition to avoid browser timezone quirks with setDate()
   let dateForConversion = currentTime;
   if (afterMaghrib) {
-    dateForConversion = new Date(currentTime);
-    dateForConversion.setDate(dateForConversion.getDate() + 1);
+    // Add exactly 24 hours in milliseconds for timezone-safe day advancement
+    dateForConversion = new Date(currentTime.getTime() + 24 * 60 * 60 * 1000);
   }
   
   const hijri = gregorianToHijri(dateForConversion, timezone);
