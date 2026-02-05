@@ -2,23 +2,32 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { DailyMeter } from '@/components/namaz/DailyMeter';
+import { TimeOfDayCard } from '@/components/namaz/TimeOfDayCard';
 import { PrayerList } from '@/components/namaz/PrayerList';
 import { MissedPrayersList } from '@/components/namaz/MissedPrayersList';
 import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
+import { usePrayerTimes, getCurrentPrayerWindow } from '@/hooks/usePrayerTimes';
 import { Clock, WarningCircle } from 'iconoir-react';
 
 const Namaz: React.FC = () => {
   const { prayers, togglePrayer, percentage, isLoading: prayersLoading } = usePrayerLog();
   const { missedPrayers, unfulfilledCount, fulfillPrayer, isLoading: missedLoading } = useMissedPrayers();
+  const { prayerTimes } = usePrayerTimes();
+  
+  // Determine current prayer window for visual theming
+  const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
+  const currentPrayer = currentPrayerWindow?.current || null;
 
   return (
     <div className="container py-6 max-w-xl mx-auto space-y-6">
-      {/* Compact Header Row */}
-      <div className="flex items-start justify-between">
-        <DateDisplay showLocation compact />
-        <DailyMeter percentage={percentage} compact />
-      </div>
+      {/* Time-aware visual header card */}
+      <TimeOfDayCard currentPrayer={currentPrayer}>
+        <div className="flex items-start justify-between">
+          <DateDisplay showLocation compact variant="light" />
+          <DailyMeter percentage={percentage} compact variant="light" />
+        </div>
+      </TimeOfDayCard>
 
       {/* Tabs */}
       <Tabs defaultValue="today" className="w-full">

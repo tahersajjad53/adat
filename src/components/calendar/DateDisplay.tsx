@@ -15,9 +15,10 @@ interface DateDisplayProps {
   className?: string;
   showLocation?: boolean;
   compact?: boolean;
+  variant?: 'default' | 'light';
 }
 
-export function DateDisplay({ className, showLocation = false, compact = false }: DateDisplayProps) {
+export function DateDisplay({ className, showLocation = false, compact = false, variant = 'default' }: DateDisplayProps) {
   const { currentDate, location, maghribTime, isLoading } = useCalendar();
 
   // DEV-only debug logging to verify timezone and date calculation
@@ -31,9 +32,11 @@ export function DateDisplay({ className, showLocation = false, compact = false }
     });
   }
 
+  const isLight = variant === 'light';
+
   if (isLoading || !currentDate) {
     return (
-      <div className={cn('flex items-center gap-2 text-muted-foreground', className)}>
+      <div className={cn('flex items-center gap-2', isLight ? 'text-white/70' : 'text-muted-foreground', className)}>
         <Refresh className="h-4 w-4 animate-spin" />
         <span className="text-sm">Loading calendar...</span>
       </div>
@@ -48,13 +51,13 @@ export function DateDisplay({ className, showLocation = false, compact = false }
       <div className={cn('flex flex-col items-start', className)}>
         <div className="flex items-center gap-2">
           {currentDate.isAfterMaghrib ? (
-            <HalfMoon className="h-4 w-4 text-primary" />
+            <HalfMoon className={cn("h-4 w-4", isLight ? "text-white" : "text-primary")} />
           ) : (
-            <SunLight className="h-4 w-4 text-accent-foreground" />
+            <SunLight className={cn("h-4 w-4", isLight ? "text-white" : "text-accent-foreground")} />
           )}
-          <span className="font-display font-semibold">{hijriFormatted}</span>
+          <span className={cn("font-display font-semibold", isLight && "text-white")}>{hijriFormatted}</span>
         </div>
-        <span className="text-sm text-muted-foreground">
+        <span className={cn("text-sm", isLight ? "text-white/80" : "text-muted-foreground")}>
           {gregorianFormatted}{location?.city ? ` · ${location.city}` : ''}
         </span>
       </div>

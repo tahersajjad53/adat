@@ -7,6 +7,7 @@ interface DailyMeterProps {
   className?: string;
   showMessage?: boolean;
   compact?: boolean;
+  variant?: 'default' | 'light';
 }
 
 const ENCOURAGEMENT_MESSAGES: Record<number, string> = {
@@ -32,16 +33,18 @@ export const DailyMeter: React.FC<DailyMeterProps> = ({
   className,
   showMessage = true,
   compact = false,
+  variant = 'default',
 }) => {
   const message = getEncouragementMessage(percentage);
+  const isLight = variant === 'light';
 
   if (compact) {
     return (
       <div className={cn('flex flex-col items-end', className)}>
-        <span className="text-3xl font-bold font-display text-foreground">
+        <span className={cn("text-3xl font-bold font-display", isLight ? "text-white" : "text-foreground")}>
           {percentage}%
         </span>
-        <span className="text-xs text-muted-foreground">Daily Progress</span>
+        <span className={cn("text-xs", isLight ? "text-white/80" : "text-muted-foreground")}>Daily Progress</span>
       </div>
     );
   }
