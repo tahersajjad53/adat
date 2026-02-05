@@ -38,13 +38,16 @@ const HIJRI_MONTHS = [
 
 /**
  * Convert a Gregorian date to Hijri using the native Intl API
+ * @param date - The Gregorian date to convert
+ * @param timezone - Optional IANA timezone for accurate date interpretation
  */
-export function gregorianToHijri(date: Date): HijriDate {
+export function gregorianToHijri(date: Date, timezone?: string): HijriDate {
   // Use Intl.DateTimeFormat with islamic-umalqura calendar for accurate conversion
   const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', {
     day: 'numeric',
     month: 'numeric',
     year: 'numeric',
+    timeZone: timezone,
   });
 
   const parts = formatter.formatToParts(date);
@@ -126,7 +129,7 @@ export function getAdjustedHijriDate(
     dateForConversion.setDate(dateForConversion.getDate() + 1);
   }
   
-  const hijri = gregorianToHijri(dateForConversion);
+  const hijri = gregorianToHijri(dateForConversion, timezone);
   
   return {
     gregorian: currentTime,
