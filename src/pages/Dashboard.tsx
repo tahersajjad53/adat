@@ -3,10 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
-import { LogOut, MapPin, User } from 'lucide-react';
+import { LogOut, MapPin, User, ChevronRight, AlertCircle } from 'lucide-react';
 import adatLogo from '@/assets/adat-logo.svg';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendar } from '@/contexts/CalendarContext';
+import { DailyMeter } from '@/components/namaz/DailyMeter';
+import { CurrentPrayerCard } from '@/components/namaz/CurrentPrayerCard';
+import { usePrayerLog } from '@/hooks/usePrayerLog';
+import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -14,6 +18,9 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [fullName, setFullName] = useState<string>('');
   const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
+
+  const { prayers, togglePrayer, percentage, completedCount, totalCount, currentPrayer, nextPrayer, isLoading: prayersLoading } = usePrayerLog();
+  const { unfulfilledCount } = useMissedPrayers();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -26,7 +33,6 @@ const Dashboard: React.FC = () => {
         
         if (error) {
           console.error('Error fetching profile:', error);
-          // If profile doesn't exist, user needs onboarding
           setNeedsOnboarding(true);
           return;
         }
@@ -35,10 +41,8 @@ const Dashboard: React.FC = () => {
           if (data.full_name) {
             setFullName(data.full_name);
           }
-          // Check if user needs onboarding (no location set)
           setNeedsOnboarding(data.latitude === null);
         } else {
-          // No profile found, needs onboarding
           setNeedsOnboarding(true);
         }
       }
@@ -46,7 +50,6 @@ const Dashboard: React.FC = () => {
     fetchProfile();
   }, [user]);
 
-  // Redirect to onboarding if needed
   useEffect(() => {
     if (needsOnboarding === true) {
       navigate('/auth/onboarding', { replace: true });
@@ -55,7 +58,9 @@ const Dashboard: React.FC = () => {
 
   const displayName = fullName || user?.email?.split('@')[0] || 'User';
 
-  // Show loading while checking onboarding status
+  // Determine which prayer to show (current or next upcoming)
+  const prayerToShow = currentPrayer || nextPrayer;
+
   if (needsOnboarding === null) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
@@ -86,8 +91,8 @@ const Dashboard: React.FC = () => {
       </header>
 
       {/* Main content */}
-      <main className="container py-12">
-        <div className="max-w-2xl mx-auto text-center space-y-6">
+      <main className="container py-8">
+        <div className="max-w-2xl mx-auto space-y-8">
           {/* Date Display */}
           <div className="flex flex-col items-center space-y-4">
             <DateDisplay showLocation className="text-center" />
@@ -104,17 +109,48 @@ const Dashboard: React.FC = () => {
             )}
           </div>
 
-          <h1 className="text-4xl font-bold tracking-tight font-display">
+          {/* Greeting */}
+          <h1 className="text-3xl font-bold tracking-tight font-display text-center">
             Assalamu Alaikum, {displayName}
           </h1>
-          <p className="text-lg text-muted-foreground">
-            Your dashboard is ready. We'll be adding prayer tracking, dues management, and goal setting features here soon.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-8">
-            <div className="p-6 border border-border rounded-lg">
-              <h3 className="font-semibold mb-2">Namaz Tracker</h3>
-              <p className="text-sm text-muted-foreground">Coming soon</p>
+
+          {/* Daily Meter */}
+          <div className="p-6 border border-border rounded-xl bg-card">
+            <DailyMeter percentage={percentage} />
+            <div className="mt-4 pt-4 border-t border-border flex items-center justify-between text-sm">
+              <span className="text-muted-foreground">
+                {completedCount} of {totalCount} prayers completed
+              </span>
+              {unfulfilledCount > 0 && (
+                <span className="flex items-center gap-1 text-destructive">
+                  <AlertCircle className="h-3 w-3" />
+                  {unfulfilledCount} missed
+                </span>
+              )}
             </div>
+          </div>
+
+          {/* Current Prayer */}
+          {prayerToShow && (
+            <CurrentPrayerCard
+              prayer={prayerToShow}
+              onToggle={() => togglePrayer(prayerToShow.name)}
+              label={currentPrayer ? 'Current Prayer' : 'Next Prayer'}
+            />
+          )}
+
+          {/* View All Link */}
+          <Button
+            variant="outline"
+            className="w-full justify-between"
+            onClick={() => navigate('/namaz')}
+          >
+            <span>View all prayers</span>
+            <ChevronRight className="h-4 w-4" />
+          </Button>
+
+          {/* Coming Soon Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="p-6 border border-border rounded-lg">
               <h3 className="font-semibold mb-2">Dues & Khumus</h3>
               <p className="text-sm text-muted-foreground">Coming soon</p>
