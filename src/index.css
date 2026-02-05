@@ -11,83 +11,83 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
 
 @layer base {
   :root {
-    --background: 100 35% 88%;
-    --foreground: 185 50% 20%;
+    --background: 45 30% 92%;
+    --foreground: 160 50% 18%;
 
-    --card: 100 30% 94%;
-    --card-foreground: 185 50% 20%;
+    --card: 45 25% 96%;
+    --card-foreground: 160 50% 18%;
 
-    --popover: 100 30% 94%;
-    --popover-foreground: 185 50% 20%;
+    --popover: 45 25% 96%;
+    --popover-foreground: 160 50% 18%;
 
-    --primary: 185 45% 25%;
-    --primary-foreground: 100 35% 95%;
+    --primary: 160 45% 22%;
+    --primary-foreground: 45 30% 96%;
 
-    --secondary: 100 25% 92%;
-    --secondary-foreground: 185 45% 25%;
+    --secondary: 45 20% 90%;
+    --secondary-foreground: 160 45% 22%;
 
-    --muted: 100 20% 90%;
-    --muted-foreground: 185 30% 40%;
+    --muted: 45 15% 88%;
+    --muted-foreground: 160 30% 35%;
 
-    --accent: 185 40% 30%;
-    --accent-foreground: 100 35% 95%;
+    --accent: 75 70% 50%;
+    --accent-foreground: 160 50% 15%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 185 20% 75%;
-    --input: 185 20% 80%;
-    --ring: 185 45% 25%;
+    --border: 160 15% 80%;
+    --input: 160 15% 85%;
+    --ring: 160 45% 22%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 185 45% 25%;
-    --sidebar-foreground: 100 30% 92%;
-    --sidebar-primary: 100 35% 88%;
-    --sidebar-primary-foreground: 185 45% 20%;
-    --sidebar-accent: 185 40% 30%;
-    --sidebar-accent-foreground: 100 35% 95%;
-    --sidebar-border: 185 35% 30%;
-    --sidebar-ring: 100 35% 75%;
+    --sidebar-background: 160 45% 22%;
+    --sidebar-foreground: 45 25% 94%;
+    --sidebar-primary: 45 30% 92%;
+    --sidebar-primary-foreground: 160 45% 18%;
+    --sidebar-accent: 160 40% 28%;
+    --sidebar-accent-foreground: 45 30% 96%;
+    --sidebar-border: 160 35% 28%;
+    --sidebar-ring: 75 70% 50%;
   }
 
   .dark {
-    --background: 185 45% 12%;
-    --foreground: 100 30% 92%;
+    --background: 160 45% 10%;
+    --foreground: 45 25% 92%;
 
-    --card: 185 40% 16%;
-    --card-foreground: 100 30% 92%;
+    --card: 160 40% 14%;
+    --card-foreground: 45 25% 92%;
 
-    --popover: 185 40% 16%;
-    --popover-foreground: 100 30% 92%;
+    --popover: 160 40% 14%;
+    --popover-foreground: 45 25% 92%;
 
-    --primary: 100 35% 75%;
-    --primary-foreground: 185 45% 15%;
+    --primary: 75 60% 55%;
+    --primary-foreground: 160 45% 12%;
 
-    --secondary: 185 35% 20%;
-    --secondary-foreground: 100 30% 88%;
+    --secondary: 160 35% 18%;
+    --secondary-foreground: 45 25% 88%;
 
-    --muted: 185 30% 18%;
-    --muted-foreground: 100 20% 65%;
+    --muted: 160 30% 16%;
+    --muted-foreground: 45 15% 60%;
 
-    --accent: 100 30% 70%;
-    --accent-foreground: 185 45% 12%;
+    --accent: 75 65% 45%;
+    --accent-foreground: 160 45% 10%;
 
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 185 30% 22%;
-    --input: 185 30% 22%;
-    --ring: 100 35% 75%;
+    --border: 160 30% 20%;
+    --input: 160 30% 20%;
+    --ring: 75 60% 55%;
     
-    --sidebar-background: 185 40% 16%;
-    --sidebar-foreground: 100 30% 92%;
-    --sidebar-primary: 100 35% 75%;
-    --sidebar-primary-foreground: 185 45% 15%;
-    --sidebar-accent: 185 35% 22%;
-    --sidebar-accent-foreground: 100 30% 92%;
-    --sidebar-border: 185 30% 22%;
-    --sidebar-ring: 100 35% 75%;
+    --sidebar-background: 160 40% 14%;
+    --sidebar-foreground: 45 25% 92%;
+    --sidebar-primary: 75 60% 55%;
+    --sidebar-primary-foreground: 160 45% 12%;
+    --sidebar-accent: 160 35% 20%;
+    --sidebar-accent-foreground: 45 25% 92%;
+    --sidebar-border: 160 30% 20%;
+    --sidebar-ring: 75 60% 55%;
   }
 }
 
