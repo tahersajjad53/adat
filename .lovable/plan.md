@@ -1,187 +1,114 @@
 
-# Refactor: Implement Accurate Bohra Calendar System
+# Theme Overhaul: Cogo-Inspired Teal & Sage Palette
 
-## Problem Summary
+## Color Analysis from Inspiration
 
-The current implementation shows **18 Shaban** when the user expects **19 Shaban** after Maghrib. This is a systematic 1-day offset caused by using incompatible calendar sources.
+From the uploaded image, I've identified a sophisticated, calming color palette:
 
-### Data Flow Analysis:
+| Role | Color | HSL Value | Usage |
+|------|-------|-----------|-------|
+| **Deep Teal** | Dark petrol blue | `185 45% 25%` | Primary, backgrounds, text |
+| **Sage Green** | Soft mint/sage | `100 35% 88%` | Cards, secondary surfaces |
+| **Dark Teal Text** | Navy-teal | `185 50% 20%` | Headings on light backgrounds |
+| **Off-White** | Cream/white | `30 20% 97%` | Light background, contrast |
 
-```
-Current Time: Feb 5, 2026, 20:15 Colombo (after Maghrib at 18:20)
+## Design Philosophy
 
-Aladhan API returns:  17 Shaban 1447 (using HJCoSA - midnight-based)
-After +1 sunset rule: 18 Shaban 1447
-User expects:         19 Shaban 1447
-```
-
-## Root Cause
-
-The **Aladhan API uses HJCoSA (Hijri Council of Saudi Arabia)** calendar which:
-- Transitions at midnight, not Maghrib
-- Uses calculated astronomy, not moon sighting
-- Does NOT align with Dawoodi Bohra calendar
-
-The Bohra community traditionally uses the **Misri/Fatimid calendar** which:
-- Has different month start dates than HJCoSA/Umm al-Qura
-- Begins each day at Maghrib (sunset)
-- Often runs 1-2 days different from Saudi calendar
-
-## Recommended Solution
-
-### Option A: Apply Bohra Calendar Offset (Recommended - Fastest)
-
-Add a **configurable base offset** (+1 day) to align Aladhan's output with Bohra calendar, then apply the sunset rule:
-
-```
-Final Date = Aladhan Hijri + Base Offset + (1 if after Maghrib)
-```
-
-For current date: `17 + 1 + 1 = 19 Shaban`
-
-**Pros:**
-- Quick to implement
-- Works immediately
-- Offset can be adjusted if needed
-
-**Cons:**
-- Hardcoded offset may drift over time
-- Not technically accurate to the calculation method
-
-### Option B: Use Misri Calendar Calculation
-
-Replace Aladhan with a proper **Misri/Fatimid calendar** library that natively:
-- Uses the 30-year tabular cycle
-- Has sunset-based day transitions built in
-
-**Pros:**
-- Technically correct implementation
-- No arbitrary offsets needed
-
-**Cons:**
-- Requires finding/building a Misri calendar library
-- More complex implementation
-
-### Option C: Hybrid Approach (Recommended for Long-term)
-
-1. Use Aladhan for **prayer times only** (accurate for location)
-2. Implement **Misri calendar calculation** for Hijri dates
-3. Apply sunset rule on top of Misri dates
+This palette conveys:
+- **Calm & Spiritual**: The teal and sage evoke tranquility, appropriate for a prayer app
+- **Natural**: Earthy greens connect to nature and growth
+- **Premium**: Sophisticated color pairing feels modern yet timeless
+- **High Contrast**: Dark teal on sage maintains excellent readability
 
 ## Implementation Plan
 
-### Phase 1: Quick Fix with Configurable Offset
+### File: `src/index.css`
 
-#### File: `src/lib/hijri.ts`
+Update the CSS custom properties with the new color scheme:
 
-Add a constant for Bohra calendar offset:
-
-```typescript
-/**
- * Bohra Calendar Offset
- * 
- * The Dawoodi Bohra community uses the Misri/Fatimid calendar
- * which often differs from the Saudi (HJCoSA/Umm al-Qura) calendar
- * by 1-2 days. This offset aligns the API output with Bohra dates.
- * 
- * Set to 1 to add one day to the base Aladhan date before
- * applying the sunset rule.
- */
-export const BOHRA_CALENDAR_OFFSET = 1;
-```
-
-#### File: `src/contexts/CalendarContext.tsx`
-
-Update `refreshDate` to apply the base offset:
-
-```typescript
-import { ..., advanceHijriDay, BOHRA_CALENDAR_OFFSET } from '@/lib/hijri';
-
-// In refreshDate():
-let hijri: HijriDate = {
-  day: aladhanHijri.day,
-  month: aladhanHijri.month,
-  year: aladhanHijri.year,
-  monthName: aladhanHijri.monthNameEn,
-  monthNameArabic: aladhanHijri.monthNameAr,
-};
-
-// Apply Bohra calendar base offset (aligns with Misri calendar)
-for (let i = 0; i < BOHRA_CALENDAR_OFFSET; i++) {
-  hijri = advanceHijriDay(hijri);
-}
-
-// Bohra sunset rule: If after Maghrib, advance one more day
-if (afterMaghrib) {
-  hijri = advanceHijriDay(hijri);
+**Light Mode:**
+```css
+:root {
+  --background: 100 35% 88%;        /* Sage green - main background */
+  --foreground: 185 50% 20%;        /* Dark teal - text */
+  
+  --card: 100 30% 94%;              /* Lighter sage - cards */
+  --card-foreground: 185 50% 20%;   /* Dark teal */
+  
+  --primary: 185 45% 25%;           /* Deep teal - buttons, accents */
+  --primary-foreground: 100 35% 95%;/* Light sage for contrast */
+  
+  --secondary: 100 25% 92%;         /* Subtle sage variation */
+  --secondary-foreground: 185 45% 25%;
+  
+  --muted: 100 20% 90%;             /* Muted sage */
+  --muted-foreground: 185 30% 40%;  /* Medium teal */
+  
+  --accent: 185 40% 30%;            /* Teal accent */
+  --accent-foreground: 100 35% 95%;
+  
+  --border: 185 20% 75%;            /* Soft teal-tinted border */
+  --input: 185 20% 80%;
+  --ring: 185 45% 25%;              /* Deep teal focus ring */
 }
 ```
 
-### Phase 2: Future Enhancement - Misri Calendar
-
-For a more robust solution, implement proper Misri calendar calculation:
-
-```typescript
-/**
- * Misri/Fatimid Calendar Calculation
- * 
- * Uses the 30-year tabular cycle with specific leap year pattern:
- * Years 2, 5, 7, 10, 13, 16, 18, 21, 24, 26, 29 in each cycle are leap years
- * 
- * Day transition occurs at Maghrib (sunset)
- */
-function gregorianToMisri(date: Date, maghribTime: string, timezone: string): HijriDate {
-  // Implementation using astronomical calculations
-  // or porting from existing Misri calendar libraries
+**Dark Mode:**
+```css
+.dark {
+  --background: 185 45% 12%;        /* Very dark teal */
+  --foreground: 100 30% 92%;        /* Light sage text */
+  
+  --card: 185 40% 16%;              /* Slightly lighter dark teal */
+  --card-foreground: 100 30% 92%;
+  
+  --primary: 100 35% 75%;           /* Sage accent in dark mode */
+  --primary-foreground: 185 45% 15%;
+  
+  --secondary: 185 35% 20%;
+  --secondary-foreground: 100 30% 88%;
+  
+  --muted: 185 30% 18%;
+  --muted-foreground: 100 20% 65%;
+  
+  --accent: 100 30% 70%;
+  --accent-foreground: 185 45% 12%;
+  
+  --border: 185 30% 22%;
+  --input: 185 30% 22%;
+  --ring: 100 35% 75%;
 }
 ```
 
-## Technical Architecture Summary
+**Sidebar (matching theme):**
+```css
+--sidebar-background: 185 45% 25%;     /* Deep teal sidebar */
+--sidebar-foreground: 100 30% 92%;     /* Sage text */
+--sidebar-primary: 100 35% 88%;
+--sidebar-primary-foreground: 185 45% 20%;
+--sidebar-accent: 185 40% 30%;
+--sidebar-accent-foreground: 100 35% 95%;
+--sidebar-border: 185 35% 30%;
+--sidebar-ring: 100 35% 75%;
+```
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     CalendarProvider                         │
-├─────────────────────────────────────────────────────────────┤
-│                                                              │
-│  1. Fetch Aladhan API                                       │
-│     └── Get prayer times + base Hijri date                  │
-│                                                              │
-│  2. Apply Bohra Calendar Offset (+1)                        │
-│     └── Aligns with Misri/Fatimid calendar                  │
-│                                                              │
-│  3. Check isAfterMaghrib()                                  │
-│     └── Compare current time vs Maghrib time                │
-│                                                              │
-│  4. Apply Sunset Rule (+1 if after Maghrib)                 │
-│     └── Islamic day begins at sunset                        │
-│                                                              │
-│  5. Final Result: Correct Bohra Hijri Date                  │
-│                                                              │
-└─────────────────────────────────────────────────────────────┘
-```
+## Visual Impact
+
+| Element | Before (B&W) | After (Teal & Sage) |
+|---------|--------------|---------------------|
+| Background | Pure white | Soft sage green |
+| Text | Black | Deep teal |
+| Cards | White with gray border | Lighter sage with teal-tinted border |
+| Buttons | Black | Deep teal |
+| Sidebar | Light gray | Rich deep teal |
 
 ## Files to Modify
 
-1. **`src/lib/hijri.ts`**
-   - Add `BOHRA_CALENDAR_OFFSET` constant
-   - Export for use in CalendarContext
+1. **`src/index.css`** - Update all CSS custom properties in `:root` and `.dark` with the new palette
 
-2. **`src/contexts/CalendarContext.tsx`**
-   - Import `BOHRA_CALENDAR_OFFSET`
-   - Apply base offset before sunset rule
-   - Update fallback logic to also use offset
+## Contextual Considerations
 
-## Expected Result
-
-After implementation:
-- Aladhan returns: 17 Shaban
-- After +1 Bohra offset: 18 Shaban
-- After +1 sunset rule (it's after Maghrib): **19 Shaban** ✓
-
-## Testing Checklist
-
-- [ ] Verify 19 Shaban displays after Maghrib on Feb 5, 2026
-- [ ] Verify 18 Shaban displays before Maghrib on Feb 5, 2026
-- [ ] Verify month rollover works correctly (day 30 → day 1 of next month)
-- [ ] Verify year rollover works correctly (Dhul Hijjah → Muharram)
-- [ ] Clear localStorage cache before testing to avoid stale data
+- **Prayer App Context**: Teal and sage evoke calmness, suitable for spiritual reflection
+- **Readability**: Dark teal on sage maintains WCAG AA contrast ratios
+- **Existing Components**: All Shadcn UI components will automatically inherit the new theme via CSS variables
+- **Progress Bar**: The DailyMeter will use the primary teal color, standing out against sage backgrounds
