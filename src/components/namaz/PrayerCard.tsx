@@ -1,18 +1,20 @@
 import React from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { Check, Clock, WarningCircle } from 'iconoir-react';
-import { PrayerName } from '@/hooks/usePrayerTimes';
+import { Check, Clock, WarningCircle, HalfMoon } from 'iconoir-react';
+import { AllPrayerName } from '@/hooks/usePrayerTimes';
 
 interface PrayerCardProps {
-  name: PrayerName;
+  name: AllPrayerName;
   displayName: string;
   time: string;
   status: 'upcoming' | 'current' | 'completed' | 'missed';
   isCompleted: boolean;
   onToggle: () => void;
   compact?: boolean;
+  isOptional?: boolean;
 }
 
 const STATUS_STYLES = {
@@ -37,14 +39,19 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
   isCompleted,
   onToggle,
   compact = false,
+  isOptional = false,
 }) => {
-  const StatusIcon = STATUS_ICONS[status];
+  // For optional prayers, don't show missed status icon
+  const effectiveStatus = isOptional && status === 'missed' ? 'upcoming' : status;
+  const StatusIcon = isOptional ? HalfMoon : STATUS_ICONS[effectiveStatus];
 
   return (
     <div
       className={cn(
         'flex items-center justify-between rounded-lg border p-4 transition-all',
-        STATUS_STYLES[status],
+        isOptional 
+          ? 'border-border/50 bg-muted/30' 
+          : STATUS_STYLES[status],
         compact && 'p-3'
       )}
     >
@@ -55,16 +62,24 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
           onCheckedChange={onToggle}
           className="h-5 w-5"
         />
-        <Label
-          htmlFor={`prayer-${name}`}
-          className={cn(
-            'cursor-pointer font-medium',
-            isCompleted && 'line-through text-muted-foreground',
-            compact ? 'text-sm' : 'text-base'
+        <div className="flex items-center gap-2">
+          <Label
+            htmlFor={`prayer-${name}`}
+            className={cn(
+              'cursor-pointer font-medium',
+              isCompleted && 'line-through text-muted-foreground',
+              isOptional && !isCompleted && 'text-muted-foreground',
+              compact ? 'text-sm' : 'text-base'
+            )}
+          >
+            {displayName}
+          </Label>
+          {isOptional && (
+            <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
+              Optional
+            </Badge>
           )}
-        >
-          {displayName}
-        </Label>
+        </div>
       </div>
 
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -72,9 +87,10 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
         <StatusIcon
           className={cn(
             'h-4 w-4',
-            status === 'current' && 'text-primary',
-            status === 'completed' && 'text-primary',
-            status === 'missed' && 'text-destructive'
+            isOptional && 'text-muted-foreground/60',
+            !isOptional && status === 'current' && 'text-primary',
+            !isOptional && status === 'completed' && 'text-primary',
+            !isOptional && status === 'missed' && 'text-destructive'
           )}
         />
       </div>

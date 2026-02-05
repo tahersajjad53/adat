@@ -2,20 +2,21 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { supabase } from '@/integrations/supabase/client';
-import { usePrayerTimes, PrayerName, PRAYER_ORDER, getPrayerStatus, PRAYER_DISPLAY_NAMES } from './usePrayerTimes';
+import { usePrayerTimes, PrayerName, AllPrayerName, PRAYER_ORDER, ALL_PRAYER_ORDER, OPTIONAL_PRAYERS, getPrayerStatus, PRAYER_DISPLAY_NAMES } from './usePrayerTimes';
 
 export interface PrayerStatus {
-  name: PrayerName;
+  name: AllPrayerName;
   displayName: string;
   time: string;
   isCompleted: boolean;
   completedAt: Date | null;
   status: 'upcoming' | 'current' | 'completed' | 'missed';
+  isOptional: boolean;
 }
 
 interface UsePrayerLogReturn {
   prayers: PrayerStatus[];
-  togglePrayer: (prayer: PrayerName) => Promise<void>;
+  togglePrayer: (prayer: AllPrayerName) => Promise<void>;
   completedCount: number;
   totalCount: number;
   percentage: number;
@@ -37,9 +38,9 @@ function getHijriDateKey(hijri: { year: number; month: number; day: number }): s
 export function usePrayerLog(): UsePrayerLogReturn {
   const { user } = useAuth();
   const { currentDate } = useCalendar();
-  const { prayerTimes, isLoading: timesLoading } = usePrayerTimes();
+  const { prayerTimes, allPrayerTimes, isLoading: timesLoading } = usePrayerTimes();
   
-  const [completedPrayers, setCompletedPrayers] = useState<Map<PrayerName, Date>>(new Map());
+  const [completedPrayers, setCompletedPrayers] = useState<Map<AllPrayerName, Date>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
 
   // Get the Hijri date key for today
@@ -65,10 +66,10 @@ export function usePrayerLog(): UsePrayerLogReturn {
 
         if (error) throw error;
 
-        const completed = new Map<PrayerName, Date>();
+        const completed = new Map<AllPrayerName, Date>();
         data?.forEach((log) => {
           if (log.completed_at) {
-            completed.set(log.prayer as PrayerName, new Date(log.completed_at));
+            completed.set(log.prayer as AllPrayerName, new Date(log.completed_at));
           }
         });
         setCompletedPrayers(completed);
@@ -83,7 +84,7 @@ export function usePrayerLog(): UsePrayerLogReturn {
   }, [user, dateKey]);
 
   // Toggle prayer completion
-  const togglePrayer = useCallback(async (prayer: PrayerName) => {
+  const togglePrayer = useCallback(async (prayer: AllPrayerName) => {
     if (!user || !dateKey || !gregorianDate) return;
 
     const isCurrentlyCompleted = completedPrayers.has(prayer);
@@ -129,13 +130,21 @@ export function usePrayerLog(): UsePrayerLogReturn {
     }
   }, [user, dateKey, gregorianDate, completedPrayers]);
 
-  // Build prayers list with status
-  const prayers: PrayerStatus[] = PRAYER_ORDER.map((name) => {
+  // Build prayers list with status (all prayers including optional)
+  const prayers: PrayerStatus[] = ALL_PRAYER_ORDER.map((name) => {
     const isCompleted = completedPrayers.has(name);
-    const time = prayerTimes?.[name] || '--:--';
-    const status = prayerTimes 
-      ? getPrayerStatus(name, prayerTimes, isCompleted)
-      : 'upcoming';
+    const time = allPrayerTimes?.[name] || '--:--';
+    const isOptional = OPTIONAL_PRAYERS.includes(name as any);
+    
+    // For optional prayers, use a simpler status calculation
+    let status: PrayerStatus['status'];
+    if (isOptional) {
+      status = isCompleted ? 'completed' : 'upcoming';
+    } else {
+      status = prayerTimes 
+        ? getPrayerStatus(name as PrayerName, prayerTimes, isCompleted)
+        : 'upcoming';
+    }
 
     return {
       name,
@@ -144,21 +153,24 @@ export function usePrayerLog(): UsePrayerLogReturn {
       isCompleted,
       completedAt: completedPrayers.get(name) || null,
       status,
+      isOptional,
     };
   });
 
-  // Find current and next prayer
-  const currentPrayer = prayers.find((p) => p.status === 'current') || null;
-  const nextPrayer = prayers.find((p) => p.status === 'upcoming') || null;
+  // Find current and next prayer (only from required prayers)
+  const requiredPrayers = prayers.filter(p => !p.isOptional);
+  const currentPrayer = requiredPrayers.find((p) => p.status === 'current') || null;
+  const nextPrayer = requiredPrayers.find((p) => p.status === 'upcoming') || null;
 
-  const completedCount = completedPrayers.size;
+  // Only count required prayers for percentage
+  const completedRequired = prayers.filter(p => !p.isOptional && p.isCompleted).length;
   const totalCount = 5;
-  const percentage = Math.round((completedCount / totalCount) * 100);
+  const percentage = Math.round((completedRequired / totalCount) * 100);
 
   return {
     prayers,
     togglePrayer,
-    completedCount,
+    completedCount: completedRequired,
     totalCount,
     percentage,
     isLoading: isLoading || timesLoading,
