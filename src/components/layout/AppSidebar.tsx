@@ -59,7 +59,7 @@ export function AppSidebar() {
         <img 
           src={adatLogo} 
           alt="Adat" 
-          className="h-8 w-auto brightness-0 invert md:invert-0 md:sepia md:saturate-[10] md:hue-rotate-[50deg] md:brightness-[0.85]" 
+          className="h-8 w-auto logo-lime" 
         />
       </SidebarHeader>
 
