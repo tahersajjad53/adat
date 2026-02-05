@@ -87,25 +87,9 @@ const Dashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Greeting */}
-        <h1 className="text-3xl font-bold tracking-tight font-display text-center">
-          Assalamu Alaikum, {displayName}
-        </h1>
-
         {/* Daily Meter */}
         <div className="p-6 border border-border rounded-xl bg-card">
           <DailyMeter percentage={percentage} />
-          <div className="mt-4 pt-4 border-t border-border flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
-              {completedCount} of {totalCount} prayers completed
-            </span>
-            {unfulfilledCount > 0 && (
-              <span className="flex items-center gap-1 text-destructive">
-                <WarningCircle className="h-3 w-3" />
-                {unfulfilledCount} missed
-              </span>
-            )}
-          </div>
         </div>
 
         {/* Current Prayer */}
