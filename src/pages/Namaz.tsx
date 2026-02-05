@@ -6,6 +6,7 @@ import { PrayerList } from '@/components/namaz/PrayerList';
 import { MissedPrayersList } from '@/components/namaz/MissedPrayersList';
 import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
+import { Clock, WarningCircle } from 'iconoir-react';
 
 const Namaz: React.FC = () => {
   const { prayers, togglePrayer, percentage, isLoading: prayersLoading } = usePrayerLog();
@@ -22,11 +23,15 @@ const Namaz: React.FC = () => {
       {/* Tabs */}
       <Tabs defaultValue="today" className="w-full">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="today">Today's Prayers</TabsTrigger>
-          <TabsTrigger value="missed" className="relative">
-            Missed Prayers
+          <TabsTrigger value="today">
+            <Clock className="h-4 w-4" />
+            Today's Namaz
+          </TabsTrigger>
+          <TabsTrigger value="missed">
+            <WarningCircle className="h-4 w-4" />
+            Missed Namaz
             {unfulfilledCount > 0 && (
-              <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-destructive text-xs text-destructive-foreground">
+              <span className="ml-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-semibold text-destructive-foreground">
                 {unfulfilledCount > 99 ? '99+' : unfulfilledCount}
               </span>
             )}
