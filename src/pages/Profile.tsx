@@ -28,11 +28,15 @@ const Profile: React.FC = () => {
     const fetchProfile = async () => {
       if (!user) return;
 
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('profiles')
         .select('full_name, latitude, longitude, city, timezone')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (error) {
+        console.error('Error fetching profile:', error);
+      }
 
       if (data) {
         setFullName(data.full_name || '');
