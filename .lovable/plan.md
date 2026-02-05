@@ -1,35 +1,28 @@
 
-
-# Consolidate Account Section in Sidebar
+# Improve Sidebar Footer UI
 
 ## Overview
 
-Remove the separate "Account" navigation group from the sidebar and move the Profile link to the footer section, placing it alongside the user info and logout button.
+Simplify the sidebar footer by merging the user info with the Profile action, and stacking the buttons vertically instead of side-by-side.
 
 ---
 
-## Current vs Proposed Structure
+## Current vs Proposed Layout
 
 ```text
-CURRENT                              PROPOSED
-+----------------------------+       +----------------------------+
-| Logo                       |       | Logo                       |
-+----------------------------+       +----------------------------+
-| NAVIGATION                 |       | NAVIGATION                 |
-| |-- Dashboard              |       | |-- Dashboard              |
-| |-- Namaz                  |       | |-- Namaz                  |
-|                            |       |                            |
-| ACCOUNT                    |       |                            |
-| |-- Profile                |       |                            |
-|                            |       |                            |
-|        (spacer)            |       |        (spacer)            |
-|                            |       |                            |
-| +------------------------+ |       | +------------------------+ |
-| | User Name              | |       | | User Name              | |
-| | user@email.com         | |       | | user@email.com         | |
-| | [Sign out]             | |       | | [Profile] [Sign out]   | |
-| +------------------------+ |       | +------------------------+ |
-+----------------------------+       +----------------------------+
+CURRENT (Expanded)                   PROPOSED (Expanded)
++---------------------------+        +---------------------------+
+| test                      |        | 👤 test                   | <- Clickable
+| test@test.com             |        |    test@test.com          |    (goes to Profile)
++---------------------------+        +---------------------------+
+| [Profile]    [Sign out]   |        | [Sign out]                |
++---------------------------+        +---------------------------+
+
+CURRENT (Collapsed)                  PROPOSED (Collapsed)
++-------+                            +-------+
+| [👤]  |                            | [👤]  | <- Profile
+| [🚪]  |                            | [🚪]  | <- Sign out
++-------+                            +-------+
 ```
 
 ---
@@ -38,22 +31,67 @@ CURRENT                              PROPOSED
 
 ### File: `src/components/layout/AppSidebar.tsx`
 
-1. **Remove** the `accountItems` array (lines 28-30)
-2. **Remove** the entire Account `SidebarGroup` (lines 87-107)
-3. **Add** Profile button to the footer alongside the logout button
-4. **Arrange** footer buttons in a row (Profile + Sign out)
+1. **Merge user info with Profile action**: Make the user info block (name + email) clickable to navigate to `/profile`
+2. **Add User icon** next to the name when expanded
+3. **Remove separate Profile button**: No longer needed since clicking user info navigates to profile
+4. **Stack Sign out below**: Place the Sign out button in its own row below the user info
+5. **Collapsed mode**: Show User icon (for Profile) and LogOut icon stacked vertically
 
 ---
 
-## Technical Details
+## Technical Implementation
 
-The footer will contain:
-- User name and email (when expanded)
-- Two buttons in a row:
-  - Profile button (navigates to `/profile`)
-  - Sign out button (triggers logout)
+### Expanded State
+- Clickable container with User icon, display name, and email
+- Hover effect to indicate interactivity
+- Sign out button below on its own row
 
-When collapsed (icon mode):
-- Both buttons show as icons only
-- User info is hidden
+### Collapsed State  
+- User icon button (navigates to profile)
+- LogOut icon button (signs out)
+- Both stacked vertically
 
+---
+
+## Code Structure
+
+```typescript
+<SidebarFooter>
+  <SidebarSeparator />
+  <div className="p-2 space-y-2">
+    {/* Clickable user info - navigates to profile */}
+    <button
+      onClick={() => navigate('/profile')}
+      className="w-full flex items-center gap-3 px-2 py-2 rounded-md hover:bg-sidebar-accent transition-colors text-left"
+    >
+      <User className="h-5 w-5 shrink-0" />
+      {!isCollapsed && (
+        <div className="min-w-0">
+          <p className="font-medium text-sm truncate">{displayName}</p>
+          <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+        </div>
+      )}
+    </button>
+    
+    {/* Sign out button - full width */}
+    <Button
+      variant="ghost"
+      size={isCollapsed ? 'icon' : 'sm'}
+      onClick={signOut}
+      className="w-full justify-start gap-2"
+    >
+      <LogOut className="h-4 w-4" />
+      {!isCollapsed && <span>Sign out</span>}
+    </Button>
+  </div>
+</SidebarFooter>
+```
+
+---
+
+## Benefits
+
+- Cleaner UI with less redundancy
+- Single tap/click to access profile
+- Consistent vertical stacking in both expanded and collapsed states
+- Better use of space
