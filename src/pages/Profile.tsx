@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import LocationSelector from '@/components/profile/LocationSelector';
+import DuesSection from '@/components/dues/DuesSection';
 import { CITIES, type City } from '@/data/cities';
 import { Refresh, FloppyDisk } from 'iconoir-react';
 import { fetchMaghribTime } from '@/lib/prayerTimes';
@@ -221,6 +222,9 @@ const Profile: React.FC = () => {
             </p>
           </section>
         )}
+
+        {/* Dues & Obligations Section */}
+        <DuesSection />
       </div>
     </div>
   );
