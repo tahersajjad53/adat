@@ -12,6 +12,7 @@ import { TimeOfDayCard } from '@/components/namaz/TimeOfDayCard';
 import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/usePrayerTimes';
+import { DueRemindersCard } from '@/components/dues/DueRemindersCard';
 
 const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
   fajr: SunLight,
@@ -150,12 +151,9 @@ const Dashboard: React.FC = () => {
           )}
         </TimeOfDayCard>
 
-        {/* Coming Soon Cards */}
+        {/* Dues Reminders & Goals Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="p-6 border border-border rounded-lg">
-            <h3 className="font-semibold mb-2">Dues & Khumus</h3>
-            <p className="text-sm text-muted-foreground">Coming soon</p>
-          </div>
+          <DueRemindersCard />
           <div className="p-6 border border-border rounded-lg">
             <h3 className="font-semibold mb-2">Goals & Habits</h3>
             <p className="text-sm text-muted-foreground">Coming soon</p>
