@@ -235,3 +235,76 @@ export function formatMonthYear(
   const monthName = getMonthName(month, calendarType);
   return `${monthName} ${year}`;
 }
+
+/**
+ * Get the current period (month/year) based on calendar type
+ */
+export function getCurrentPeriod(
+  calendarType: CalendarType,
+  currentHijri: HijriDate,
+  currentGregorian: Date
+): { month: number; year: number } {
+  if (calendarType === 'hijri') {
+    return { month: currentHijri.month, year: currentHijri.year };
+  }
+  return { 
+    month: currentGregorian.getMonth() + 1, 
+    year: currentGregorian.getFullYear() 
+  };
+}
+
+/**
+ * Format due date with Hijri context for Gregorian calendar types
+ * Hijri: "30 Shaban"
+ * Gregorian: "Feb 25 (7 Shaban)"
+ */
+export function formatDueDateWithContext(
+  calendarType: CalendarType,
+  dueDay: number,
+  currentHijri: HijriDate,
+  currentGregorian: Date
+): string {
+  if (calendarType === 'hijri') {
+    return `${dueDay} ${getHijriMonthName(currentHijri.month)}`;
+  }
+  // Gregorian with Hijri context
+  const gregorianMonth = GREGORIAN_MONTHS[currentGregorian.getMonth()];
+  const hijriContext = `${currentHijri.day} ${getHijriMonthName(currentHijri.month)}`;
+  return `${gregorianMonth} ${dueDay} (${hijriContext})`;
+}
+
+/**
+ * Check if a due is within its active date range
+ */
+export function isDueInActiveRange(
+  calendarType: CalendarType,
+  startMonth: number,
+  startYear: number,
+  endMonth: number | null | undefined,
+  endYear: number | null | undefined,
+  currentHijri: HijriDate,
+  currentGregorian: Date
+): boolean {
+  const { month: currentMonth, year: currentYear } = getCurrentPeriod(
+    calendarType,
+    currentHijri,
+    currentGregorian
+  );
+
+  // Check if current is after or at start
+  const afterStart = 
+    currentYear > startYear || 
+    (currentYear === startYear && currentMonth >= startMonth);
+
+  // If no end date, always active after start
+  if (!endMonth || !endYear) {
+    return afterStart;
+  }
+
+  // Check if current is before or at end
+  const beforeEnd = 
+    currentYear < endYear || 
+    (currentYear === endYear && currentMonth <= endMonth);
+
+  return afterStart && beforeEnd;
+}
