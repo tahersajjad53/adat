@@ -14,6 +14,160 @@ export type Database = {
   }
   public: {
     Tables: {
+      due_payments: {
+        Row: {
+          amount_due: number
+          amount_paid: number | null
+          calendar_type: string
+          created_at: string
+          due_month: number
+          due_type: string
+          due_year: number
+          id: string
+          paid_at: string | null
+          reference_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_due: number
+          amount_paid?: number | null
+          calendar_type: string
+          created_at?: string
+          due_month: number
+          due_type: string
+          due_year: number
+          id?: string
+          paid_at?: string | null
+          reference_id: string
+          user_id: string
+        }
+        Update: {
+          amount_due?: number
+          amount_paid?: number | null
+          calendar_type?: string
+          created_at?: string
+          due_month?: number
+          due_type?: string
+          due_year?: number
+          id?: string
+          paid_at?: string | null
+          reference_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      fmb_hubs: {
+        Row: {
+          calendar_type: string
+          created_at: string
+          end_month: number | null
+          end_year: number | null
+          id: string
+          is_active: boolean
+          monthly_amount: number
+          reminder_day: number | null
+          reminder_type: string
+          sabeel_id: string
+          start_month: number
+          start_year: number
+          updated_at: string
+        }
+        Insert: {
+          calendar_type?: string
+          created_at?: string
+          end_month?: number | null
+          end_year?: number | null
+          id?: string
+          is_active?: boolean
+          monthly_amount: number
+          reminder_day?: number | null
+          reminder_type?: string
+          sabeel_id: string
+          start_month: number
+          start_year: number
+          updated_at?: string
+        }
+        Update: {
+          calendar_type?: string
+          created_at?: string
+          end_month?: number | null
+          end_year?: number | null
+          id?: string
+          is_active?: boolean
+          monthly_amount?: number
+          reminder_day?: number | null
+          reminder_type?: string
+          sabeel_id?: string
+          start_month?: number
+          start_year?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fmb_hubs_sabeel_id_fkey"
+            columns: ["sabeel_id"]
+            isOneToOne: false
+            referencedRelation: "sabeels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      khumus: {
+        Row: {
+          calculation_type: string
+          calendar_type: string
+          created_at: string
+          fixed_amount: number | null
+          id: string
+          is_active: boolean
+          monthly_income: number | null
+          percentage_rate: number | null
+          person_name: string
+          reminder_day: number | null
+          reminder_type: string
+          sabeel_id: string
+          updated_at: string
+        }
+        Insert: {
+          calculation_type?: string
+          calendar_type?: string
+          created_at?: string
+          fixed_amount?: number | null
+          id?: string
+          is_active?: boolean
+          monthly_income?: number | null
+          percentage_rate?: number | null
+          person_name: string
+          reminder_day?: number | null
+          reminder_type?: string
+          sabeel_id: string
+          updated_at?: string
+        }
+        Update: {
+          calculation_type?: string
+          calendar_type?: string
+          created_at?: string
+          fixed_amount?: number | null
+          id?: string
+          is_active?: boolean
+          monthly_income?: number | null
+          percentage_rate?: number | null
+          person_name?: string
+          reminder_day?: number | null
+          reminder_type?: string
+          sabeel_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "khumus_sabeel_id_fkey"
+            columns: ["sabeel_id"]
+            isOneToOne: false
+            referencedRelation: "sabeels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prayer_logs: {
         Row: {
           completed_at: string | null
@@ -89,12 +243,125 @@ export type Database = {
         }
         Relationships: []
       }
+      sabeels: {
+        Row: {
+          calendar_type: string
+          created_at: string
+          end_month: number | null
+          end_year: number | null
+          id: string
+          is_active: boolean
+          monthly_amount: number
+          reminder_day: number | null
+          reminder_type: string
+          sabeel_name: string
+          start_month: number
+          start_year: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          calendar_type?: string
+          created_at?: string
+          end_month?: number | null
+          end_year?: number | null
+          id?: string
+          is_active?: boolean
+          monthly_amount: number
+          reminder_day?: number | null
+          reminder_type?: string
+          sabeel_name: string
+          start_month: number
+          start_year: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          calendar_type?: string
+          created_at?: string
+          end_month?: number | null
+          end_year?: number | null
+          id?: string
+          is_active?: boolean
+          monthly_amount?: number
+          reminder_day?: number | null
+          reminder_type?: string
+          sabeel_name?: string
+          start_month?: number
+          start_year?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      zakats: {
+        Row: {
+          assets_value: number | null
+          calculation_type: string
+          calendar_type: string
+          created_at: string
+          fixed_amount: number | null
+          id: string
+          is_active: boolean
+          nisab_threshold: number | null
+          person_name: string
+          reminder_day: number | null
+          reminder_type: string
+          sabeel_id: string
+          updated_at: string
+          zakat_rate: number | null
+        }
+        Insert: {
+          assets_value?: number | null
+          calculation_type?: string
+          calendar_type?: string
+          created_at?: string
+          fixed_amount?: number | null
+          id?: string
+          is_active?: boolean
+          nisab_threshold?: number | null
+          person_name: string
+          reminder_day?: number | null
+          reminder_type?: string
+          sabeel_id: string
+          updated_at?: string
+          zakat_rate?: number | null
+        }
+        Update: {
+          assets_value?: number | null
+          calculation_type?: string
+          calendar_type?: string
+          created_at?: string
+          fixed_amount?: number | null
+          id?: string
+          is_active?: boolean
+          nisab_threshold?: number | null
+          person_name?: string
+          reminder_day?: number | null
+          reminder_type?: string
+          sabeel_id?: string
+          updated_at?: string
+          zakat_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "zakats_sabeel_id_fkey"
+            columns: ["sabeel_id"]
+            isOneToOne: false
+            referencedRelation: "sabeels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      owns_sabeel: {
+        Args: { _sabeel_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
