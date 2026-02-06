@@ -8,11 +8,11 @@ import { useToast } from '@/hooks/use-toast';
 import LocationSelector from '@/components/profile/LocationSelector';
 import DuesSection from '@/components/dues/DuesSection';
 import { CITIES, type City } from '@/data/cities';
-import { Refresh, FloppyDisk } from 'iconoir-react';
+import { Refresh, FloppyDisk, LogOut } from 'iconoir-react';
 import { fetchMaghribTime } from '@/lib/prayerTimes';
 
 const Profile: React.FC = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { toast } = useToast();
   
   const [fullName, setFullName] = useState('');
@@ -225,6 +225,18 @@ const Profile: React.FC = () => {
 
         {/* Dues & Obligations Section */}
         <DuesSection />
+
+        {/* Sign Out Section */}
+        <section className="pt-4 border-t border-border">
+          <Button
+            variant="outline"
+            onClick={signOut}
+            className="w-full justify-center gap-2 text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <LogOut className="h-4 w-4" />
+            Sign out
+          </Button>
+        </section>
       </div>
     </div>
   );

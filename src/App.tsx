@@ -10,10 +10,11 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import { AppLayout } from "@/components/layout/AppLayout";
 import Auth from "./pages/Auth";
 import Signup from "./pages/Signup";
-import Dashboard from "./pages/Dashboard";
+import Today from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
 import Profile from "./pages/Profile";
 import Namaz from "./pages/Namaz";
+import Goals from "./pages/Goals";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/" element={<Navigate to="/auth" replace />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/auth/signup" element={<Signup />} />
+              <Route path="/dashboard" element={<Navigate to="/today" replace />} />
               <Route
                 path="/auth/onboarding"
                 element={
@@ -39,11 +41,21 @@ const App = () => (
                 }
               />
               <Route
-                path="/dashboard"
+                path="/today"
                 element={
                   <ProtectedRoute>
                     <AppLayout>
-                      <Dashboard />
+                      <Today />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/goals"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Goals />
                     </AppLayout>
                   </ProtectedRoute>
                 }
