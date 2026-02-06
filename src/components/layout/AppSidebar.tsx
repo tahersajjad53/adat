@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Home, Clock, User, LogOut } from 'iconoir-react';
+import { Home, Clock, User, LogOut, Archery } from 'iconoir-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -22,8 +22,9 @@ import { NavLink } from '@/components/NavLink';
 import adatLogo from '@/assets/adat-logo.svg';
 
 const navItems = [
-  { title: 'Dashboard', url: '/dashboard', icon: Home },
+  { title: 'Today', url: '/today', icon: Home },
   { title: 'Namaz', url: '/namaz', icon: Clock },
+  { title: 'Goals', url: '/goals', icon: Archery },
 ];
 
 export function AppSidebar() {

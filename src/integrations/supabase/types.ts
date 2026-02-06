@@ -112,6 +112,92 @@ export type Database = {
           },
         ]
       }
+      goal_completions: {
+        Row: {
+          completed_at: string
+          completion_date: string
+          goal_id: string
+          gregorian_date: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string
+          completion_date: string
+          goal_id: string
+          gregorian_date: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          completed_at?: string
+          completion_date?: string
+          goal_id?: string
+          gregorian_date?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "goal_completions_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      goals: {
+        Row: {
+          created_at: string
+          description: string | null
+          due_date: string | null
+          end_date: string | null
+          id: string
+          is_active: boolean
+          recurrence_days: number[] | null
+          recurrence_pattern: Json | null
+          recurrence_type: string
+          sort_order: number
+          start_date: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          recurrence_days?: number[] | null
+          recurrence_pattern?: Json | null
+          recurrence_type?: string
+          sort_order?: number
+          start_date?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          end_date?: string | null
+          id?: string
+          is_active?: boolean
+          recurrence_days?: number[] | null
+          recurrence_pattern?: Json | null
+          recurrence_type?: string
+          sort_order?: number
+          start_date?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       khumus: {
         Row: {
           calculation_type: string
