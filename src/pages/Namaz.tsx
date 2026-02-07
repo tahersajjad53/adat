@@ -8,10 +8,12 @@ import { MissedPrayersList } from '@/components/namaz/MissedPrayersList';
 import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 import { usePrayerTimes, getCurrentPrayerWindow } from '@/hooks/usePrayerTimes';
+import { useTodayProgress } from '@/hooks/useTodayProgress';
 import { Clock, WarningCircle } from 'iconoir-react';
 
 const Namaz: React.FC = () => {
-  const { prayers, togglePrayer, percentage, isLoading: prayersLoading } = usePrayerLog();
+  const { prayers, togglePrayer, isLoading: prayersLoading } = usePrayerLog();
+  const { overallPercentage } = useTodayProgress();
   const { missedPrayers, unfulfilledCount, fulfillPrayer, isLoading: missedLoading } = useMissedPrayers();
   const { prayerTimes } = usePrayerTimes();
   
@@ -25,7 +27,7 @@ const Namaz: React.FC = () => {
       <TimeOfDayCard currentPrayer={currentPrayer}>
         <div className="flex items-start justify-between">
           <DateDisplay showLocation compact variant="light" />
-          <DailyMeter percentage={percentage} compact variant="light" />
+          <DailyMeter percentage={overallPercentage} compact variant="light" />
         </div>
       </TimeOfDayCard>
 

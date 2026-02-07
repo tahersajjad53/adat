@@ -8,6 +8,8 @@ interface DailyMeterProps {
   showMessage?: boolean;
   compact?: boolean;
   variant?: 'default' | 'light';
+  /** Optional breakdown label e.g. "Prayers: 3/5 · Goals: 2/3" */
+  breakdownLabel?: string;
 }
 
 const ENCOURAGEMENT_MESSAGES: Record<number, string> = {
@@ -16,7 +18,7 @@ const ENCOURAGEMENT_MESSAGES: Record<number, string> = {
   40: "You're on track",
   60: 'More than halfway there!',
   80: 'Almost complete!',
-  100: 'Masha\'Allah! All prayers complete!',
+  100: "Masha'Allah! All complete!",
 };
 
 function getEncouragementMessage(percentage: number): string {
@@ -34,6 +36,7 @@ export const DailyMeter: React.FC<DailyMeterProps> = ({
   showMessage = true,
   compact = false,
   variant = 'default',
+  breakdownLabel,
 }) => {
   const message = getEncouragementMessage(percentage);
   const isLight = variant === 'light';
@@ -62,6 +65,10 @@ export const DailyMeter: React.FC<DailyMeterProps> = ({
         value={percentage} 
         className="h-3"
       />
+
+      {breakdownLabel && (
+        <p className="text-xs text-muted-foreground">{breakdownLabel}</p>
+      )}
       
       {showMessage && (
         <p className="text-sm text-muted-foreground">{message}</p>
