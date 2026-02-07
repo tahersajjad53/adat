@@ -10,9 +10,11 @@ import { useCalendar } from '@/contexts/CalendarContext';
 import { DailyMeter } from '@/components/namaz/DailyMeter';
 import { TimeOfDayCard } from '@/components/namaz/TimeOfDayCard';
 import { usePrayerLog } from '@/hooks/usePrayerLog';
-import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/usePrayerTimes';
+import { useTodayProgress } from '@/hooks/useTodayProgress';
+import { useGoalCompletions } from '@/hooks/useGoalCompletions';
 import { DueRemindersCard } from '@/components/dues/DueRemindersCard';
+import TodaysGoals from '@/components/goals/TodaysGoals';
 
 const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
   fajr: SunLight,
@@ -27,14 +29,17 @@ const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { location, requestLocationPermission } = useCalendar();
   const navigate = useNavigate();
-  const [fullName, setFullName] = useState<string>('');
   const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
 
-  const { prayers, togglePrayer, percentage, completedCount, totalCount, currentPrayer, nextPrayer, isLoading: prayersLoading } = usePrayerLog();
-  const { unfulfilledCount } = useMissedPrayers();
+  const { prayers, togglePrayer, currentPrayer, nextPrayer } = usePrayerLog();
   const { prayerTimes } = usePrayerTimes();
+  const { isCompleted, toggleCompletion, isToggling } = useGoalCompletions();
+  const {
+    prayerCompleted, prayerTotal,
+    goalsCompleted, goalsTotal, goalsDueToday,
+    overallPercentage,
+  } = useTodayProgress();
 
-  // Get current prayer window for theming
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayerName = currentPrayerWindow?.current || null;
 
@@ -54,9 +59,6 @@ const Dashboard: React.FC = () => {
         }
         
         if (data) {
-          if (data.full_name) {
-            setFullName(data.full_name);
-          }
           setNeedsOnboarding(data.latitude === null);
         } else {
           setNeedsOnboarding(true);
@@ -72,9 +74,15 @@ const Dashboard: React.FC = () => {
     }
   }, [needsOnboarding, navigate]);
 
-  // Determine which prayer to show (current or next upcoming)
   const prayerToShow = currentPrayer || nextPrayer;
   const PrayerIcon = prayerToShow ? PRAYER_ICONS[prayerToShow.name] : SunLight;
+
+  // Build breakdown label
+  const breakdownParts: string[] = [`Prayers: ${prayerCompleted}/${prayerTotal}`];
+  if (goalsTotal > 0) {
+    breakdownParts.push(`Goals: ${goalsCompleted}/${goalsTotal}`);
+  }
+  const breakdownLabel = breakdownParts.join(' · ');
 
   if (needsOnboarding === null) {
     return (
@@ -89,13 +97,11 @@ const Dashboard: React.FC = () => {
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Unified Time-Aware Card */}
         <TimeOfDayCard currentPrayer={currentPrayerName}>
-          {/* Top row: Date + Progress */}
           <div className="flex items-start justify-between">
             <DateDisplay showLocation compact variant="light" />
-            <DailyMeter percentage={percentage} compact variant="light" />
+            <DailyMeter percentage={overallPercentage} compact variant="light" />
           </div>
 
-          {/* Location prompt if needed */}
           {!location?.city && (
             <Button
               variant="outline"
@@ -108,10 +114,8 @@ const Dashboard: React.FC = () => {
             </Button>
           )}
 
-          {/* Divider */}
           <div className="my-4 border-t border-white/20" />
 
-          {/* Next Namaz section */}
           {prayerToShow ? (
             <div className="flex items-center justify-between">
               <div>
@@ -131,7 +135,6 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
 
-              {/* Checkbox with completion indicator */}
               <div className="flex items-center gap-2">
                 {prayerToShow.isCompleted && (
                   <div className="flex items-center gap-1 text-white/80 text-sm">
@@ -151,13 +154,17 @@ const Dashboard: React.FC = () => {
           )}
         </TimeOfDayCard>
 
-        {/* Dues Reminders & Goals Cards */}
+        {/* Goals & Dues Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <DueRemindersCard />
-          <div className="p-6 border border-border rounded-lg">
-            <h3 className="font-semibold mb-2">Goals & Habits</h3>
-            <p className="text-sm text-muted-foreground">Coming soon</p>
-          </div>
+          <TodaysGoals
+            goalsDueToday={goalsDueToday}
+            goalsCompleted={goalsCompleted}
+            goalsTotal={goalsTotal}
+            isCompleted={isCompleted}
+            onToggle={toggleCompletion}
+            isToggling={isToggling}
+          />
         </div>
       </div>
     </div>
