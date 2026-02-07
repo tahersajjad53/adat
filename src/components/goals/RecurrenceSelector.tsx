@@ -1,0 +1,245 @@
+import React from 'react';
+import { Label } from '@/components/ui/label';
+import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import type { RecurrenceType, RecurrencePattern } from '@/types/goals';
+
+interface RecurrenceSelectorProps {
+  recurrenceType: RecurrenceType;
+  recurrenceDays: number[];
+  recurrencePattern: RecurrencePattern | null;
+  dueDate: string;
+  onRecurrenceTypeChange: (type: RecurrenceType) => void;
+  onRecurrenceDaysChange: (days: number[]) => void;
+  onRecurrencePatternChange: (pattern: RecurrencePattern | null) => void;
+  onDueDateChange: (date: string) => void;
+  disabled?: boolean;
+}
+
+const DAY_LABELS = [
+  { value: '0', label: 'S' },
+  { value: '1', label: 'M' },
+  { value: '2', label: 'T' },
+  { value: '3', label: 'W' },
+  { value: '4', label: 'T' },
+  { value: '5', label: 'F' },
+  { value: '6', label: 'S' },
+];
+
+const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
+  recurrenceType,
+  recurrenceDays,
+  recurrencePattern,
+  dueDate,
+  onRecurrenceTypeChange,
+  onRecurrenceDaysChange,
+  onRecurrencePatternChange,
+  onDueDateChange,
+  disabled = false,
+}) => {
+  const handleIntervalChange = (value: string) => {
+    const num = parseInt(value, 10);
+    if (isNaN(num) || num < 1) return;
+    onRecurrencePatternChange({
+      type: 'interval',
+      interval: num,
+      intervalUnit: recurrencePattern?.intervalUnit || 'days',
+    });
+  };
+
+  const handleIntervalUnitChange = (unit: 'days' | 'weeks') => {
+    onRecurrencePatternChange({
+      type: 'interval',
+      interval: recurrencePattern?.interval || 2,
+      intervalUnit: unit,
+    });
+  };
+
+  const handleMonthlyDayChange = (value: string) => {
+    const num = parseInt(value, 10);
+    if (isNaN(num) || num < 1 || num > 30) return;
+    onRecurrencePatternChange({
+      type: 'monthly',
+      monthlyDay: num,
+      calendarType: recurrencePattern?.calendarType || 'hijri',
+    });
+  };
+
+  const handleMonthlyCalendarChange = (cal: 'hijri' | 'gregorian') => {
+    onRecurrencePatternChange({
+      type: 'monthly',
+      monthlyDay: recurrencePattern?.monthlyDay || 1,
+      calendarType: cal,
+    });
+  };
+
+  const handleCustomTypeChange = (type: 'interval' | 'monthly') => {
+    if (type === 'interval') {
+      onRecurrencePatternChange({
+        type: 'interval',
+        interval: 2,
+        intervalUnit: 'days',
+      });
+    } else {
+      onRecurrencePatternChange({
+        type: 'monthly',
+        monthlyDay: 1,
+        calendarType: 'hijri',
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="space-y-2">
+        <Label>Repeats</Label>
+        <Select
+          value={recurrenceType}
+          onValueChange={(v) => onRecurrenceTypeChange(v as RecurrenceType)}
+          disabled={disabled}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="daily">Daily</SelectItem>
+            <SelectItem value="weekly">Weekly</SelectItem>
+            <SelectItem value="custom">Custom</SelectItem>
+            <SelectItem value="one-time">One-time</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Weekly day picker */}
+      {recurrenceType === 'weekly' && (
+        <div className="space-y-2">
+          <Label>On days</Label>
+          <ToggleGroup
+            type="multiple"
+            value={recurrenceDays.map(String)}
+            onValueChange={(vals) => onRecurrenceDaysChange(vals.map(Number))}
+            className="justify-start gap-1"
+            disabled={disabled}
+          >
+            {DAY_LABELS.map((day) => (
+              <ToggleGroupItem
+                key={day.value}
+                value={day.value}
+                className="h-9 w-9 rounded-full text-xs font-medium data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                aria-label={day.label}
+              >
+                {day.label}
+              </ToggleGroupItem>
+            ))}
+          </ToggleGroup>
+        </div>
+      )}
+
+      {/* Custom recurrence options */}
+      {recurrenceType === 'custom' && (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Pattern</Label>
+            <Select
+              value={recurrencePattern?.type || 'interval'}
+              onValueChange={(v) => handleCustomTypeChange(v as 'interval' | 'monthly')}
+              disabled={disabled}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="interval">Every N days/weeks</SelectItem>
+                <SelectItem value="monthly">Day of month</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {recurrencePattern?.type === 'interval' && (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Every</span>
+              <Input
+                type="number"
+                min="1"
+                max="365"
+                value={recurrencePattern.interval || 2}
+                onChange={(e) => handleIntervalChange(e.target.value)}
+                className="w-20"
+                disabled={disabled}
+              />
+              <Select
+                value={recurrencePattern.intervalUnit || 'days'}
+                onValueChange={(v) => handleIntervalUnitChange(v as 'days' | 'weeks')}
+                disabled={disabled}
+              >
+                <SelectTrigger className="w-24">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="days">days</SelectItem>
+                  <SelectItem value="weeks">weeks</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
+          {recurrencePattern?.type === 'monthly' && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground">Day</span>
+                <Input
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={recurrencePattern.monthlyDay || 1}
+                  onChange={(e) => handleMonthlyDayChange(e.target.value)}
+                  className="w-20"
+                  disabled={disabled}
+                />
+                <span className="text-sm text-muted-foreground">of each month</span>
+              </div>
+              <div className="space-y-2">
+                <Label className="text-xs">Calendar</Label>
+                <Select
+                  value={recurrencePattern.calendarType || 'hijri'}
+                  onValueChange={(v) => handleMonthlyCalendarChange(v as 'hijri' | 'gregorian')}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hijri">Hijri</SelectItem>
+                    <SelectItem value="gregorian">Gregorian</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* One-time date picker */}
+      {recurrenceType === 'one-time' && (
+        <div className="space-y-2">
+          <Label>Due date</Label>
+          <Input
+            type="date"
+            value={dueDate}
+            onChange={(e) => onDueDateChange(e.target.value)}
+            disabled={disabled}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default RecurrenceSelector;
