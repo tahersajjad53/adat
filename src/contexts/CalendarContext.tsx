@@ -146,7 +146,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
         } else {
           currentHour = now.getHours();
         }
-        if (currentHour < 6) {
+        if (currentHour < 4) {
           baseDate = new Date(now);
           baseDate.setDate(baseDate.getDate() - 1);
         }
