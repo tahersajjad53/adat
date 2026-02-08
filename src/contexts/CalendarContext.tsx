@@ -131,7 +131,28 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
 
       // Compute Hijri dates using deterministic Bohra engine (no Aladhan Hijri needed)
       const afterMaghrib = isAfterMaghrib(now, maghrib, location.timezone);
-      const preMaghribHijri = gregorianToBohra(now, location.timezone);
+
+      // If past midnight but still "after Maghrib", use previous Gregorian day
+      // so the Bohra conversion yields the correct Islamic day
+      let baseDate = now;
+      if (afterMaghrib) {
+        let currentHour: number;
+        if (location.timezone) {
+          const fmt = new Intl.DateTimeFormat('en-US', {
+            hour: 'numeric', hour12: false, timeZone: location.timezone,
+          });
+          const parts = fmt.formatToParts(now);
+          currentHour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
+        } else {
+          currentHour = now.getHours();
+        }
+        if (currentHour < 6) {
+          baseDate = new Date(now);
+          baseDate.setDate(baseDate.getDate() - 1);
+        }
+      }
+
+      const preMaghribHijri = gregorianToBohra(baseDate, location.timezone);
       const postMaghribHijri = advanceHijriDay(preMaghribHijri);
 
       const dualDate: DualDate = {
