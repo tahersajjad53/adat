@@ -14,10 +14,10 @@ export function useGoalCompletions(options: UseGoalCompletionsOptions = {}) {
   const { currentDate } = useCalendar();
   const queryClient = useQueryClient();
 
-  const hijriDate = currentDate?.hijri;
+  const hijriDate = currentDate?.preMaghribHijri ?? currentDate?.hijri;
   const gregorianDate = currentDate?.gregorian;
 
-  // Format current Hijri date as YYYY-MM-DD for database
+  // Format pre-Maghrib Hijri date as YYYY-MM-DD for database (canonical for goals)
   const currentHijriDateStr = hijriDate
     ? `${hijriDate.year}-${String(hijriDate.month).padStart(2, '0')}-${String(hijriDate.day).padStart(2, '0')}`
     : null;

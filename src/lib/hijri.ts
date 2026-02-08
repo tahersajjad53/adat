@@ -1,22 +1,12 @@
 /**
- * Hijri Calendar Utilities
+ * Bohra/Misri Tabular Hijri Calendar Engine
  * 
- * Provides conversion between Gregorian and Hijri calendars
- * with special handling for Maghrib-based day transitions
- * (used by Dawoodi Bohra community)
+ * Deterministic conversion between Gregorian and Dawoodi Bohra Hijri calendar
+ * using Julian Day Number (JDN) as intermediary. Implements the Misri/Fatimid
+ * calendar with Bohra-specific leap year cycle and Maghrib-based day transitions.
  */
 
-/**
- * Bohra Calendar Offset
- * 
- * The Dawoodi Bohra community uses the Misri/Fatimid calendar
- * which often differs from the Saudi (HJCoSA/Umm al-Qura) calendar
- * by 1-2 days. This offset aligns the API output with Bohra dates.
- * 
- * Set to 1 to add one day to the base Aladhan date before
- * applying the sunset rule.
- */
-export const BOHRA_CALENDAR_OFFSET = 1;
+// ─── Types ───────────────────────────────────────────────────────────
 
 export interface HijriDate {
   day: number;
@@ -28,113 +18,247 @@ export interface HijriDate {
 
 export interface DualDate {
   gregorian: Date;
-  hijri: HijriDate;
+  hijri: HijriDate;              // The "current" Hijri (post-Maghrib if applicable)
+  preMaghribHijri: HijriDate;    // Hijri date for daytime (Fajr/Zuhr/Asr)
+  postMaghribHijri: HijriDate;   // Hijri date for evening (Maghrib/Isha/Nisful Layl)
   isAfterMaghrib: boolean;
 }
 
-// Hijri month names - transliterated and Arabic
+// ─── Month Data ──────────────────────────────────────────────────────
+
 const HIJRI_MONTHS = [
-  { name: 'Muharram', arabic: 'محرم' },
+  { name: 'Moharram', arabic: 'محرم' },
   { name: 'Safar', arabic: 'صفر' },
-  { name: 'Rabi al-Awwal', arabic: 'ربيع الأول' },
-  { name: 'Rabi al-Thani', arabic: 'ربيع الآخر' },
-  { name: 'Jumada al-Awwal', arabic: 'جمادى الأولى' },
-  { name: 'Jumada al-Thani', arabic: 'جمادى الآخرة' },
+  { name: 'Rabiul Awwal', arabic: 'ربيع الأول' },
+  { name: 'Rabiul Akhar', arabic: 'ربيع الآخر' },
+  { name: 'Jamadal Ula', arabic: 'جمادى الأولى' },
+  { name: 'Jamadal Ukra', arabic: 'جمادى الآخرة' },
   { name: 'Rajab', arabic: 'رجب' },
-  { name: 'Shaban', arabic: 'شعبان' },
+  { name: 'Shaban Karim', arabic: 'شعبان' },
   { name: 'Ramadan', arabic: 'رمضان' },
-  { name: 'Shawwal', arabic: 'شوال' },
-  { name: 'Dhul Qadah', arabic: 'ذو القعدة' },
-  { name: 'Dhul Hijjah', arabic: 'ذو الحجة' },
+  { name: 'Shawwal Mukarram', arabic: 'شوال' },
+  { name: 'Zilqad', arabic: 'ذو القعدة' },
+  { name: 'Zilhaj', arabic: 'ذو الحجة' },
 ] as const;
 
+// Base month lengths: odd = 30, even = 29
+const BASE_MONTH_DAYS = [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29] as const;
+
+// Bohra leap year positions within a 30-year cycle
+const LEAP_YEAR_POSITIONS = [2, 5, 8, 10, 13, 16, 19, 21, 24, 27, 29] as const;
+
+// Epoch: JDN for 1 Moharram 1 AH (evening of July 15, 622 CE Julian)
+const HIJRI_EPOCH_JDN = 1948440;
+
+// A 30-year Hijri cycle has exactly 10631 days (19 × 354 + 11 × 355)
+const CYCLE_DAYS = 10631;
+const CYCLE_YEARS = 30;
+const NORMAL_YEAR_DAYS = 354;
+
+// ─── Leap Year ───────────────────────────────────────────────────────
+
 /**
- * Convert a Gregorian date to Hijri using the native Intl API
- * @param date - The Gregorian date to convert
- * @param timezone - Optional IANA timezone for accurate date interpretation
+ * Check if a Bohra Hijri year is a leap year.
+ * Leap year formula: year mod 30, check against known positions.
  */
-export function gregorianToHijri(date: Date, timezone?: string): HijriDate {
-  // Use Intl.DateTimeFormat with islamic-umalqura calendar for accurate conversion
-  // Only pass timeZone if it's a valid, non-empty string
-  const formatOptions: Intl.DateTimeFormatOptions = {
-    day: 'numeric',
-    month: 'numeric',
-    year: 'numeric',
-  };
-  
-  if (timezone && timezone.trim()) {
-    formatOptions.timeZone = timezone.trim();
-  }
-  
-  const formatter = new Intl.DateTimeFormat('en-u-ca-islamic-umalqura', formatOptions);
-
-  const parts = formatter.formatToParts(date);
-  
-  const day = parseInt(parts.find(p => p.type === 'day')?.value || '1', 10);
-  const month = parseInt(parts.find(p => p.type === 'month')?.value || '1', 10);
-  const year = parseInt(parts.find(p => p.type === 'year')?.value || '1446', 10);
-
-  return {
-    day,
-    month,
-    year,
-    monthName: HIJRI_MONTHS[month - 1]?.name || '',
-    monthNameArabic: HIJRI_MONTHS[month - 1]?.arabic || '',
-  };
+export function isBohraLeapYear(year: number): boolean {
+  // Use the user's formula: remainder = year - round(year/30) * 30
+  // This is equivalent to a signed modulo; normalize to 0..29
+  const remainder = year - Math.round(year / 30) * 30;
+  const normalized = ((remainder % 30) + 30) % 30;
+  return (LEAP_YEAR_POSITIONS as readonly number[]).includes(normalized);
 }
 
 /**
- * Advance a Hijri date by 1 day, handling month/year rollovers
- * Used for Bohra sunset rule: Islamic day begins at Maghrib
+ * Get the number of days in a Bohra Hijri month (1-indexed).
+ * Zilhaj (month 12) has 30 days in leap years.
+ */
+export function getDaysInBohraMonth(month: number, year: number): number {
+  if (month === 12 && isBohraLeapYear(year)) return 30;
+  return BASE_MONTH_DAYS[month - 1];
+}
+
+/**
+ * Get total days in a Bohra Hijri year.
+ */
+function getDaysInBohraYear(year: number): number {
+  return isBohraLeapYear(year) ? 355 : 354;
+}
+
+// ─── JDN Conversion ──────────────────────────────────────────────────
+
+/**
+ * Convert Gregorian date to Julian Day Number.
+ */
+export function gregorianToJDN(year: number, month: number, day: number): number {
+  const a = Math.floor((14 - month) / 12);
+  const y = year + 4800 - a;
+  const m = month + 12 * a - 3;
+  return (
+    day +
+    Math.floor((153 * m + 2) / 5) +
+    365 * y +
+    Math.floor(y / 4) -
+    Math.floor(y / 100) +
+    Math.floor(y / 400) -
+    32045
+  );
+}
+
+/**
+ * Convert Julian Day Number to Gregorian date components.
+ */
+export function jdnToGregorian(jdn: number): { year: number; month: number; day: number } {
+  const a = jdn + 32044;
+  const b = Math.floor((4 * a + 3) / 146097);
+  const c = a - Math.floor(146097 * b / 4);
+  const d = Math.floor((4 * c + 3) / 1461);
+  const e = c - Math.floor(1461 * d / 4);
+  const m = Math.floor((5 * e + 2) / 153);
+  const day = e - Math.floor((153 * m + 2) / 5) + 1;
+  const month = m + 3 - 12 * Math.floor(m / 10);
+  const year = 100 * b + d - 4800 + Math.floor(m / 10);
+  return { year, month, day };
+}
+
+/**
+ * Convert a Bohra Hijri date to JDN.
+ */
+export function bohraToJDN(hijri: { year: number; month: number; day: number }): number {
+  const { year, month, day } = hijri;
+
+  // Count complete 30-year cycles
+  const cycles = Math.floor((year - 1) / CYCLE_YEARS);
+  const remainingYears = (year - 1) % CYCLE_YEARS;
+
+  let jdn = HIJRI_EPOCH_JDN + cycles * CYCLE_DAYS;
+
+  // Add days for each remaining complete year
+  for (let y = 1; y <= remainingYears; y++) {
+    const actualYear = cycles * CYCLE_YEARS + y;
+    jdn += getDaysInBohraYear(actualYear);
+  }
+
+  // Add days for complete months in current year
+  for (let m = 1; m < month; m++) {
+    jdn += getDaysInBohraMonth(m, year);
+  }
+
+  // Add remaining days (day 1 = epoch day, so subtract 1)
+  jdn += day - 1;
+
+  return jdn;
+}
+
+/**
+ * Convert JDN to Bohra Hijri date.
+ */
+export function jdnToBohra(jdn: number): HijriDate {
+  // Days since epoch
+  let remaining = jdn - HIJRI_EPOCH_JDN;
+
+  if (remaining < 0) {
+    // Before epoch - return 1/1/1 as fallback
+    return makeHijriDate(1, 1, 1);
+  }
+
+  // Count complete 30-year cycles
+  const cycles = Math.floor(remaining / CYCLE_DAYS);
+  remaining -= cycles * CYCLE_DAYS;
+
+  // Find year within cycle
+  let year = cycles * CYCLE_YEARS + 1;
+  while (remaining >= getDaysInBohraYear(year)) {
+    remaining -= getDaysInBohraYear(year);
+    year++;
+  }
+
+  // Find month
+  let month = 1;
+  while (month < 12 && remaining >= getDaysInBohraMonth(month, year)) {
+    remaining -= getDaysInBohraMonth(month, year);
+    month++;
+  }
+
+  const day = remaining + 1;
+
+  return makeHijriDate(day, month, year);
+}
+
+// ─── Gregorian ↔ Bohra Hijri ─────────────────────────────────────────
+
+/**
+ * Convert a Gregorian Date to Bohra Hijri date.
+ * This is the PRIMARY conversion function used throughout the app.
+ * 
+ * @param date - Gregorian Date object
+ * @param timezone - Optional IANA timezone string (used to determine the correct Gregorian day)
+ */
+export function gregorianToBohra(date: Date, timezone?: string): HijriDate {
+  let year: number, month: number, day: number;
+
+  if (timezone) {
+    // Extract date components in user's timezone
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      year: 'numeric', month: 'numeric', day: 'numeric',
+      timeZone: timezone,
+    });
+    const parts = fmt.formatToParts(date);
+    year = parseInt(parts.find(p => p.type === 'year')!.value);
+    month = parseInt(parts.find(p => p.type === 'month')!.value);
+    day = parseInt(parts.find(p => p.type === 'day')!.value);
+  } else {
+    year = date.getFullYear();
+    month = date.getMonth() + 1;
+    day = date.getDate();
+  }
+
+  const jdn = gregorianToJDN(year, month, day);
+  return jdnToBohra(jdn);
+}
+
+// ─── Day Advancement (leap-year aware) ───────────────────────────────
+
+/**
+ * Advance a Hijri date by 1 day, handling month/year rollovers.
+ * Correctly handles leap years (Zilhaj 30 only exists in leap years).
  */
 export function advanceHijriDay(hijri: HijriDate): HijriDate {
-  // Hijri months alternate between 30 and 29 days
-  // Odd months (1,3,5,7,9,11) = 30 days
-  // Even months (2,4,6,8,10,12) = 29 days (Dhul Hijjah can be 30 in leap years)
-  const daysInMonth = hijri.month % 2 === 1 ? 30 : 29;
-  
+  const daysInMonth = getDaysInBohraMonth(hijri.month, hijri.year);
+
   let newDay = hijri.day + 1;
   let newMonth = hijri.month;
   let newYear = hijri.year;
-  
+
   if (newDay > daysInMonth) {
     newDay = 1;
     newMonth += 1;
-    
+
     if (newMonth > 12) {
       newMonth = 1;
       newYear += 1;
     }
   }
-  
-  return {
-    day: newDay,
-    month: newMonth,
-    year: newYear,
-    monthName: HIJRI_MONTHS[newMonth - 1]?.name || '',
-    monthNameArabic: HIJRI_MONTHS[newMonth - 1]?.arabic || '',
-  };
+
+  return makeHijriDate(newDay, newMonth, newYear);
 }
 
+// ─── Maghrib Time Check ──────────────────────────────────────────────
+
 /**
- * Check if current time is after Maghrib
- * @param currentTime - Current time as Date
- * @param maghribTime - Maghrib time as "HH:MM" string (24-hour format)
- * @param timezone - Optional IANA timezone string (e.g., "Asia/Colombo")
+ * Check if current time is after Maghrib.
  */
 export function isAfterMaghrib(
-  currentTime: Date, 
+  currentTime: Date,
   maghribTime: string,
   timezone?: string
 ): boolean {
   const [hours, minutes] = maghribTime.split(':').map(Number);
-  
-  // Get current time in user's timezone
+
   let currentHours: number;
   let currentMinutes: number;
-  
+
   if (timezone) {
-    // Use Intl to get time in user's timezone
     const formatter = new Intl.DateTimeFormat('en-US', {
       hour: 'numeric',
       minute: 'numeric',
@@ -145,60 +269,61 @@ export function isAfterMaghrib(
     currentHours = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
     currentMinutes = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
   } else {
-    // Fallback to browser's local time
     currentHours = currentTime.getHours();
     currentMinutes = currentTime.getMinutes();
   }
-  
-  const currentTotalMinutes = currentHours * 60 + currentMinutes;
-  const maghribTotalMinutes = hours * 60 + minutes;
-  
-  return currentTotalMinutes >= maghribTotalMinutes;
+
+  return currentHours * 60 + currentMinutes >= hours * 60 + minutes;
 }
 
+// ─── Adjusted Date (with Maghrib rule) ───────────────────────────────
+
 /**
- * Get the adjusted Hijri date based on Maghrib time
- * If current time is after Maghrib, the Hijri date advances by 1 day
- * 
- * This implements the Bohra sunset rule: the Islamic day begins at Maghrib,
- * not at midnight. Instead of relying on Intl's calendar for +1 day,
- * we manually increment the Hijri date to ensure consistent advancement.
- * 
- * @param currentTime - Current local time
- * @param maghribTime - Maghrib time as "HH:MM" string (24-hour format)
- * @param timezone - Optional IANA timezone string for accurate comparison
+ * Get the adjusted Hijri date based on Maghrib time.
+ * Returns both pre-Maghrib and post-Maghrib Hijri dates.
  */
 export function getAdjustedHijriDate(
-  currentTime: Date, 
+  currentTime: Date,
   maghribTime: string | null,
   timezone?: string
 ): DualDate {
-  const afterMaghrib = maghribTime 
-    ? isAfterMaghrib(currentTime, maghribTime, timezone) 
+  const afterMaghrib = maghribTime
+    ? isAfterMaghrib(currentTime, maghribTime, timezone)
     : false;
-  
-  // Get base Hijri date for the current moment (no +24h adjustment)
-  let hijri = gregorianToHijri(currentTime, timezone);
-  
-  // Bohra sunset rule: If after Maghrib, the Islamic day advances
-  // Manually increment the Hijri day by 1 (handles month/year rollovers)
-  if (afterMaghrib) {
-    hijri = advanceHijriDay(hijri);
-  }
-  
+
+  const preMaghribHijri = gregorianToBohra(currentTime, timezone);
+  const postMaghribHijri = advanceHijriDay(preMaghribHijri);
+
   return {
     gregorian: currentTime,
-    hijri,
+    hijri: afterMaghrib ? postMaghribHijri : preMaghribHijri,
+    preMaghribHijri,
+    postMaghribHijri,
     isAfterMaghrib: afterMaghrib,
   };
 }
 
+// ─── Helper: build HijriDate with month names ───────────────────────
+
+function makeHijriDate(day: number, month: number, year: number): HijriDate {
+  return {
+    day,
+    month,
+    year,
+    monthName: HIJRI_MONTHS[month - 1]?.name || '',
+    monthNameArabic: HIJRI_MONTHS[month - 1]?.arabic || '',
+  };
+}
+
+// ─── Formatting ──────────────────────────────────────────────────────
+
 /**
- * Format a Hijri date as a string
- * @param hijriDate - The Hijri date object
- * @param format - 'short' | 'long' | 'arabic'
+ * Format a Hijri date as a string.
  */
-export function formatHijriDate(hijriDate: HijriDate, format: 'short' | 'long' | 'arabic' = 'long'): string {
+export function formatHijriDate(
+  hijriDate: HijriDate,
+  format: 'short' | 'long' | 'arabic' = 'long'
+): string {
   switch (format) {
     case 'short':
       return `${hijriDate.day}/${hijriDate.month}/${hijriDate.year}`;
@@ -211,7 +336,14 @@ export function formatHijriDate(hijriDate: HijriDate, format: 'short' | 'long' |
 }
 
 /**
- * Format a Gregorian date nicely
+ * Format a Hijri date as YYYY-MM-DD storage key.
+ */
+export function formatHijriDateKey(hijri: HijriDate): string {
+  return `${hijri.year}-${String(hijri.month).padStart(2, '0')}-${String(hijri.day).padStart(2, '0')}`;
+}
+
+/**
+ * Format a Gregorian date nicely.
  */
 export function formatGregorianDate(date: Date, format: 'short' | 'long' = 'long'): string {
   if (format === 'short') {
@@ -221,7 +353,6 @@ export function formatGregorianDate(date: Date, format: 'short' | 'long' = 'long
       year: 'numeric',
     });
   }
-  
   return date.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
@@ -230,8 +361,10 @@ export function formatGregorianDate(date: Date, format: 'short' | 'long' = 'long
   });
 }
 
+// ─── Month Utilities ─────────────────────────────────────────────────
+
 /**
- * Get the Hijri month name by number (1-12)
+ * Get the Hijri month name by number (1-12).
  */
 export function getHijriMonthName(month: number, arabic: boolean = false): string {
   const monthData = HIJRI_MONTHS[month - 1];
@@ -239,7 +372,7 @@ export function getHijriMonthName(month: number, arabic: boolean = false): strin
 }
 
 /**
- * Get all Hijri month names
+ * Get all Hijri month names.
  */
 export function getAllHijriMonths(): typeof HIJRI_MONTHS {
   return HIJRI_MONTHS;

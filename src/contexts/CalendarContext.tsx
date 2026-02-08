@@ -2,13 +2,14 @@
  * Calendar Context
  * 
  * Provides global access to current Hijri/Gregorian dates
- * with automatic Maghrib-based day transition handling
- * Uses Aladhan API for accurate Hijri dates with Bohra sunset rule
+ * with automatic Maghrib-based day transition handling.
+ * Uses Bohra tabular calendar engine for Hijri dates
+ * and Aladhan API only for prayer times.
  */
 
 import React, { createContext, useContext, useEffect, useState, useCallback, ReactNode } from 'react';
-import { DualDate, HijriDate, isAfterMaghrib, advanceHijriDay, BOHRA_CALENDAR_OFFSET } from '@/lib/hijri';
-import { fetchPrayerTimesWithHijri, Location, DEFAULT_LOCATION, getCurrentLocation, AladhanHijriDate } from '@/lib/prayerTimes';
+import { DualDate, gregorianToBohra, advanceHijriDay, isAfterMaghrib } from '@/lib/hijri';
+import { fetchPrayerTimesWithHijri, Location, DEFAULT_LOCATION, getCurrentLocation } from '@/lib/prayerTimes';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -36,7 +37,6 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
   // Load user's saved location from profile
   const loadUserLocation = useCallback(async () => {
     if (!user) {
-      // Use default location for non-authenticated users
       setLocationState(DEFAULT_LOCATION);
       return;
     }
@@ -55,11 +55,9 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
       }
 
       if (data?.latitude && data?.longitude) {
-        // Backfill timezone if missing - use browser's timezone as fallback
         let timezone = data.timezone;
         if (!timezone) {
           timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-          // Persist the backfilled timezone to the profile
           supabase
             .from('profiles')
             .update({ timezone })
@@ -68,7 +66,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
               if (error) console.error('Failed to backfill timezone:', error);
             });
         }
-        
+
         setLocationState({
           latitude: data.latitude,
           longitude: data.longitude,
@@ -76,7 +74,6 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
           timezone,
         });
       } else {
-        // No saved location, use default
         setLocationState(DEFAULT_LOCATION);
       }
     } catch (err) {
@@ -119,7 +116,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
     }
   }, [setLocation]);
 
-  // Fetch prayer times with Hijri date and update current date
+  // Fetch prayer times and compute Hijri dates locally
   const refreshDate = useCallback(async () => {
     if (!location) return;
 
@@ -128,47 +125,39 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
       setError(null);
 
       const now = new Date();
-      const { timings, hijri: aladhanHijri } = await fetchPrayerTimesWithHijri(now, location);
-      const maghrib = timings.Maghrib.split(' ')[0]; // Remove timezone info
+      const { timings } = await fetchPrayerTimesWithHijri(now, location);
+      const maghrib = timings.Maghrib.split(' ')[0];
       setMaghribTime(maghrib);
 
-      // Check if after Maghrib
+      // Compute Hijri dates using deterministic Bohra engine (no Aladhan Hijri needed)
       const afterMaghrib = isAfterMaghrib(now, maghrib, location.timezone);
-      
-      // Convert Aladhan Hijri to our HijriDate format
-      let hijri: HijriDate = {
-        day: aladhanHijri.day,
-        month: aladhanHijri.month,
-        year: aladhanHijri.year,
-        monthName: aladhanHijri.monthNameEn,
-        monthNameArabic: aladhanHijri.monthNameAr,
-      };
-      
-      // Apply Bohra calendar base offset (aligns with Misri/Fatimid calendar)
-      for (let i = 0; i < BOHRA_CALENDAR_OFFSET; i++) {
-        hijri = advanceHijriDay(hijri);
-      }
-      
-      // Bohra sunset rule: If after Maghrib, advance the Hijri day by 1
-      if (afterMaghrib) {
-        hijri = advanceHijriDay(hijri);
-      }
-      
+      const preMaghribHijri = gregorianToBohra(now, location.timezone);
+      const postMaghribHijri = advanceHijriDay(preMaghribHijri);
+
       const dualDate: DualDate = {
         gregorian: now,
-        hijri,
+        hijri: afterMaghrib ? postMaghribHijri : preMaghribHijri,
+        preMaghribHijri,
+        postMaghribHijri,
         isAfterMaghrib: afterMaghrib,
       };
-      
+
       setCurrentDate(dualDate);
     } catch (err) {
       console.error('Failed to refresh date:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch prayer times');
-      
-      // Fallback: show date without Maghrib adjustment (use Intl as fallback)
-      const { getAdjustedHijriDate } = await import('@/lib/hijri');
-      const dualDate = getAdjustedHijriDate(new Date(), null, location?.timezone);
-      setCurrentDate(dualDate);
+
+      // Fallback: compute Hijri without Maghrib check
+      const now = new Date();
+      const preMaghribHijri = gregorianToBohra(now, location?.timezone);
+      const postMaghribHijri = advanceHijriDay(preMaghribHijri);
+      setCurrentDate({
+        gregorian: now,
+        hijri: preMaghribHijri,
+        preMaghribHijri,
+        postMaghribHijri,
+        isAfterMaghrib: false,
+      });
     } finally {
       setIsLoading(false);
     }
@@ -192,7 +181,7 @@ export function CalendarProvider({ children }: { children: ReactNode }) {
       if (location) {
         refreshDate();
       }
-    }, 60000); // Every minute
+    }, 60000);
 
     return () => clearInterval(interval);
   }, [location, refreshDate]);
