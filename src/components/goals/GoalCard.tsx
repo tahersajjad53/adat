@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { MoreHoriz, EditPencil, Trash } from 'iconoir-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +12,7 @@ import {
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getRecurrenceDescription } from '@/lib/recurrence';
+import { useConfetti } from '@/components/ui/confetti';
 import type { GoalWithStatus } from '@/types/goals';
 
 interface GoalCardProps {
@@ -44,6 +45,15 @@ const GoalCard: React.FC<GoalCardProps> = ({
   };
 
   const recurrenceLabel = getRecurrenceDescription(goal);
+  const checkboxRef = useRef<HTMLButtonElement>(null);
+  const { triggerConfetti, ConfettiPortal } = useConfetti();
+
+  const handleToggle = () => {
+    if (!goal.isCompleted) {
+      triggerConfetti(checkboxRef.current);
+    }
+    onToggle(goal.id);
+  };
 
   return (
     <div
@@ -72,8 +82,9 @@ const GoalCard: React.FC<GoalCardProps> = ({
 
       {/* Checkbox */}
       <Checkbox
+        ref={checkboxRef}
         checked={goal.isCompleted}
-        onCheckedChange={() => onToggle(goal.id)}
+        onCheckedChange={handleToggle}
         disabled={isToggling}
         className="mt-0.5"
       />
@@ -124,6 +135,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
+      <ConfettiPortal />
     </div>
   );
 };
