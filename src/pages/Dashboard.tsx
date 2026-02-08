@@ -154,18 +154,18 @@ const Dashboard: React.FC = () => {
           )}
         </TimeOfDayCard>
 
-        {/* Goals & Dues Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <DueRemindersCard />
-          <TodaysGoals
-            goalsDueToday={goalsDueToday}
-            goalsCompleted={goalsCompleted}
-            goalsTotal={goalsTotal}
-            isCompleted={isCompleted}
-            onToggle={toggleCompletion}
-            isToggling={isToggling}
-          />
-        </div>
+        {/* Dues Reminders - only shows when there are active reminders */}
+        <DueRemindersCard />
+
+        {/* Today's Goals */}
+        <TodaysGoals
+          goalsDueToday={goalsDueToday}
+          goalsCompleted={goalsCompleted}
+          goalsTotal={goalsTotal}
+          isCompleted={isCompleted}
+          onToggle={toggleCompletion}
+          isToggling={isToggling}
+        />
       </div>
     </div>
   );
