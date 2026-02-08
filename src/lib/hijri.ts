@@ -278,8 +278,8 @@ export function isAfterMaghrib(
   // After Maghrib on the same evening
   if (currentTotalMinutes >= hours * 60 + minutes) return true;
 
-  // Past midnight but before Fajr -- still "after Maghrib"
-  if (currentHours < 6) return true;
+  // Past midnight but before day reset (4 AM) -- still "after Maghrib"
+  if (currentHours < 4) return true;
 
   return false;
 }
@@ -312,7 +312,7 @@ export function getAdjustedHijriDate(
     } else {
       currentHour = currentTime.getHours();
     }
-    if (currentHour < 6) {
+    if (currentHour < 4) {
       baseDate = new Date(currentTime);
       baseDate.setDate(baseDate.getDate() - 1);
     }

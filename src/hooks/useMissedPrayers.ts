@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { HijriDate, gregorianToBohra, formatHijriDate } from '@/lib/hijri';
+import { HijriDate, gregorianToBohra, advanceHijriDay, formatHijriDate, formatHijriDateKey } from '@/lib/hijri';
 import { PrayerName, PRAYER_DISPLAY_NAMES } from './usePrayerTimes';
 
 export interface MissedPrayer {
@@ -91,23 +91,26 @@ export function useMissedPrayers(): UseMissedPrayersReturn {
         // Generate all expected prayers from start date to yesterday
         const missed: MissedPrayer[] = [];
         const prayers: PrayerName[] = ['fajr', 'dhuhr', 'asr', 'maghrib', 'isha'];
+        const POST_MAGHRIB: PrayerName[] = ['maghrib', 'isha'];
         
         const currentDate = new Date(startDate);
         currentDate.setHours(12, 0, 0, 0); // Noon to avoid timezone issues
 
         while (currentDate <= yesterday) {
-          const gregorianStr = currentDate.toISOString().split('T')[0];
-          const hijri = gregorianToBohra(currentDate);
-          const hijriKey = `${hijri.year}-${String(hijri.month).padStart(2, '0')}-${String(hijri.day).padStart(2, '0')}`;
+          const preMaghribHijri = gregorianToBohra(currentDate);
+          const postMaghribHijri = advanceHijriDay(preMaghribHijri);
 
           for (const prayer of prayers) {
+            const isPostMaghrib = POST_MAGHRIB.includes(prayer);
+            const hijri = isPostMaghrib ? postMaghribHijri : preMaghribHijri;
+            const hijriKey = formatHijriDateKey(hijri);
             const key = `${hijriKey}-${prayer}`;
             const logEntry = completedMap.get(key);
 
             // If completed_at is null, it's a missed prayer
             if (!logEntry?.completedAt) {
               missed.push({
-                id: logEntry?.id || `${hijriKey}-${prayer}`, // Use existing ID or generate temp one
+                id: logEntry?.id || `${hijriKey}-${prayer}`,
                 prayer,
                 prayerDate: hijriKey,
                 gregorianDate: new Date(currentDate),
