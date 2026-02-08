@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Check, Clock, WarningCircle, HalfMoon } from 'iconoir-react';
 import { AllPrayerName } from '@/hooks/usePrayerTimes';
 import { HijriDate } from '@/lib/hijri';
+import { useConfetti } from '@/components/ui/confetti';
 
 interface PrayerCardProps {
   name: AllPrayerName;
@@ -46,6 +47,15 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
 }) => {
   const effectiveStatus = isOptional && status === 'missed' ? 'upcoming' : status;
   const StatusIcon = isOptional ? HalfMoon : STATUS_ICONS[effectiveStatus];
+  const checkboxRef = useRef<HTMLButtonElement>(null);
+  const { triggerConfetti, ConfettiPortal } = useConfetti();
+
+  const handleToggle = () => {
+    if (!isCompleted) {
+      triggerConfetti(checkboxRef.current);
+    }
+    onToggle();
+  };
 
   return (
     <div
@@ -59,9 +69,10 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
     >
       <div className="flex items-center gap-3">
         <Checkbox
+          ref={checkboxRef}
           id={`prayer-${name}`}
           checked={isCompleted}
-          onCheckedChange={onToggle}
+          onCheckedChange={handleToggle}
           className="h-5 w-5"
         />
         <div className="flex flex-col">
@@ -103,6 +114,7 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
           )}
         />
       </div>
+      <ConfettiPortal />
     </div>
   );
 };
