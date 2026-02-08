@@ -48,7 +48,7 @@ const BASE_MONTH_DAYS = [30, 29, 30, 29, 30, 29, 30, 29, 30, 29, 30, 29] as cons
 const LEAP_YEAR_POSITIONS = [2, 5, 8, 10, 13, 16, 19, 21, 24, 27, 29] as const;
 
 // Epoch: JDN for 1 Moharram 1 AH (evening of July 15, 622 CE Julian)
-const HIJRI_EPOCH_JDN = 1948440;
+const HIJRI_EPOCH_JDN = 1948439;
 
 // A 30-year Hijri cycle has exactly 10631 days (19 × 354 + 11 × 355)
 const CYCLE_DAYS = 10631;
