@@ -104,22 +104,9 @@ export function DueRemindersCard() {
 
   const progressPercentage = totalCount > 0 ? (paidCount / totalCount) * 100 : 0;
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Bell className="h-5 w-5" />
-            Dues Reminders
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex items-center justify-center py-8">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-          </div>
-        </CardContent>
-      </Card>
-    );
+  // Hide entirely when loading or no reminders
+  if (isLoading || reminders.length === 0) {
+    return null;
   }
 
   return (

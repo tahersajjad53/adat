@@ -49,7 +49,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-start gap-3 rounded-lg border bg-card p-3 transition-colors ${
+      className={`group flex items-start gap-4 rounded-xl border border-border bg-card p-4 transition-colors ${
         isDragging ? 'opacity-50 shadow-lg' : ''
       } ${goal.isCompleted ? 'opacity-75' : ''}`}
     >
@@ -82,7 +82,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span
-            className={`text-sm font-medium leading-tight ${
+            className={`text-base font-medium leading-tight ${
               goal.isCompleted ? 'line-through text-muted-foreground' : ''
             }`}
           >
