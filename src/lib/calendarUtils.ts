@@ -4,7 +4,7 @@
  * Provides dual calendar support (Hijri and Gregorian) for reminder calculations
  */
 
-import { HijriDate, getHijriMonthName } from './hijri';
+import { HijriDate, getHijriMonthName, getDaysInBohraMonth } from './hijri';
 import type { CalendarType, ReminderType } from '@/types/dues';
 
 // Gregorian month names
@@ -14,13 +14,12 @@ const GREGORIAN_MONTHS = [
 ] as const;
 
 /**
- * Get the number of days in a Hijri month
- * Hijri months alternate between 30 and 29 days
- * Odd months (1,3,5,7,9,11) = 30 days
- * Even months (2,4,6,8,10,12) = 29 days
+ * Get the number of days in a Hijri month (Bohra calendar, leap-year aware).
+ * @param month - 1-indexed Hijri month
+ * @param year - Hijri year (needed for Zilhaj leap year check)
  */
-export function getDaysInHijriMonth(month: number): number {
-  return month % 2 === 1 ? 30 : 29;
+export function getDaysInHijriMonth(month: number, year: number = 1446): number {
+  return getDaysInBohraMonth(month, year);
 }
 
 /**
@@ -35,7 +34,7 @@ export function getDaysInGregorianMonth(month: number, year: number): number {
  * Calculate days remaining in the current Hijri month
  */
 export function daysRemainingHijri(currentHijri: HijriDate): number {
-  const totalDays = getDaysInHijriMonth(currentHijri.month);
+  const totalDays = getDaysInHijriMonth(currentHijri.month, currentHijri.year);
   return Math.max(0, totalDays - currentHijri.day);
 }
 
@@ -131,7 +130,7 @@ export function formatDueDate(
   currentGregorian: Date
 ): string {
   if (calendarType === 'hijri') {
-    const totalDays = getDaysInHijriMonth(currentHijri.month);
+    const totalDays = getDaysInHijriMonth(currentHijri.month, currentHijri.year);
     const dueDay = reminderType === 'custom' && reminderDay ? reminderDay : totalDays;
     return `${dueDay} ${getHijriMonthName(currentHijri.month)}`;
   } else {
@@ -162,18 +161,18 @@ export function getMonthName(
 export function getMonthOptions(calendarType: CalendarType): Array<{ value: number; label: string }> {
   if (calendarType === 'hijri') {
     return [
-      { value: 1, label: 'Muharram' },
+      { value: 1, label: 'Moharram' },
       { value: 2, label: 'Safar' },
-      { value: 3, label: 'Rabi al-Awwal' },
-      { value: 4, label: 'Rabi al-Thani' },
-      { value: 5, label: 'Jumada al-Awwal' },
-      { value: 6, label: 'Jumada al-Thani' },
+      { value: 3, label: 'Rabiul Awwal' },
+      { value: 4, label: 'Rabiul Akhar' },
+      { value: 5, label: 'Jamadal Ula' },
+      { value: 6, label: 'Jamadal Ukra' },
       { value: 7, label: 'Rajab' },
-      { value: 8, label: 'Shaban' },
+      { value: 8, label: 'Shaban Karim' },
       { value: 9, label: 'Ramadan' },
-      { value: 10, label: 'Shawwal' },
-      { value: 11, label: 'Dhul Qadah' },
-      { value: 12, label: 'Dhul Hijjah' },
+      { value: 10, label: 'Shawwal Mukarram' },
+      { value: 11, label: 'Zilqad' },
+      { value: 12, label: 'Zilhaj' },
     ];
   }
   return GREGORIAN_MONTHS.map((name, index) => ({
@@ -189,7 +188,7 @@ export function getDayOptions(calendarType: CalendarType, month?: number): Array
   let maxDays: number;
   
   if (calendarType === 'hijri') {
-    maxDays = month ? getDaysInHijriMonth(month) : 30;
+    maxDays = month ? getDaysInHijriMonth(month) : 30; // year unknown here, default OK
   } else {
     // For Gregorian, use 31 as default (actual validation happens elsewhere)
     maxDays = 31;

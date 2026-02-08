@@ -47,6 +47,7 @@ function getDueDay(
   reminderDay: number | null | undefined,
   calendarType: CalendarType,
   hijriMonth: number,
+  hijriYear: number,
   gregorianMonth: number,
   gregorianYear: number
 ): number {
@@ -55,7 +56,7 @@ function getDueDay(
   }
   // Default to last day of month
   if (calendarType === 'hijri') {
-    return getDaysInHijriMonth(hijriMonth);
+    return getDaysInHijriMonth(hijriMonth, hijriYear);
   }
   return getDaysInGregorianMonth(gregorianMonth, gregorianYear);
 }
@@ -106,6 +107,7 @@ export function useDueReminders(): UseDueRemindersReturn {
             sabeel.reminder_day,
             sabeel.calendar_type,
             hijri.month,
+            hijri.year,
             gregorian.getMonth() + 1,
             gregorian.getFullYear()
           );
@@ -157,6 +159,7 @@ export function useDueReminders(): UseDueRemindersReturn {
             fmb.reminder_day,
             fmb.calendar_type,
             hijri.month,
+            hijri.year,
             gregorian.getMonth() + 1,
             gregorian.getFullYear()
           );
@@ -196,6 +199,7 @@ export function useDueReminders(): UseDueRemindersReturn {
               khumus.reminder_day,
               khumus.calendar_type,
               hijri.month,
+              hijri.year,
               gregorian.getMonth() + 1,
               gregorian.getFullYear()
             );
@@ -236,6 +240,7 @@ export function useDueReminders(): UseDueRemindersReturn {
               zakat.reminder_day,
               zakat.calendar_type,
               hijri.month,
+              hijri.year,
               gregorian.getMonth() + 1,
               gregorian.getFullYear()
             );

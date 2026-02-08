@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Check, Clock, WarningCircle, HalfMoon } from 'iconoir-react';
 import { AllPrayerName } from '@/hooks/usePrayerTimes';
+import { HijriDate } from '@/lib/hijri';
 
 interface PrayerCardProps {
   name: AllPrayerName;
@@ -15,6 +16,7 @@ interface PrayerCardProps {
   onToggle: () => void;
   compact?: boolean;
   isOptional?: boolean;
+  hijriDate?: HijriDate | null;
 }
 
 const STATUS_STYLES = {
@@ -40,8 +42,8 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
   onToggle,
   compact = false,
   isOptional = false,
+  hijriDate,
 }) => {
-  // For optional prayers, don't show missed status icon
   const effectiveStatus = isOptional && status === 'missed' ? 'upcoming' : status;
   const StatusIcon = isOptional ? HalfMoon : STATUS_ICONS[effectiveStatus];
 
@@ -62,22 +64,29 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
           onCheckedChange={onToggle}
           className="h-5 w-5"
         />
-        <div className="flex items-center gap-2">
-          <Label
-            htmlFor={`prayer-${name}`}
-            className={cn(
-              'cursor-pointer font-medium',
-              isCompleted && 'line-through text-muted-foreground',
-              isOptional && !isCompleted && 'text-muted-foreground',
-              compact ? 'text-sm' : 'text-base'
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2">
+            <Label
+              htmlFor={`prayer-${name}`}
+              className={cn(
+                'cursor-pointer font-medium',
+                isCompleted && 'line-through text-muted-foreground',
+                isOptional && !isCompleted && 'text-muted-foreground',
+                compact ? 'text-sm' : 'text-base'
+              )}
+            >
+              {displayName}
+            </Label>
+            {isOptional && (
+              <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
+                Optional
+              </Badge>
             )}
-          >
-            {displayName}
-          </Label>
-          {isOptional && (
-            <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
-              Optional
-            </Badge>
+          </div>
+          {hijriDate && (
+            <span className="text-xs text-muted-foreground">
+              {hijriDate.day} {hijriDate.monthName}
+            </span>
           )}
         </div>
       </div>

@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { supabase } from '@/integrations/supabase/client';
-import { usePrayerTimes, PrayerName, AllPrayerName, PRAYER_ORDER, ALL_PRAYER_ORDER, OPTIONAL_PRAYERS, getPrayerStatus, PRAYER_DISPLAY_NAMES } from './usePrayerTimes';
+import { HijriDate, formatHijriDateKey } from '@/lib/hijri';
+import { usePrayerTimes, PrayerName, AllPrayerName, ALL_PRAYER_ORDER, OPTIONAL_PRAYERS, getPrayerStatus, PRAYER_DISPLAY_NAMES } from './usePrayerTimes';
 
 export interface PrayerStatus {
   name: AllPrayerName;
@@ -12,6 +13,8 @@ export interface PrayerStatus {
   completedAt: Date | null;
   status: 'upcoming' | 'current' | 'completed' | 'missed';
   isOptional: boolean;
+  /** The Hijri date this prayer belongs to */
+  hijriDate: HijriDate | null;
 }
 
 interface UsePrayerLogReturn {
@@ -26,14 +29,29 @@ interface UsePrayerLogReturn {
 }
 
 /**
- * Format Hijri date as storage key (YYYY-MM-DD)
+ * Prayers that belong to the post-Maghrib Hijri date.
+ * All others belong to the pre-Maghrib Hijri date.
  */
-function getHijriDateKey(hijri: { year: number; month: number; day: number }): string {
-  return `${hijri.year}-${String(hijri.month).padStart(2, '0')}-${String(hijri.day).padStart(2, '0')}`;
+const POST_MAGHRIB_PRAYERS: AllPrayerName[] = ['maghrib', 'isha', 'nisfulLayl'];
+
+/**
+ * Get the correct Hijri date for a specific prayer.
+ */
+function getHijriDateForPrayer(
+  prayer: AllPrayerName,
+  preMaghrib: HijriDate,
+  postMaghrib: HijriDate
+): HijriDate {
+  return POST_MAGHRIB_PRAYERS.includes(prayer) ? postMaghrib : preMaghrib;
 }
 
 /**
- * Hook to manage prayer completion state for today
+ * Hook to manage prayer completion state for today.
+ * 
+ * Each prayer is tracked against the Gregorian day (primary key for fetching)
+ * and stored with its correct per-prayer Hijri date:
+ * - Fajr, Zuhr, Asr → preMaghribHijri
+ * - Maghrib, Isha, Nisful Layl → postMaghribHijri
  */
 export function usePrayerLog(): UsePrayerLogReturn {
   const { user } = useAuth();
@@ -43,14 +61,14 @@ export function usePrayerLog(): UsePrayerLogReturn {
   const [completedPrayers, setCompletedPrayers] = useState<Map<AllPrayerName, Date>>(new Map());
   const [isLoading, setIsLoading] = useState(true);
 
-  // Get the Hijri date key for today
-  const dateKey = currentDate ? getHijriDateKey(currentDate.hijri) : null;
-  const gregorianDate = currentDate?.gregorian ? currentDate.gregorian.toISOString().split('T')[0] : null;
+  const gregorianDate = currentDate?.gregorian
+    ? currentDate.gregorian.toISOString().split('T')[0]
+    : null;
 
-  // Fetch today's prayer logs
+  // Fetch today's prayer logs by Gregorian date
   useEffect(() => {
     const fetchTodaysPrayers = async () => {
-      if (!user || !dateKey) {
+      if (!user || !gregorianDate) {
         setIsLoading(false);
         return;
       }
@@ -61,7 +79,7 @@ export function usePrayerLog(): UsePrayerLogReturn {
           .from('prayer_logs')
           .select('prayer, completed_at')
           .eq('user_id', user.id)
-          .eq('prayer_date', dateKey)
+          .eq('gregorian_date', gregorianDate)
           .not('completed_at', 'is', null);
 
         if (error) throw error;
@@ -81,22 +99,28 @@ export function usePrayerLog(): UsePrayerLogReturn {
     };
 
     fetchTodaysPrayers();
-  }, [user, dateKey]);
+  }, [user, gregorianDate]);
 
   // Toggle prayer completion
   const togglePrayer = useCallback(async (prayer: AllPrayerName) => {
-    if (!user || !dateKey || !gregorianDate) return;
+    if (!user || !gregorianDate || !currentDate) return;
 
+    const hijriForPrayer = getHijriDateForPrayer(
+      prayer,
+      currentDate.preMaghribHijri,
+      currentDate.postMaghribHijri
+    );
+    const prayerDateKey = formatHijriDateKey(hijriForPrayer);
     const isCurrentlyCompleted = completedPrayers.has(prayer);
 
     try {
       if (isCurrentlyCompleted) {
-        // Remove completion
+        // Remove completion - match by gregorian_date + prayer (unique per Gregorian day)
         await supabase
           .from('prayer_logs')
           .delete()
           .eq('user_id', user.id)
-          .eq('prayer_date', dateKey)
+          .eq('gregorian_date', gregorianDate)
           .eq('prayer', prayer);
 
         setCompletedPrayers((prev) => {
@@ -105,13 +129,13 @@ export function usePrayerLog(): UsePrayerLogReturn {
           return next;
         });
       } else {
-        // Mark as completed
+        // Mark as completed with per-prayer Hijri date
         const now = new Date();
         await supabase
           .from('prayer_logs')
           .upsert({
             user_id: user.id,
-            prayer_date: dateKey,
+            prayer_date: prayerDateKey,
             prayer,
             completed_at: now.toISOString(),
             gregorian_date: gregorianDate,
@@ -128,15 +152,14 @@ export function usePrayerLog(): UsePrayerLogReturn {
     } catch (err) {
       console.error('Error toggling prayer:', err);
     }
-  }, [user, dateKey, gregorianDate, completedPrayers]);
+  }, [user, gregorianDate, currentDate, completedPrayers]);
 
-  // Build prayers list with status (all prayers including optional)
+  // Build prayers list with status
   const prayers: PrayerStatus[] = ALL_PRAYER_ORDER.map((name) => {
     const isCompleted = completedPrayers.has(name);
     const time = allPrayerTimes?.[name] || '--:--';
     const isOptional = OPTIONAL_PRAYERS.includes(name as any);
     
-    // For optional prayers, use a simpler status calculation
     let status: PrayerStatus['status'];
     if (isOptional) {
       status = isCompleted ? 'completed' : 'upcoming';
@@ -146,6 +169,10 @@ export function usePrayerLog(): UsePrayerLogReturn {
         : 'upcoming';
     }
 
+    const hijriDate = currentDate
+      ? getHijriDateForPrayer(name, currentDate.preMaghribHijri, currentDate.postMaghribHijri)
+      : null;
+
     return {
       name,
       displayName: PRAYER_DISPLAY_NAMES[name],
@@ -154,6 +181,7 @@ export function usePrayerLog(): UsePrayerLogReturn {
       completedAt: completedPrayers.get(name) || null,
       status,
       isOptional,
+      hijriDate,
     };
   });
 

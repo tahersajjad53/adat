@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
-import { HijriDate, gregorianToHijri, formatHijriDate } from '@/lib/hijri';
+import { HijriDate, gregorianToBohra, formatHijriDate } from '@/lib/hijri';
 import { PrayerName, PRAYER_DISPLAY_NAMES } from './usePrayerTimes';
 
 export interface MissedPrayer {
@@ -97,7 +97,7 @@ export function useMissedPrayers(): UseMissedPrayersReturn {
 
         while (currentDate <= yesterday) {
           const gregorianStr = currentDate.toISOString().split('T')[0];
-          const hijri = gregorianToHijri(currentDate);
+          const hijri = gregorianToBohra(currentDate);
           const hijriKey = `${hijri.year}-${String(hijri.month).padStart(2, '0')}-${String(hijri.day).padStart(2, '0')}`;
 
           for (const prayer of prayers) {

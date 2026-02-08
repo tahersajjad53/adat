@@ -40,6 +40,7 @@ export const PrayerList: React.FC<PrayerListProps> = ({
           onToggle={() => onToggle(prayer.name)}
           compact={compact}
           isOptional={prayer.isOptional}
+          hijriDate={prayer.hijriDate}
         />
       ))}
     </div>
