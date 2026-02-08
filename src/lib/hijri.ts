@@ -273,7 +273,15 @@ export function isAfterMaghrib(
     currentMinutes = currentTime.getMinutes();
   }
 
-  return currentHours * 60 + currentMinutes >= hours * 60 + minutes;
+  const currentTotalMinutes = currentHours * 60 + currentMinutes;
+
+  // After Maghrib on the same evening
+  if (currentTotalMinutes >= hours * 60 + minutes) return true;
+
+  // Past midnight but before Fajr -- still "after Maghrib"
+  if (currentHours < 6) return true;
+
+  return false;
 }
 
 // ─── Adjusted Date (with Maghrib rule) ───────────────────────────────
@@ -291,7 +299,26 @@ export function getAdjustedHijriDate(
     ? isAfterMaghrib(currentTime, maghribTime, timezone)
     : false;
 
-  const preMaghribHijri = gregorianToBohra(currentTime, timezone);
+  // If past midnight but still "after Maghrib", use previous Gregorian day
+  let baseDate = currentTime;
+  if (afterMaghrib) {
+    let currentHour: number;
+    if (timezone) {
+      const fmt = new Intl.DateTimeFormat('en-US', {
+        hour: 'numeric', hour12: false, timeZone: timezone,
+      });
+      const parts = fmt.formatToParts(currentTime);
+      currentHour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
+    } else {
+      currentHour = currentTime.getHours();
+    }
+    if (currentHour < 6) {
+      baseDate = new Date(currentTime);
+      baseDate.setDate(baseDate.getDate() - 1);
+    }
+  }
+
+  const preMaghribHijri = gregorianToBohra(baseDate, timezone);
   const postMaghribHijri = advanceHijriDay(preMaghribHijri);
 
   return {
