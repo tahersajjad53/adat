@@ -13,7 +13,7 @@ import { Clock, WarningCircle } from 'iconoir-react';
 
 const Namaz: React.FC = () => {
   const { prayers, togglePrayer, isLoading: prayersLoading } = usePrayerLog();
-  const { overallPercentage } = useTodayProgress();
+  const { overallPercentage } = useTodayProgress(prayers, prayersLoading);
   const { missedPrayers, unfulfilledCount, fulfillPrayer, isLoading: missedLoading } = useMissedPrayers();
   const { prayerTimes } = usePrayerTimes();
   
