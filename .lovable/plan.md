@@ -1,54 +1,47 @@
 
-# Typography Enhancement -- Stronger Visual Hierarchy
 
-## Inspiration from Reference
+# Fix Header Card Layout + Add Color-Coded Progress Bar
 
-The Starlink reference uses extreme contrast between large bold headings and small uppercase labels. We can adopt three key patterns while keeping our existing Bricolage Grotesque + Inter system:
+## Problems Identified
 
-1. **Uppercase tracking labels** for section counters and small metadata
-2. **Larger page headings** with tighter tracking for more impact
-3. **Bolder percentage displays** to create a strong focal point
+1. **"DAILY PROGRESS" wraps onto two lines** -- the uppercase tracked text is too wide for the available space on the right side of the header card
+2. **Hijri date text may wrap** on narrower screens due to long month names like "Shaban Karim"
+3. **Progress bar is missing from the header card** -- the reference image (noise level UI) shows a colored fill bar with hatched/striped patterns, which would add visual interest
 
-## Changes
+## Fixes
 
-### 1. Global Utility Class (`src/index.css`)
-Add a reusable `.label-caps` utility for uppercase spaced-out labels:
-```css
-.label-caps {
-  @apply text-xs font-semibold uppercase tracking-widest text-muted-foreground;
-}
+### 1. DailyMeter compact mode -- prevent label wrapping (`src/components/namaz/DailyMeter.tsx`)
+- Add `whitespace-nowrap` to the "Daily Progress" label so it stays on one line
+- Slightly reduce percentage size from `text-4xl` to `text-3xl` on mobile to give more breathing room
+- Use responsive sizing: `text-3xl sm:text-4xl`
+
+### 2. DateDisplay compact mode -- prevent Hijri date wrapping (`src/components/calendar/DateDisplay.tsx`)
+- Add `whitespace-nowrap` to the Hijri date span
+- Use responsive font size: `text-sm sm:text-base` for the Hijri date to scale down on very narrow screens
+
+### 3. Add a color-coded progress bar inside the header card (`src/pages/Dashboard.tsx`)
+Inspired by the noise-level reference, add a thin progress bar between the date/progress row and the prayer section. The bar will:
+- Use `bg-white/20` track with a lime/accent-colored fill (`bg-[hsl(75,70%,55%)]`) for a pop of color against the gradient background
+- Add diagonal stripe pattern via a CSS background on the fill indicator using repeating-linear-gradient (similar to the hatched pattern in the reference)
+- This requires a small addition to the Progress component: accept optional `indicatorClassName` prop, or simply render a custom inline bar in Dashboard
+
+### 4. Custom striped progress bar in Dashboard (`src/pages/Dashboard.tsx`)
+Instead of modifying the shared Progress component, render a simple custom bar directly in the TimeOfDayCard:
 ```
+<div className="mt-3 h-2 w-full rounded-full bg-white/20 overflow-hidden">
+  <div
+    className="h-full rounded-full bg-[hsl(75,70%,55%)] transition-all"
+    style={{
+      width: `${overallPercentage}%`,
+      backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(255,255,255,0.2) 3px, rgba(255,255,255,0.2) 6px)',
+    }}
+  />
+</div>
+```
+This goes right after the date/progress flex row and before the divider line.
 
-### 2. Dashboard (`src/pages/Dashboard.tsx`)
-- Change "Current Namaz" / "Next Namaz" label from `text-sm text-white/70` to uppercase tracked style: `text-xs font-semibold uppercase tracking-widest text-white/70`
-- Increase prayer name heading from `text-xl` to `text-2xl`
+## Files Changed
+- `src/components/namaz/DailyMeter.tsx` -- whitespace-nowrap on label, responsive percentage size
+- `src/components/calendar/DateDisplay.tsx` -- whitespace-nowrap and responsive font on Hijri date
+- `src/pages/Dashboard.tsx` -- add striped progress bar between header row and prayer section, remove the plain `border-t` divider (the bar acts as the visual separator)
 
-### 3. DailyMeter (`src/components/namaz/DailyMeter.tsx`)
-- "Daily Progress" label: apply uppercase tracking (`text-xs font-semibold uppercase tracking-widest`)
-- Compact percentage: bump from `text-3xl` to `text-4xl`
-- Full percentage: keep `text-5xl` (already strong)
-
-### 4. Section Headers -- TodaysGoals + DueRemindersCard
-- Keep current `text-xl font-bold` for section titles (appropriate for sub-sections)
-- Change the counter text (e.g., "3/5") to use uppercase tracking style for consistency
-
-### 5. Page Titles (`Goals.tsx`, `Namaz.tsx`, `Profile.tsx`)
-- Increase page titles from `text-2xl md:text-3xl` to `text-3xl md:text-4xl` for more visual weight
-- Subtitle text stays `text-base text-muted-foreground` for contrast
-
-### 6. DateDisplay (`src/components/calendar/DateDisplay.tsx`)
-- In compact mode, change "Gregorian date / city" line to uppercase tracked style
-- In full mode, bump Hijri date from `text-2xl` to `text-3xl`
-
-## Files Modified
-- `src/index.css` -- add `.label-caps` utility
-- `src/components/namaz/DailyMeter.tsx` -- uppercase label, larger percentage
-- `src/pages/Dashboard.tsx` -- uppercase prayer label, larger prayer name
-- `src/components/goals/TodaysGoals.tsx` -- uppercase counter
-- `src/components/dues/DueRemindersCard.tsx` -- uppercase counter
-- `src/components/calendar/DateDisplay.tsx` -- uppercase date line, larger Hijri
-- `src/pages/Goals.tsx` -- larger page title
-- `src/pages/Namaz.tsx` -- no structural change needed (uses shared components)
-- `src/pages/Profile.tsx` -- larger page title (if applicable)
-
-All changes are purely CSS class adjustments -- no logic or structural changes.
