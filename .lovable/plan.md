@@ -1,37 +1,29 @@
 
-# Fix: Immediate Progress Update on Prayer Toggle
+# Add FAB for "Add Sabeel" (matching Goals pattern)
 
-## Problem
+## What Changes
 
-When you check off a prayer on the Today or Namaz page, the percentage in the header card doesn't update immediately.
+Replace the inline "Add Sabeel" button in the header with:
+- **Desktop**: A standard button in the header (same as Goals page)
+- **Mobile**: A floating action button (FAB) pinned to the bottom-right corner
 
-**Root cause:** `usePrayerLog()` uses local `useState` to track completed prayers. Both the Dashboard component and the `useTodayProgress` hook call `usePrayerLog()` independently, creating two separate state instances. Toggling a prayer updates one instance but the other (used for the percentage calculation) doesn't know about it until the component remounts or the date changes.
+This matches the existing Goals page pattern exactly.
 
-The same issue occurs on the Namaz page -- it calls `usePrayerLog()` once and `useTodayProgress()` once, but `useTodayProgress` has its own internal `usePrayerLog()` call.
+## Technical Details
 
-## Solution
-
-Remove the duplicate `usePrayerLog()` call inside `useTodayProgress` by making it accept prayer data as parameters instead of fetching its own copy. This way, both the prayer list and the progress meter read from the **same** state instance.
-
-## Changes
-
-### 1. `src/hooks/useTodayProgress.ts`
-- Remove the internal `usePrayerLog()` call
-- Accept `prayers: PrayerStatus[]` and `prayersLoading: boolean` as parameters
-- Compute prayer progress from the passed-in array (same logic, just using the parameter instead of its own hook call)
-
-### 2. `src/pages/Dashboard.tsx`
-- Pass `prayers` and `isLoading` from the existing `usePrayerLog()` call into `useTodayProgress(prayers, prayersLoading)`
-
-### 3. `src/pages/Namaz.tsx`
-- Same change: pass prayer data from its `usePrayerLog()` call into `useTodayProgress(prayers, prayersLoading)`
-
-## Why This Works
-
-Both the prayer checkboxes and the progress percentage now read from a single `usePrayerLog()` instance. When `togglePrayer` optimistically updates the local state, the percentage recalculates immediately via `useMemo` -- no refetch needed.
-
-## Impact
-
-- Instant percentage updates on both Today and Namaz pages
-- No new dependencies or API changes
-- Removes one redundant Supabase query per page (the duplicate `usePrayerLog` fetch)
+### `src/components/dues/DuesSection.tsx`
+1. Import `useIsMobile` from `@/hooks/use-mobile` and `Plus` from `iconoir-react` (replacing the lucide `Plus`)
+2. In the header, wrap the "Add Sabeel" button with `{!isMobile && ...}` so it only shows on desktop
+3. Add a mobile FAB at the bottom of the component (outside the main content area):
+   ```
+   {isMobile && (
+     <Button
+       onClick={handleAddSabeel}
+       size="icon"
+       className="fixed bottom-20 right-4 z-40 h-14 w-14 rounded-full shadow-lg"
+     >
+       <Plus className="h-6 w-6" />
+     </Button>
+   )}
+   ```
+4. Update the empty state to also conditionally show the inline "Add Your First Sabeel" button only on desktop (on mobile the FAB serves this purpose)
