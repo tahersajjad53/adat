@@ -1,9 +1,9 @@
 import { useMemo } from 'react';
 import { useGoals } from './useGoals';
 import { useGoalCompletions } from './useGoalCompletions';
-import { usePrayerLog } from './usePrayerLog';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { getGoalsDueOnDate } from '@/lib/recurrence';
+import type { PrayerStatus } from './usePrayerLog';
 
 export interface TodayProgressData {
   // Prayers
@@ -26,11 +26,10 @@ export interface TodayProgressData {
   isLoading: boolean;
 }
 
-export function useTodayProgress(): TodayProgressData {
+export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolean): TodayProgressData {
   const { currentDate } = useCalendar();
   const { goals, isLoading: goalsLoading } = useGoals();
   const { isCompleted, isLoading: completionsLoading } = useGoalCompletions();
-  const { prayers, isLoading: prayersLoading } = usePrayerLog();
 
   const hijriDate = currentDate?.hijri;
   const gregorianDate = currentDate?.gregorian;

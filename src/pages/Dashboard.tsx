@@ -31,14 +31,14 @@ const Dashboard: React.FC = () => {
   const navigate = useNavigate();
   const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
 
-  const { prayers, togglePrayer, currentPrayer, nextPrayer } = usePrayerLog();
+  const { prayers, togglePrayer, currentPrayer, nextPrayer, isLoading: prayersLoading } = usePrayerLog();
   const { prayerTimes } = usePrayerTimes();
   const { isCompleted, toggleCompletion, isToggling } = useGoalCompletions();
   const {
     prayerCompleted, prayerTotal,
     goalsCompleted, goalsTotal, goalsDueToday,
     overallPercentage,
-  } = useTodayProgress();
+  } = useTodayProgress(prayers, prayersLoading);
 
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayerName = currentPrayerWindow?.current || null;
