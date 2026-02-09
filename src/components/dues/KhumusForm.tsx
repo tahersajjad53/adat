@@ -156,45 +156,33 @@ const KhumusForm: React.FC<KhumusFormProps> = ({
       {calculationType === 'fixed' ? (
         <div className="space-y-2">
           <Label htmlFor="fixedAmount">Monthly Amount</Label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-              ₹
-            </span>
-            <Input
-              id="fixedAmount"
-              type="number"
-              value={fixedAmount}
-              onChange={(e) => setFixedAmount(e.target.value)}
-              placeholder="0"
-              className="pl-7"
-              disabled={isLoading}
-              required
-              min="0"
-              step="0.01"
-            />
-          </div>
+          <Input
+            id="fixedAmount"
+            type="number"
+            value={fixedAmount}
+            onChange={(e) => setFixedAmount(e.target.value)}
+            placeholder="0"
+            disabled={isLoading}
+            required
+            min="0"
+            step="0.01"
+          />
         </div>
       ) : (
         <>
           <div className="space-y-2">
             <Label htmlFor="monthlyIncome">Monthly Income</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                ₹
-              </span>
-              <Input
-                id="monthlyIncome"
-                type="number"
-                value={monthlyIncome}
-                onChange={(e) => setMonthlyIncome(e.target.value)}
-                placeholder="0"
-                className="pl-7"
-                disabled={isLoading}
-                required
-                min="0"
-                step="0.01"
-              />
-            </div>
+            <Input
+              id="monthlyIncome"
+              type="number"
+              value={monthlyIncome}
+              onChange={(e) => setMonthlyIncome(e.target.value)}
+              placeholder="0"
+              disabled={isLoading}
+              required
+              min="0"
+              step="0.01"
+            />
           </div>
 
           <div className="space-y-2">
@@ -223,7 +211,7 @@ const KhumusForm: React.FC<KhumusFormProps> = ({
           <div className="p-3 bg-muted/50 rounded-lg">
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Calculated amount:</span>
-              <span className="font-semibold">₹{calculatedAmount.toLocaleString('en-IN')}</span>
+              <span className="font-semibold">{calculatedAmount}</span>
             </div>
           </div>
         </>

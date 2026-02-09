@@ -146,23 +146,17 @@ const FMBHubForm: React.FC<FMBHubFormProps> = ({
 
       <div className="space-y-2">
         <Label htmlFor="monthlyAmount">Monthly Contribution</Label>
-        <div className="relative">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-            ₹
-          </span>
-          <Input
-            id="monthlyAmount"
-            type="number"
-            value={monthlyAmount}
-            onChange={(e) => setMonthlyAmount(e.target.value)}
-            placeholder="0"
-            className="pl-7"
-            disabled={isLoading}
-            required
-            min="0"
-            step="0.01"
-          />
-        </div>
+        <Input
+          id="monthlyAmount"
+          type="number"
+          value={monthlyAmount}
+          onChange={(e) => setMonthlyAmount(e.target.value)}
+          placeholder="0"
+          disabled={isLoading}
+          required
+          min="0"
+          step="0.01"
+        />
       </div>
 
       <div className="space-y-2">
