@@ -40,7 +40,7 @@ const Namaz: React.FC = () => {
           </TabsTrigger>
           <TabsTrigger value="missed">
             <WarningCircle className="h-4 w-4" />
-            Missed Namaz
+            Qaza Namaz
             {unfulfilledCount > 0 && (
               <span className="ml-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-semibold text-destructive-foreground">
                 {unfulfilledCount > 99 ? '99+' : unfulfilledCount}

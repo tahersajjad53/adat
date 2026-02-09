@@ -55,15 +55,6 @@ export const MissedPrayersList: React.FC<MissedPrayersListProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Qaza count */}
-      <div className="text-sm text-muted-foreground">
-        {unfulfilledCount > 0 ? (
-          <span>{unfulfilledCount} qaza</span>
-        ) : (
-          <span>All prayers fulfilled!</span>
-        )}
-      </div>
-
       {/* Grouped list */}
       {dateKeys.map((dateKey) => {
         const group = groupedPrayers[dateKey];
