@@ -61,7 +61,7 @@ export const MissedPrayerCard: React.FC<MissedPrayerCardProps> = ({
           className="shrink-0 gap-2"
         >
           <Undo className="h-3 w-3" />
-          Make Up
+          Ada
         </Button>
       )}
     </div>
