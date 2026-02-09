@@ -62,7 +62,7 @@ const Goals: React.FC = () => {
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-display">Goals</h1>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Goals</h1>
             <p className="text-base text-muted-foreground mt-1 font-normal">
               Track your daily spiritual habits and recurring tasks.
             </p>

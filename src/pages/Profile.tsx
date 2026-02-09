@@ -156,7 +156,7 @@ const Profile: React.FC = () => {
           </button>
 
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-display">Account Information</h1>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Account Information</h1>
             <p className="text-base text-muted-foreground mt-1 font-normal">Manage your personal details and location.</p>
           </div>
 
@@ -255,7 +255,7 @@ const Profile: React.FC = () => {
     <div className="container py-8">
       <div className="max-w-xl mx-auto space-y-6">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight font-display">Profile</h1>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Profile</h1>
           <p className="text-base text-muted-foreground mt-1 font-normal">Manage your account settings.</p>
         </div>
 

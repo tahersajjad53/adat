@@ -36,7 +36,7 @@ export function DueRemindersCard() {
           <Bell className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-bold font-display tracking-tight">Dues Reminders</h2>
         </div>
-        <span className="text-sm text-muted-foreground font-medium">
+        <span className="label-caps">
           {paidCount}/{totalCount}
         </span>
       </div>
