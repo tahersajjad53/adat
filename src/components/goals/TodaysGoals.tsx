@@ -41,7 +41,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
           <Archery className="h-5 w-5 text-primary" />
           <h2 className="text-xl font-bold font-display tracking-tight">Today's Goals</h2>
         </div>
-        <span className="text-sm text-muted-foreground font-medium">
+        <span className="label-caps">
           {goalsCompleted}/{goalsTotal}
         </span>
       </div>

@@ -119,7 +119,7 @@ const Dashboard: React.FC = () => {
           {prayerToShow ? (
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-sm text-white/70">
+                <span className="text-xs font-semibold uppercase tracking-widest text-white/70">
                   {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
                 </span>
                 <div className="flex items-center gap-3 mt-1">
@@ -127,7 +127,7 @@ const Dashboard: React.FC = () => {
                     <PrayerIcon className="h-5 w-5 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-xl font-bold text-white font-display">
+                    <h3 className="text-2xl font-bold text-white font-display">
                       {prayerToShow.displayName}
                     </h3>
                     <span className="text-sm text-white/80">{prayerToShow.time}</span>

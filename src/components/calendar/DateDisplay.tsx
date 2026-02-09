@@ -57,7 +57,7 @@ export function DateDisplay({ className, showLocation = false, compact = false, 
           )}
           <span className={cn("font-display font-semibold", isLight && "text-white")}>{hijriFormatted}</span>
         </div>
-        <span className={cn("text-sm", isLight ? "text-white/80" : "text-muted-foreground")}>
+        <span className={cn("text-xs font-semibold uppercase tracking-widest", isLight ? "text-white/80" : "text-muted-foreground")}>
           {gregorianFormatted}{location?.city ? ` · ${location.city}` : ''}
         </span>
       </div>
@@ -73,7 +73,7 @@ export function DateDisplay({ className, showLocation = false, compact = false, 
         ) : (
           <SunLight className="h-5 w-5 text-accent-foreground" />
         )}
-        <p className="text-2xl font-display font-bold tracking-tight">
+        <p className="text-3xl font-display font-bold tracking-tight">
           {hijriFormatted}
         </p>
       </div>
