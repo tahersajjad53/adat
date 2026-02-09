@@ -1,53 +1,37 @@
 
+# Fix: Immediate Progress Update on Prayer Toggle
 
-# Confetti Animation + Goal Descriptions in Today View
+## Problem
 
-## 1. Confetti Animation on Completion
+When you check off a prayer on the Today or Namaz page, the percentage in the header card doesn't update immediately.
 
-### Approach
-Create a lightweight, dependency-free confetti component using CSS keyframe animations. No npm package needed -- just a small React component that renders ~20-30 small colored circles/squares that burst outward and fade, triggered from the checkbox position.
+**Root cause:** `usePrayerLog()` uses local `useState` to track completed prayers. Both the Dashboard component and the `useTodayProgress` hook call `usePrayerLog()` independently, creating two separate state instances. Toggling a prayer updates one instance but the other (used for the percentage calculation) doesn't know about it until the component remounts or the date changes.
 
-### Implementation
-- **New file: `src/components/ui/confetti.tsx`** -- A `ConfettiBurst` component that:
-  - Accepts a `trigger` boolean and an optional `originRef` (to burst from the checkbox)
-  - Renders 20-30 absolutely-positioned particles with randomized directions, colors (using theme primary/accent tones), and durations
-  - Auto-removes itself after ~800ms
-  - Uses CSS `@keyframes` for the burst animation (translateX/Y + opacity + scale)
+The same issue occurs on the Namaz page -- it calls `usePrayerLog()` once and `useTodayProgress()` once, but `useTodayProgress` has its own internal `usePrayerLog()` call.
 
-- **New hook: `src/hooks/useConfetti.ts`** -- A simple hook returning `{ triggerConfetti, ConfettiPortal }`:
-  - `triggerConfetti(element)` captures the click position and sets state
-  - `ConfettiPortal` renders the burst at that position via a portal
+## Solution
 
-### Integration Points
-- **`src/components/namaz/PrayerCard.tsx`**: Wrap `onToggle` -- only trigger confetti when checking ON (not unchecking)
-- **`src/components/goals/TodaysGoals.tsx`**: Same pattern on goal checkbox toggle
-- **`src/components/goals/GoalCard.tsx`**: Same pattern on the Goals page
+Remove the duplicate `usePrayerLog()` call inside `useTodayProgress` by making it accept prayer data as parameters instead of fetching its own copy. This way, both the prayer list and the progress meter read from the **same** state instance.
 
-### Behavior
-- Confetti fires only when marking something complete (not when unchecking)
-- Burst is small and brief (~600-800ms), not disruptive
-- Particles use the app's primary color palette for visual coherence
+## Changes
 
----
+### 1. `src/hooks/useTodayProgress.ts`
+- Remove the internal `usePrayerLog()` call
+- Accept `prayers: PrayerStatus[]` and `prayersLoading: boolean` as parameters
+- Compute prayer progress from the passed-in array (same logic, just using the parameter instead of its own hook call)
 
-## 2. Goal Description in Today View
+### 2. `src/pages/Dashboard.tsx`
+- Pass `prayers` and `isLoading` from the existing `usePrayerLog()` call into `useTodayProgress(prayers, prayersLoading)`
 
-### Change
-In `src/components/goals/TodaysGoals.tsx`, render `goal.description` below the title when it exists.
+### 3. `src/pages/Namaz.tsx`
+- Same change: pass prayer data from its `usePrayerLog()` call into `useTodayProgress(prayers, prayersLoading)`
 
-### Styling
-- Shown as a secondary line: `text-sm text-muted-foreground font-normal`
-- Truncated to one line with `line-clamp-1` to keep the list compact
-- When the goal is completed, the description also gets `line-through` styling
+## Why This Works
 
----
+Both the prayer checkboxes and the progress percentage now read from a single `usePrayerLog()` instance. When `togglePrayer` optimistically updates the local state, the percentage recalculates immediately via `useMemo` -- no refetch needed.
 
-## Files Changed
+## Impact
 
-| File | Change |
-|------|--------|
-| `src/components/ui/confetti.tsx` | New -- CSS-based confetti burst component |
-| `src/hooks/useConfetti.ts` | New -- hook to trigger confetti from any component |
-| `src/components/namaz/PrayerCard.tsx` | Trigger confetti on prayer check-on |
-| `src/components/goals/TodaysGoals.tsx` | Trigger confetti on goal check-on; render goal description |
-| `src/components/goals/GoalCard.tsx` | Trigger confetti on goal check-on |
+- Instant percentage updates on both Today and Namaz pages
+- No new dependencies or API changes
+- Removes one redundant Supabase query per page (the duplicate `usePrayerLog` fetch)
