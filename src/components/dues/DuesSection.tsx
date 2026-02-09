@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus } from 'iconoir-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import SabeelCard from './SabeelCard';
 import SabeelFormSheet from './SabeelFormSheet';
@@ -14,6 +15,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { Sabeel, SabeelInput, SabeelWithRelations, FMBHub, FMBHubInput, Khumus, KhumusInput, Zakat, ZakatInput } from '@/types/dues';
 
 const DuesSection: React.FC = () => {
+  const isMobile = useIsMobile();
   const { sabeels, isLoading, createSabeel, updateSabeel, deleteSabeel, refetch } = useSabeels();
   
   // Sabeel form state
@@ -207,10 +209,12 @@ const DuesSection: React.FC = () => {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-display">Sabeel</h2>
-        <Button size="sm" onClick={handleAddSabeel}>
-          <Plus className="h-4 w-4 mr-1" />
-          Add Sabeel
-        </Button>
+        {!isMobile && (
+          <Button size="sm" onClick={handleAddSabeel}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add Sabeel
+          </Button>
+        )}
       </div>
 
       {sabeels.length === 0 ? (
@@ -218,10 +222,12 @@ const DuesSection: React.FC = () => {
           <p className="text-muted-foreground mb-4">
             No Sabeels configured yet. Add your first Sabeel to start tracking your dues.
           </p>
-          <Button variant="outline" onClick={handleAddSabeel}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Your First Sabeel
-          </Button>
+          {!isMobile && (
+            <Button variant="outline" onClick={handleAddSabeel}>
+              <Plus className="h-4 w-4 mr-2" />
+              Add Your First Sabeel
+            </Button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
@@ -283,6 +289,17 @@ const DuesSection: React.FC = () => {
         onSubmit={handleZakatSubmit}
         isLoading={isZakatSubmitting}
       />
+
+      {/* Mobile FAB */}
+      {isMobile && (
+        <Button
+          onClick={handleAddSabeel}
+          size="icon"
+          className="fixed bottom-20 right-4 z-40 h-14 w-14 rounded-full shadow-lg"
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      )}
     </section>
   );
 };
