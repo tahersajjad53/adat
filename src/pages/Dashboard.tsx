@@ -149,6 +149,8 @@ const Dashboard: React.FC = () => {
                 />
               </div>
             </div>
+          ) : overallPercentage === 100 ? (
+            <p className="text-white/80 text-sm font-medium">Masha'Allah! All done for today.</p>
           ) : (
             <p className="text-white/70 text-sm">No prayer information available</p>
           )}
