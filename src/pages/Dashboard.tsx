@@ -114,7 +114,17 @@ const Dashboard: React.FC = () => {
             </Button>
           )}
 
-          <div className="my-4 border-t border-white/20" />
+          {/* Striped progress bar */}
+          <div className="mt-3 mb-4 h-2 w-full rounded-full bg-white/20 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${overallPercentage}%`,
+                backgroundColor: 'hsl(75, 70%, 55%)',
+                backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(255,255,255,0.2) 3px, rgba(255,255,255,0.2) 6px)',
+              }}
+            />
+          </div>
 
           {prayerToShow ? (
             <div className="flex items-center justify-between">

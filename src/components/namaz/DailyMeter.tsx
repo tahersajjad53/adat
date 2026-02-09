@@ -44,10 +44,10 @@ export const DailyMeter: React.FC<DailyMeterProps> = ({
   if (compact) {
     return (
       <div className={cn('flex flex-col items-end', className)}>
-        <span className={cn("text-4xl font-bold font-display", isLight ? "text-white" : "text-foreground")}>
+        <span className={cn("text-3xl sm:text-4xl font-bold font-display", isLight ? "text-white" : "text-foreground")}>
           {percentage}%
         </span>
-        <span className={cn("text-xs font-semibold uppercase tracking-widest", isLight ? "text-white/80" : "text-muted-foreground")}>Daily Progress</span>
+        <span className={cn("text-xs font-semibold uppercase tracking-widest whitespace-nowrap", isLight ? "text-white/80" : "text-muted-foreground")}>Daily Progress</span>
       </div>
     );
   }
