@@ -64,7 +64,7 @@ const Goals: React.FC = () => {
           <div>
             <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Goals</h1>
             <p className="text-base text-muted-foreground mt-1 font-normal">
-              Track your daily spiritual habits and recurring tasks.
+              Rooted in Niyat, completed with Ikhlas.
             </p>
           </div>
           {!isMobile && (
