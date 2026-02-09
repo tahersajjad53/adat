@@ -1,35 +1,32 @@
 
 
-# Remove Currency Symbols from Sabeel Management
+# Redesign Dues Reminders to Match Goals UI Pattern
 
-## What Changes
+## Overview
 
-Remove all `₹` currency symbols and Indian locale formatting (`toLocaleString('en-IN')`) from the dues/Sabeel components. Amounts will display as plain numbers since currency management is not yet implemented.
+Replace the current Card-based `DueRemindersCard` with a flat list layout matching `TodaysGoals` -- a section header with icon + title + count, followed by individual rounded bordered items with checkboxes.
 
-## Files to Update
+## Changes
 
-### 1. `src/components/dues/SabeelFormSheet.tsx`
-- Remove the `₹` prefix span from the monthly amount input
-- Remove `pl-7` padding class (no longer needed without prefix)
+### `src/components/dues/DueRemindersCard.tsx`
 
-### 2. `src/components/dues/FMBHubForm.tsx`
-- Remove the `₹` prefix span from the monthly amount input
-- Remove `pl-7` padding class
+**Remove**: The `Card`/`CardHeader`/`CardContent` wrapper, `Progress` bar, `Badge` components, and `Button` for marking paid.
 
-### 3. `src/components/dues/KhumusForm.tsx`
-- Remove `₹` prefix spans from fixed amount and monthly income inputs
-- Remove `pl-7` padding classes
-- Change calculated amount display from `₹{amount.toLocaleString('en-IN')}` to just `{calculatedAmount}`
+**New layout**:
+- **Header row**: Bell icon + "Dues Reminders" title (h2, same styling as goals) + `{paidCount}/{totalCount}` counter on the right
+- **Each reminder item**: Same `rounded-xl border border-border bg-card p-4` card style as goal items, with:
+  - A `Checkbox` on the left (checked when paid, triggers `markAsPaid` with confetti)
+  - Title with strike-through when paid, plus calendar type icon inline
+  - Subtitle line: amount and due date (with strike-through when paid)
+  - Check icon on the right when paid (matching goals' completed state)
+- **Empty state**: Same pattern as goals -- centered text with "No dues reminders right now"
+- Remove the monthly progress bar at the bottom (the count in the header serves this purpose)
 
-### 4. `src/components/dues/ZakatForm.tsx`
-- Remove `₹` prefix spans from fixed amount, assets value, and nisab threshold inputs
-- Remove `pl-7` padding classes
-- Change calculated zakat display from `₹{amount.toLocaleString('en-IN')}` to plain number
+### Technical Details
 
-### 5. `src/components/dues/SabeelCard.tsx`
-- Remove `₹` from all display values: monthly amounts, khumus calculations, zakat calculations
-- Replace `.toLocaleString('en-IN')` / `formatAmount()` calls with plain number display
-
-### 6. `src/components/dues/DueRemindersCard.tsx`
-- Remove `₹` from the reminder amount display
+- Import `Checkbox` and `useConfetti` to match goals pattern
+- Remove imports: `Card`, `CardContent`, `CardHeader`, `CardTitle`, `Progress`, `Badge`, `Button`
+- Keep urgency logic but express it through subtle text color rather than background colors (to stay consistent with the clean goals style)
+- The component remains self-contained with its own hooks (`useDueReminders`, `useDuePayments`)
+- Continue returning `null` when loading or no reminders exist
 
