@@ -166,45 +166,33 @@ const ZakatForm: React.FC<ZakatFormProps> = ({
       {calculationType === 'fixed' ? (
         <div className="space-y-2">
           <Label htmlFor="fixedAmount">Annual Zakat Amount</Label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-              ₹
-            </span>
-            <Input
-              id="fixedAmount"
-              type="number"
-              value={fixedAmount}
-              onChange={(e) => setFixedAmount(e.target.value)}
-              placeholder="0"
-              className="pl-7"
-              disabled={isLoading}
-              required
-              min="0"
-              step="0.01"
-            />
-          </div>
+          <Input
+            id="fixedAmount"
+            type="number"
+            value={fixedAmount}
+            onChange={(e) => setFixedAmount(e.target.value)}
+            placeholder="0"
+            disabled={isLoading}
+            required
+            min="0"
+            step="0.01"
+          />
         </div>
       ) : (
         <>
           <div className="space-y-2">
             <Label htmlFor="assetsValue">Total Assets Value</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                ₹
-              </span>
-              <Input
-                id="assetsValue"
-                type="number"
-                value={assetsValue}
-                onChange={(e) => setAssetsValue(e.target.value)}
-                placeholder="0"
-                className="pl-7"
-                disabled={isLoading}
-                required
-                min="0"
-                step="0.01"
-              />
-            </div>
+            <Input
+              id="assetsValue"
+              type="number"
+              value={assetsValue}
+              onChange={(e) => setAssetsValue(e.target.value)}
+              placeholder="0"
+              disabled={isLoading}
+              required
+              min="0"
+              step="0.01"
+            />
             <p className="text-xs text-muted-foreground">
               Total value of zakatable assets
             </p>
@@ -212,23 +200,17 @@ const ZakatForm: React.FC<ZakatFormProps> = ({
 
           <div className="space-y-2">
             <Label htmlFor="nisabThreshold">Nisab Threshold</Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
-                ₹
-              </span>
-              <Input
-                id="nisabThreshold"
-                type="number"
-                value={nisabThreshold}
-                onChange={(e) => setNisabThreshold(e.target.value)}
-                placeholder="0"
-                className="pl-7"
-                disabled={isLoading}
-                required
-                min="0"
-                step="0.01"
-              />
-            </div>
+            <Input
+              id="nisabThreshold"
+              type="number"
+              value={nisabThreshold}
+              onChange={(e) => setNisabThreshold(e.target.value)}
+              placeholder="0"
+              disabled={isLoading}
+              required
+              min="0"
+              step="0.01"
+            />
             <p className="text-xs text-muted-foreground">
               Minimum wealth threshold for Zakat obligation
             </p>
@@ -269,7 +251,7 @@ const ZakatForm: React.FC<ZakatFormProps> = ({
             <div className="flex items-center justify-between text-sm">
               <span className="text-muted-foreground">Calculated Zakat:</span>
               <span className="font-semibold">
-                {isAboveNisab ? `₹${calculatedAmount.toLocaleString('en-IN')}` : '₹0'}
+                {isAboveNisab ? calculatedAmount : 0}
               </span>
             </div>
           </div>

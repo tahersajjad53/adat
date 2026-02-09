@@ -96,7 +96,7 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground mt-1">
-                    ₹{formatAmount(sabeel.monthly_amount)}/month
+                    {formatAmount(sabeel.monthly_amount)}/month
                     <span className="mx-1.5">·</span>
                     From{' '}
                     {formatMonthYear(
@@ -155,7 +155,7 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
                 <div className="flex items-center justify-between bg-card rounded-md p-2.5 border border-border">
                   <div>
                     <p className="text-sm font-medium">
-                      ₹{formatAmount(sabeel.fmb_hub.monthly_amount)}/month
+                      {formatAmount(sabeel.fmb_hub.monthly_amount)}/month
                     </p>
                   </div>
                   <div className="flex items-center gap-1">
@@ -211,10 +211,10 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
                         <p className="text-sm font-medium">{khumus.person_name}</p>
                         <p className="text-xs text-muted-foreground">
                           {khumus.calculation_type === 'fixed'
-                            ? `₹${formatAmount(khumus.fixed_amount || 0)}`
-                            : `${khumus.percentage_rate}% of ₹${formatAmount(
+                            ? formatAmount(khumus.fixed_amount || 0)
+                            : `${khumus.percentage_rate}% of ${formatAmount(
                                 khumus.monthly_income || 0
-                              )} = ₹${formatAmount(calculateKhumusAmount(khumus))}`}
+                              )} = ${formatAmount(calculateKhumusAmount(khumus))}`}
                         </p>
                       </div>
                       <div className="flex items-center gap-1">
@@ -272,10 +272,10 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
                         <p className="text-sm font-medium">{zakat.person_name}</p>
                         <p className="text-xs text-muted-foreground">
                           {zakat.calculation_type === 'fixed'
-                            ? `₹${formatAmount(zakat.fixed_amount || 0)}`
-                            : `${zakat.zakat_rate}% of ₹${formatAmount(
+                            ? formatAmount(zakat.fixed_amount || 0)
+                            : `${zakat.zakat_rate}% of ${formatAmount(
                                 zakat.assets_value || 0
-                              )} = ₹${formatAmount(calculateZakatAmount(zakat))}`}
+                              )} = ${formatAmount(calculateZakatAmount(zakat))}`}
                         </p>
                       </div>
                       <div className="flex items-center gap-1">

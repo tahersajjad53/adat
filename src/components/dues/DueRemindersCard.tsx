@@ -68,7 +68,7 @@ function ReminderItem({ reminder, isPaid, onMarkPaid, isMarking }: ReminderItemP
           </Badge>
         </div>
         <p className="text-sm text-muted-foreground mt-0.5">
-          ₹{reminder.amount.toLocaleString('en-IN')} · Due {reminder.dueDate}
+          {reminder.amount} · Due {reminder.dueDate}
         </p>
       </div>
       <Button
