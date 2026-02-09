@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { MissedPrayerCard } from './MissedPrayerCard';
 import { MissedPrayer } from '@/hooks/useMissedPrayers';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Button } from '@/components/ui/button';
-import { Filter } from 'iconoir-react';
 
 interface MissedPrayersListProps {
   prayers: MissedPrayer[];
@@ -16,8 +14,6 @@ export const MissedPrayersList: React.FC<MissedPrayersListProps> = ({
   onFulfill,
   isLoading = false,
 }) => {
-  const [showFulfilled, setShowFulfilled] = useState(true);
-
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -28,12 +24,7 @@ export const MissedPrayersList: React.FC<MissedPrayersListProps> = ({
     );
   }
 
-  const filteredPrayers = showFulfilled
-    ? prayers
-    : prayers.filter((p) => !p.isFulfilled);
-
   const unfulfilledCount = prayers.filter((p) => !p.isFulfilled).length;
-  const fulfilledCount = prayers.filter((p) => p.isFulfilled).length;
 
   if (prayers.length === 0) {
     return (
@@ -45,7 +36,7 @@ export const MissedPrayersList: React.FC<MissedPrayersListProps> = ({
   }
 
   // Group prayers by date
-  const groupedPrayers = filteredPrayers.reduce((groups, prayer) => {
+  const groupedPrayers = prayers.reduce((groups, prayer) => {
     const dateKey = prayer.gregorianDate.toISOString().split('T')[0];
     if (!groups[dateKey]) {
       groups[dateKey] = {
@@ -64,28 +55,13 @@ export const MissedPrayersList: React.FC<MissedPrayersListProps> = ({
 
   return (
     <div className="space-y-6">
-      {/* Filter controls */}
-      <div className="flex items-center justify-between">
-        <div className="text-sm text-muted-foreground">
-          {unfulfilledCount > 0 ? (
-            <span>{unfulfilledCount} unfulfilled</span>
-          ) : (
-            <span>All prayers fulfilled!</span>
-          )}
-          {fulfilledCount > 0 && (
-            <span className="ml-2">• {fulfilledCount} fulfilled</span>
-          )}
-        </div>
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => setShowFulfilled(!showFulfilled)}
-          className="gap-2"
-        >
-          <Filter className="h-3 w-3" />
-          {showFulfilled ? 'Hide fulfilled' : 'Show all'}
-        </Button>
+      {/* Qaza count */}
+      <div className="text-sm text-muted-foreground">
+        {unfulfilledCount > 0 ? (
+          <span>{unfulfilledCount} qaza</span>
+        ) : (
+          <span>All prayers fulfilled!</span>
+        )}
       </div>
 
       {/* Grouped list */}
