@@ -1,103 +1,62 @@
 
 
-# Overdue Goals -- "Yesterday" / Date Labels + Late Completion
+# Tap-to-Edit Goals + Sabeel Layout Improvements
 
-## Overview
+## 1. Goal Cards: Tap to Open Edit View
 
-Currently, goals only show for the current day. If a goal goes unchecked, it silently disappears the next day. This plan adds Todoist-style overdue tracking: missed goals carry forward with contextual date labels ("Yesterday" or "8 Feb") in red, and completing them late still clears the obligation.
+Currently, users must tap the 3-dot menu then select "Edit" to modify a goal. This change makes the content area of each goal card tappable to directly open the edit form.
 
-## How It Works
+### GoalCard.tsx (Goals page)
+- Make the content area (title, description, badges) clickable by wrapping it in a `<button>` or adding an `onClick` handler to the content `<div>`
+- Clicking the content area calls `onEdit(goal)` directly
+- The checkbox, drag handle, and 3-dot menu remain as separate interactive elements (not affected by the tap)
+- Add `cursor-pointer` to the content area for visual feedback
 
+### TodaysGoals.tsx (Dashboard)
+- Make each goal row's content area tappable -- navigate to `/goals` page where the user can manage goals
+- This is simpler since the Today view doesn't have inline editing; tapping navigates to the Goals page
+
+## 2. Sabeel Card: Tap Sub-Items to Edit
+
+### SabeelCard.tsx
+- Make each FMB Hub, Khumus, and Zakat item row tappable to open its edit form
+- Add `onClick` to the card `<div>` that calls the respective `onEditFMBHub`, `onEditKhumus`, or `onEditZakat` handler
+- Add `cursor-pointer` styling
+- The edit/delete icon buttons remain but the whole row also becomes tappable
+
+## 3. Sabeel Card: Improved Spacing and Visual Hierarchy
+
+The current collapsible content uses uniform `space-y-3` between all sections (FMB Hub, Khumus, Zakat), giving equal spacing between a section label and its items vs. between different sections. This makes it hard to visually group related information.
+
+### Changes to SabeelCard.tsx spacing:
+- Increase spacing between **sections** (FMB Hub, Khumus, Zakat) from `space-y-3` to `space-y-6` -- this creates clear visual separation between different obligation types
+- Keep the spacing between a **section header and its items** tight at `mb-2` (already in place)
+- Keep spacing between **items within a section** at `space-y-2` (already in place)
+- Add a subtle `border-t border-border/50` separator between sections for additional visual clarity
+- Increase padding inside the collapsible content from `py-3` to `py-4` for more breathing room at top and bottom
+
+### Before vs After spacing:
 ```text
-Goal due Feb 8 (daily)
-+---------+-------------------+---------------------------+
-| Feb 8   | Shows normally    | No label needed           |
-| Feb 9   | Still shows       | Red label: "Yesterday"    |
-| Feb 10+ | Still shows       | Red label: "8 Feb"        |
-| Ticked  | Clears overdue    | Refreshes to next due date|
-+---------+-------------------+---------------------------+
+BEFORE (uniform space-y-3):        AFTER (grouped by proximity):
+FMB HUB label                      FMB HUB label
+   [small gap]                        [small gap]
+   9,200/month                        9,200/month
+   [small gap]                        
+KHUMUS label                           [large gap + divider]
+   [small gap]                      
+   Taher - 14,500                   KHUMUS label
+   [small gap]                        [small gap]
+ZAKAT label                            Taher - 14,500
+   [small gap]                      
+   No Zakat entries                    [large gap + divider]
+                                    
+                                    ZAKAT label
+                                       [small gap]
+                                       No Zakat entries
 ```
-
-## Changes
-
-### 1. New utility: `getOverdueGoals` in `src/lib/recurrence.ts`
-
-Add a function that looks back up to 7 days (configurable) from today. For each past day, it checks which goals were due using the existing `isGoalDueOnDate()` logic. It then cross-references with completions for those dates. Any goal that was due but has no completion is returned as "overdue" with metadata:
-- `overdueDate`: the Gregorian date when it was due
-- `overdueDateLabel`: "Yesterday" or formatted date (e.g., "8 Feb")
-- `isOverdue: true`
-- `overdueHijriDate`: the Hijri date string (for recording completion against the correct date)
-
-Also add a helper `getOverdueDateLabel(dueDate: Date, today: Date): string` that returns "Yesterday" for 1-day-old and "8 Feb" style for older.
-
-### 2. New hook: `src/hooks/useOverdueGoals.ts`
-
-This hook:
-- Gets the current Gregorian/Hijri dates from `CalendarContext`
-- Gets all active goals from `useGoals`
-- Fetches goal completions for the past 7 days (batch query: `completion_date IN (...)` for all past Hijri dates)
-- Uses `getOverdueGoals()` to compute which goals are overdue
-- Provides a `completeOverdue(goalId, overdueHijriDate, overdueGregorianDate)` mutation that inserts a completion for the original due date
-- Deduplicates: if a goal is overdue from multiple days, only the most recent missed occurrence is shown (to avoid flooding the list)
-
-### 3. Update `src/components/goals/TodaysGoals.tsx`
-
-- Accept a new prop `overdueGoals` (array of goals with overdue metadata)
-- Render overdue goals above the today goals, each with a red date label below the title:
-  - `<span className="text-xs text-destructive font-medium">Yesterday</span>`
-  - or `<span className="text-xs text-destructive font-medium">8 Feb</span>`
-- When an overdue goal is ticked, call `completeOverdue()` instead of the regular `toggleCompletion`
-- Show overdue count separately in the section header if any exist (e.g., "2 overdue")
-
-### 4. Update `src/components/goals/GoalCard.tsx` (Goals page)
-
-- Accept optional `overdueLabel?: string` prop
-- When present, render the red date label beneath the title (same style as TodaysGoals)
-- This gives the Goals page the same visual treatment
-
-### 5. Update `src/pages/Goals.tsx`
-
-- Import and use `useOverdueGoals`
-- Pass overdue metadata to `GoalCard` via the `GoalList` component
-- Overdue goals appear at the top of the list, above regular active goals
-
-### 6. Update `src/pages/Dashboard.tsx`
-
-- Import `useOverdueGoals`
-- Pass overdue goals to `TodaysGoals`
-
-### 7. Update `src/hooks/useTodayProgress.ts`
-
-- Overdue goals should NOT count toward today's Ada percentage (they are from past days)
-- They are shown for awareness/action but don't inflate the daily total
-
-## Types
-
-Add to `src/types/goals.ts`:
-```typescript
-export interface OverdueGoal {
-  goal: Goal;
-  overdueDate: Date;          // Gregorian date when it was due
-  overdueDateLabel: string;   // "Yesterday" or "8 Feb"
-  overdueHijriDate: string;   // YYYY-MM-DD Hijri for completion recording
-}
-```
-
-## Edge Cases
-
-- **Daily goals**: If unchecked for 3 days, only the most recent missed day is shown (not 3 copies)
-- **Weekly goals**: Only shows as overdue if the specific weekday was missed
-- **One-time goals**: Shows as overdue until completed, then disappears permanently
-- **Completing an overdue goal**: Records completion against the original Hijri date, then the goal naturally appears for its next scheduled occurrence
-- **Lookback window**: 7 days max to avoid performance issues and overwhelming the user
 
 ## Files Changed
-- `src/lib/recurrence.ts` -- add `getOverdueGoals()` and `getOverdueDateLabel()`
-- `src/types/goals.ts` -- add `OverdueGoal` interface
-- `src/hooks/useOverdueGoals.ts` -- new hook (batch-fetch past completions, compute overdue)
-- `src/components/goals/TodaysGoals.tsx` -- render overdue goals with red labels
-- `src/components/goals/GoalCard.tsx` -- accept optional `overdueLabel` prop
-- `src/components/goals/GoalList.tsx` -- pass overdue metadata through
-- `src/pages/Dashboard.tsx` -- wire up `useOverdueGoals`
-- `src/pages/Goals.tsx` -- wire up `useOverdueGoals`, show overdue at top
+- `src/components/goals/GoalCard.tsx` -- add onClick to content area calling onEdit
+- `src/components/goals/TodaysGoals.tsx` -- add onClick to goal rows navigating to /goals
+- `src/components/dues/SabeelCard.tsx` -- make sub-item rows tappable + increase inter-section spacing from space-y-3 to space-y-6, add section dividers, increase padding
 
