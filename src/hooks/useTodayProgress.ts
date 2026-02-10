@@ -26,7 +26,7 @@ export interface TodayProgressData {
   isLoading: boolean;
 }
 
-export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolean): TodayProgressData {
+export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolean, overdueGoalIds?: Set<string>): TodayProgressData {
   const { currentDate } = useCalendar();
   const { goals, isLoading: goalsLoading } = useGoals();
   const { isCompleted, isLoading: completionsLoading } = useGoalCompletions();
@@ -50,7 +50,8 @@ export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolea
     if (hijriDate && gregorianDate) {
       // Get active goals that are due today
       const activeGoals = goals.filter(g => g.is_active);
-      goalsDueToday = getGoalsDueOnDate(activeGoals, hijriDate, gregorianDate);
+      const allDueToday = getGoalsDueOnDate(activeGoals, hijriDate, gregorianDate);
+      goalsDueToday = overdueGoalIds ? allDueToday.filter(g => !overdueGoalIds.has(g.id)) : allDueToday;
       
       // Count completed goals
       goalsCompleted = goalsDueToday.filter(goal => isCompleted(goal.id)).length;
@@ -80,7 +81,7 @@ export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolea
       overallTotal,
       overallPercentage,
     };
-  }, [goals, prayers, hijriDate, gregorianDate, isCompleted]);
+  }, [goals, prayers, hijriDate, gregorianDate, isCompleted, overdueGoalIds]);
 
   return {
     ...progressData,

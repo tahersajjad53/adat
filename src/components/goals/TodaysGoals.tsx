@@ -48,6 +48,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   const hasOverdue = overdueGoals.length > 0;
   const totalDisplay = goalsTotal + overdueGoals.length;
   const completedDisplay = goalsCompleted;
+  const totalForCounter = goalsTotal;
 
   return (
     <div>
@@ -63,7 +64,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
             </span>
           )}
           <span className="label-caps">
-            {completedDisplay}/{goalsTotal}
+            {completedDisplay}/{totalForCounter}
           </span>
         </div>
       </div>
