@@ -94,7 +94,13 @@ const GoalCard: React.FC<GoalCardProps> = ({
       />
 
       {/* Content */}
-      <div className="flex-1 min-w-0">
+      <div
+        className="flex-1 min-w-0 cursor-pointer"
+        onClick={() => onEdit(goal)}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter') onEdit(goal); }}
+      >
         <div className="flex items-center gap-2">
           <span
             className={`text-base font-medium leading-tight ${

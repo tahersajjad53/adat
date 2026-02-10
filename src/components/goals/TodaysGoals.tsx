@@ -94,7 +94,13 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                 disabled={isCompletingOverdue}
                 className="h-5 w-5"
               />
-              <div className="flex-1 min-w-0">
+              <div
+                className="flex-1 min-w-0 cursor-pointer"
+                onClick={() => navigate('/goals')}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => { if (e.key === 'Enter') navigate('/goals'); }}
+              >
                 <span className="text-base font-medium">{overdue.goal.title}</span>
                 <p className="text-xs font-medium text-destructive mt-0.5">
                   {overdue.overdueDateLabel}
@@ -121,7 +127,13 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                   disabled={isToggling}
                   className="h-5 w-5"
                 />
-                <div className="flex-1 min-w-0">
+                <div
+                  className="flex-1 min-w-0 cursor-pointer"
+                  onClick={() => navigate('/goals')}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter') navigate('/goals'); }}
+                >
                   <span
                     className={`text-base font-medium ${
                       completed ? 'line-through text-muted-foreground' : ''

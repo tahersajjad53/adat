@@ -132,7 +132,7 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
 
         {/* Collapsible Content */}
         <CollapsibleContent>
-          <div className="border-t border-border bg-muted/30 px-4 py-3 space-y-3">
+          <div className="border-t border-border bg-muted/30 px-4 py-4 space-y-6">
             {/* FMB Hub Section */}
             <div>
               <div className="flex items-center justify-between mb-2">
@@ -152,7 +152,10 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
                 )}
               </div>
               {sabeel.fmb_hub ? (
-                <div className="flex items-center justify-between bg-card rounded-md p-2.5 border border-border">
+                <div
+                  className="flex items-center justify-between bg-card rounded-md p-2.5 border border-border cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => onEditFMBHub(sabeel.fmb_hub!.id)}
+                >
                   <div>
                     <p className="text-sm font-medium">
                       {formatAmount(sabeel.fmb_hub.monthly_amount)}/month
@@ -185,7 +188,7 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
             </div>
 
             {/* Khumus Section */}
-            <div>
+            <div className="border-t border-border/50 pt-6">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   Khumus
@@ -205,7 +208,8 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
                   {sabeel.khumus_list.map((khumus) => (
                     <div
                       key={khumus.id}
-                      className="flex items-center justify-between bg-card rounded-md p-2.5 border border-border"
+                      className="flex items-center justify-between bg-card rounded-md p-2.5 border border-border cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => onEditKhumus(khumus.id)}
                     >
                       <div>
                         <p className="text-sm font-medium">{khumus.person_name}</p>
@@ -246,7 +250,7 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
             </div>
 
             {/* Zakat Section */}
-            <div>
+            <div className="border-t border-border/50 pt-6">
               <div className="flex items-center justify-between mb-2">
                 <h4 className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                   Zakat
@@ -266,7 +270,8 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
                   {sabeel.zakats.map((zakat) => (
                     <div
                       key={zakat.id}
-                      className="flex items-center justify-between bg-card rounded-md p-2.5 border border-border"
+                      className="flex items-center justify-between bg-card rounded-md p-2.5 border border-border cursor-pointer hover:bg-muted/50 transition-colors"
+                      onClick={() => onEditZakat(zakat.id)}
                     >
                       <div>
                         <p className="text-sm font-medium">{zakat.person_name}</p>
