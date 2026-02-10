@@ -1,62 +1,43 @@
 
+# Deduplicate Overdue + Today Goals
 
-# Tap-to-Edit Goals + Sabeel Layout Improvements
+## Problem
+When a recurring goal (e.g., daily "Dua Kamil") is missed, the app shows TWO entries: one overdue copy with a "Yesterday" label AND the regular today copy. The user should only see ONE instance -- the overdue version with its label. Completing it clears the obligation; the goal then naturally reappears for its next occurrence.
 
-## 1. Goal Cards: Tap to Open Edit View
+## Approach
+Filter out any goal from the "today" list if it already appears in the overdue list. This is a simple ID-based exclusion applied in two places.
 
-Currently, users must tap the 3-dot menu then select "Edit" to modify a goal. This change makes the content area of each goal card tappable to directly open the edit form.
+## Changes
 
-### GoalCard.tsx (Goals page)
-- Make the content area (title, description, badges) clickable by wrapping it in a `<button>` or adding an `onClick` handler to the content `<div>`
-- Clicking the content area calls `onEdit(goal)` directly
-- The checkbox, drag handle, and 3-dot menu remain as separate interactive elements (not affected by the tap)
-- Add `cursor-pointer` to the content area for visual feedback
+### 1. `src/pages/Dashboard.tsx`
+- After getting `overdueGoals` and `goalsDueToday`, filter `goalsDueToday` to exclude any goal whose ID is in the overdue list
+- Update `goalsTotal` and `goalsCompleted` counts accordingly
 
-### TodaysGoals.tsx (Dashboard)
-- Make each goal row's content area tappable -- navigate to `/goals` page where the user can manage goals
-- This is simpler since the Today view doesn't have inline editing; tapping navigates to the Goals page
+### 2. `src/hooks/useTodayProgress.ts`
+- Accept an optional `overdueGoalIds` parameter (a `Set<string>`)
+- When computing `goalsDueToday`, exclude goals whose IDs are in the overdue set
+- This ensures the Ada percentage and counts reflect the deduplicated list
 
-## 2. Sabeel Card: Tap Sub-Items to Edit
+### 3. `src/components/goals/TodaysGoals.tsx`
+- Update the counter display: the total should be `goalsTotal` (already deduplicated from above), not `goalsTotal + overdueGoals.length`
+- Remove the current `totalDisplay = goalsTotal + overdueGoals.length` line and just use `goalsTotal` directly for the empty-state check (but include overdue count so empty state doesn't show when there are overdue items)
 
-### SabeelCard.tsx
-- Make each FMB Hub, Khumus, and Zakat item row tappable to open its edit form
-- Add `onClick` to the card `<div>` that calls the respective `onEditFMBHub`, `onEditKhumus`, or `onEditZakat` handler
-- Add `cursor-pointer` styling
-- The edit/delete icon buttons remain but the whole row also becomes tappable
+### 4. `src/pages/Goals.tsx`
+- No structural changes needed here since the Goals page shows all goals as a management list with overdue labels -- it doesn't duplicate entries
 
-## 3. Sabeel Card: Improved Spacing and Visual Hierarchy
+## Technical Details
 
-The current collapsible content uses uniform `space-y-3` between all sections (FMB Hub, Khumus, Zakat), giving equal spacing between a section label and its items vs. between different sections. This makes it hard to visually group related information.
-
-### Changes to SabeelCard.tsx spacing:
-- Increase spacing between **sections** (FMB Hub, Khumus, Zakat) from `space-y-3` to `space-y-6` -- this creates clear visual separation between different obligation types
-- Keep the spacing between a **section header and its items** tight at `mb-2` (already in place)
-- Keep spacing between **items within a section** at `space-y-2` (already in place)
-- Add a subtle `border-t border-border/50` separator between sections for additional visual clarity
-- Increase padding inside the collapsible content from `py-3` to `py-4` for more breathing room at top and bottom
-
-### Before vs After spacing:
-```text
-BEFORE (uniform space-y-3):        AFTER (grouped by proximity):
-FMB HUB label                      FMB HUB label
-   [small gap]                        [small gap]
-   9,200/month                        9,200/month
-   [small gap]                        
-KHUMUS label                           [large gap + divider]
-   [small gap]                      
-   Taher - 14,500                   KHUMUS label
-   [small gap]                        [small gap]
-ZAKAT label                            Taher - 14,500
-   [small gap]                      
-   No Zakat entries                    [large gap + divider]
-                                    
-                                    ZAKAT label
-                                       [small gap]
-                                       No Zakat entries
+The key filtering logic in Dashboard.tsx:
+```typescript
+const overdueGoalIds = new Set(overdueGoals.map(o => o.goal.id));
+const filteredGoalsDueToday = goalsDueToday.filter(g => !overdueGoalIds.has(g.id));
 ```
 
-## Files Changed
-- `src/components/goals/GoalCard.tsx` -- add onClick to content area calling onEdit
-- `src/components/goals/TodaysGoals.tsx` -- add onClick to goal rows navigating to /goals
-- `src/components/dues/SabeelCard.tsx` -- make sub-item rows tappable + increase inter-section spacing from space-y-3 to space-y-6, add section dividers, increase padding
+This is passed to `TodaysGoals` as `goalsDueToday={filteredGoalsDueToday}`.
 
+For `useTodayProgress`, the hook will accept an optional exclusion set so progress calculations stay accurate without double-counting.
+
+## Files Changed
+- `src/hooks/useTodayProgress.ts` -- accept optional `overdueGoalIds` param, exclude from today's count
+- `src/pages/Dashboard.tsx` -- pass overdue IDs to progress hook and filter goals for TodaysGoals
+- `src/components/goals/TodaysGoals.tsx` -- fix total count to not add overdue on top of today
