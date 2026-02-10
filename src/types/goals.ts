@@ -55,3 +55,12 @@ export interface GoalWithStatus extends Goal {
   isCompleted: boolean;
   completionId?: string;
 }
+
+// Overdue goal metadata for missed goals carried forward
+export interface OverdueGoal {
+  goal: Goal;
+  overdueDate: Date;          // Gregorian date when it was due
+  overdueDateLabel: string;   // "Yesterday" or "8 Feb"
+  overdueHijriDate: string;   // YYYY-MM-DD Hijri for completion recording
+  overdueGregorianDate: string; // YYYY-MM-DD Gregorian for completion recording
+}

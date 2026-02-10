@@ -15,6 +15,7 @@ import { useTodayProgress } from '@/hooks/useTodayProgress';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
 import { DueRemindersCard } from '@/components/dues/DueRemindersCard';
 import TodaysGoals from '@/components/goals/TodaysGoals';
+import { useOverdueGoals } from '@/hooks/useOverdueGoals';
 
 const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
   fajr: SunLight,
@@ -34,6 +35,7 @@ const Dashboard: React.FC = () => {
   const { prayers, togglePrayer, currentPrayer, nextPrayer, isLoading: prayersLoading } = usePrayerLog();
   const { prayerTimes } = usePrayerTimes();
   const { isCompleted, toggleCompletion, isToggling } = useGoalCompletions();
+  const { overdueGoals, completeOverdue, isCompletingOverdue } = useOverdueGoals();
   const {
     prayerCompleted, prayerTotal,
     goalsCompleted, goalsTotal, goalsDueToday,
@@ -177,6 +179,9 @@ const Dashboard: React.FC = () => {
           isCompleted={isCompleted}
           onToggle={toggleCompletion}
           isToggling={isToggling}
+          overdueGoals={overdueGoals}
+          onCompleteOverdue={completeOverdue}
+          isCompletingOverdue={isCompletingOverdue}
         />
       </div>
     </div>
