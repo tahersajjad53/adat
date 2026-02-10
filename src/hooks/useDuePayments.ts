@@ -122,11 +122,6 @@ export function useDuePayments(): UseDuePaymentsReturn {
           if (insertError) throw insertError;
         }
 
-        toast({
-          title: 'Payment recorded',
-          description: 'Due marked as paid for this month.',
-        });
-
         await fetchPayments();
       } catch (err) {
         console.error('Error marking payment:', err);

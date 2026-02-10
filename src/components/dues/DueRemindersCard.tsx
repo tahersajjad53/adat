@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useConfetti } from '@/components/ui/confetti';
 import { useDueReminders } from '@/hooks/useDueReminders';
 import { useDuePayments } from '@/hooks/useDuePayments';
+import { showCelebrationToast } from '@/components/ui/celebration-toast';
 import { cn } from '@/lib/utils';
 import type { DueReminder } from '@/types/dues';
 export function DueRemindersCard() {
@@ -29,6 +30,7 @@ export function DueRemindersCard() {
     triggerConfetti(checkboxRefs.current.get(reminder.id));
     try {
       await markAsPaid(reminder);
+      showCelebrationToast(reminder.title, String(reminder.amount));
     } finally {
       setMarkingId(null);
     }
