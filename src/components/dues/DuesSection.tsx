@@ -195,7 +195,7 @@ const DuesSection: React.FC = () => {
     return (
       <section className="space-y-4">
         <div className="flex items-center justify-between">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-display">Sabeel</h2>
+        <h2 className="font-display tracking-tight font-normal text-xl">Sabeel</h2>
         </div>
         <div className="space-y-3">
           <Skeleton className="h-24 w-full" />
@@ -208,7 +208,7 @@ const DuesSection: React.FC = () => {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl md:text-3xl font-bold tracking-tight font-display">Sabeel</h2>
+        <h2 className="font-display tracking-tight font-normal text-xl">Sabeel</h2>
         {!isMobile && (
           <Button size="sm" onClick={handleAddSabeel}>
             <Plus className="h-4 w-4 mr-1" />

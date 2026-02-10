@@ -156,7 +156,7 @@ const Profile: React.FC = () => {
           </button>
 
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Account Information</h1>
+            <h1 className="text-4xl font-normal tracking-tight font-display">Account Information</h1>
             <p className="text-base text-muted-foreground mt-1 font-normal">Manage your personal details and location.</p>
           </div>
 
@@ -183,7 +183,7 @@ const Profile: React.FC = () => {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold">Location</h2>
+            <h2 className="font-display tracking-tight font-normal text-xl">Location</h2>
             <p className="text-sm text-muted-foreground">
               Your location is used to calculate accurate prayer times.
             </p>
@@ -255,7 +255,7 @@ const Profile: React.FC = () => {
     <div className="container py-8">
       <div className="max-w-xl mx-auto space-y-6">
         <div>
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Profile</h1>
+          <h1 className="text-4xl font-normal tracking-tight font-display">Profile</h1>
           <p className="text-base text-muted-foreground mt-1 font-normal">Manage your account settings.</p>
         </div>
 
