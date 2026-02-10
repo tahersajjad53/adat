@@ -1,38 +1,104 @@
 
-# Standardize H1/H2 Typography Globally
 
-## The Standard (from Goals page)
+# Enhanced Toast for Due Payments
 
-The updated styling pattern from the Goals page:
-- **H1**: `text-4xl font-normal font-display tracking-tight` (with `md:text-4xl` for responsive)
-- **H1 subtitle**: `text-base text-muted-foreground mt-1 font-normal`
-- **H2 (section headers)**: `font-display tracking-tight font-normal text-xl`
+## Overview
 
-The key change: headings use `font-normal` instead of `font-bold`/`font-semibold`, creating a lighter, more elegant feel with the Bricolage Grotesque display font.
+Replace the plain text toast ("Payment recorded") with a visually rich, branded celebration toast -- inspired by the GPT-4o announcement modal reference. The toast will feature a decorative CSS gradient/pattern banner at the top (warm beige and lime-green tones matching the app's branding), followed by friendly, enthusiastic copy.
 
-## Pages to Update
+## PatternCraft Feasibility
 
-### 1. Profile page (`src/pages/Profile.tsx`)
-- **Line 159** (Account Information H1): Change `font-bold` to `font-normal`
-- **Line 186** (Location H2): Change from `text-lg font-semibold` to `font-display tracking-tight font-normal text-xl`
-- **Line 258** (Profile menu H1): Change `font-bold` to `font-normal`
+PatternCraft (patterncraft.fun) is a collection of copy-paste CSS/Tailwind gradient and pattern snippets -- not an installable npm package. Its patterns are pure CSS (gradients, repeating-linear-gradients, SVG data URIs) that can be directly embedded in our styles. This makes it fully feasible and lightweight to adopt for:
 
-### 2. Dues Section (`src/components/dues/DuesSection.tsx`)
-- **Line 198** (loading skeleton H2): Change `font-bold` to `font-normal`, update size from `text-2xl md:text-3xl` to `text-xl`
-- **Line 211** (Sabeel H2): Same change -- `font-bold` to `font-normal`, size to `text-xl`
+1. **Toast banner visuals** -- warm abstract gradient with subtle pattern overlay
+2. **Progress card backgrounds** -- time-of-day themed patterns (already partially done with prayer gradients)
 
-### 3. Global base styles (`src/index.css`)
-Add default heading styles in the `@layer base` block so any new pages automatically follow the convention:
+Since it's just CSS, there's zero dependency overhead.
+
+## Design
+
+### Toast Visual Structure
+
+```text
++----------------------------------+
+|  [x]                             |
+|  /////////////////////////////// |
+|  //  Gradient + Pattern Banner // |
+|  //  (warm lime/beige tones)  // |
+|  /////////////////////////////// |
+|                                  |
+|  Jazakallah! Payment Recorded    |
+|  [Title] marked as paid for      |
+|  [month]. Keep up the great work!|
+|                                  |
++----------------------------------+
+```
+
+- Top section: A decorative CSS gradient banner (lime-to-warm-beige with a subtle diagonal stripe or dot pattern overlay)
+- Title: Warm, enthusiastic ("Jazakallah!" or "Well done!")
+- Description: Specific and friendly, mentioning the due name
+
+### Implementation Approach
+
+Rather than using the plain radix toast, create a **custom Sonner toast** with a rich React component as its content. Sonner (already installed) supports custom JSX toasts which gives full layout control -- this avoids fighting the radix toast's simple text-only layout.
+
+## Changes
+
+### 1. Create `src/components/ui/celebration-toast.tsx`
+
+A new React component that renders the rich toast content:
+- A decorative gradient banner div at the top (~80px tall) with CSS pattern overlay using warm lime/beige colours
+- Title in display font: enthusiastic message like "Jazakallah!" 
+- Description with the specific due name and month
+- Rounded corners matching the app's `--radius: 1rem` design
+- Export a `showCelebrationToast(title: string, dueName: string)` helper that calls Sonner's `toast.custom()` with this component
+
+### 2. Update `src/hooks/useDuePayments.ts`
+
+- Replace the plain `toast({ title: 'Payment recorded', ... })` call (line 125-128) with `showCelebrationToast(reminder title, month)`
+- The hook needs to accept the reminder title so it can display it -- OR we move the toast call to the `DueRemindersCard` component which already has the reminder context
+
+Better approach: Move the success toast from `useDuePayments` to `DueRemindersCard.handleToggle` (which already knows the reminder title). Remove the generic toast from the hook.
+
+### 3. Update `src/components/dues/DueRemindersCard.tsx`
+
+- After `await markAsPaid(reminder)` succeeds, call `showCelebrationToast()` with the reminder's title and amount
+- This keeps the toast contextual and friendly (e.g., "Sabeel marked as paid")
+
+### 4. Add CSS pattern utility to `src/index.css`
+
+Add a reusable `.pattern-celebration` class with a warm lime/beige gradient and subtle pattern overlay:
 ```css
-h1 {
-  @apply text-4xl font-normal font-display tracking-tight;
-}
-h2 {
-  @apply text-xl font-normal font-display tracking-tight;
+.pattern-celebration {
+  background: 
+    repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      hsl(68 75% 55% / 0.1) 10px,
+      hsl(68 75% 55% / 0.1) 20px
+    ),
+    linear-gradient(
+      135deg,
+      hsl(40 30% 94%) 0%,
+      hsl(68 75% 55% / 0.3) 50%,
+      hsl(160 45% 22% / 0.2) 100%
+    );
 }
 ```
 
+This pattern class can later be reused for progress cards and other branded visuals.
+
+## Toast Copy Examples
+
+- **Title**: "Jazakallah!" or "Well done!"
+- **Description**: "[Due Name] marked as paid. Keep it up!"
+- **Amount context**: Shows the amount paid
+
 ## Files Changed
-- `src/index.css` -- add global h1/h2 base styles
-- `src/pages/Profile.tsx` -- update 3 heading instances to use `font-normal`
-- `src/components/dues/DuesSection.tsx` -- update 2 heading instances to use `font-normal` and consistent sizing
+
+- `src/components/ui/celebration-toast.tsx` -- new component for rich toast layout + helper function
+- `src/index.css` -- add `.pattern-celebration` CSS utility class
+- `src/hooks/useDuePayments.ts` -- remove generic success toast (line 125-128)
+- `src/components/dues/DueRemindersCard.tsx` -- call `showCelebrationToast()` after successful payment
+
