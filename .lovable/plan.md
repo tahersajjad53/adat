@@ -1,47 +1,103 @@
 
 
-# Fix Header Card Layout + Add Color-Coded Progress Bar
+# Overdue Goals -- "Yesterday" / Date Labels + Late Completion
 
-## Problems Identified
+## Overview
 
-1. **"DAILY PROGRESS" wraps onto two lines** -- the uppercase tracked text is too wide for the available space on the right side of the header card
-2. **Hijri date text may wrap** on narrower screens due to long month names like "Shaban Karim"
-3. **Progress bar is missing from the header card** -- the reference image (noise level UI) shows a colored fill bar with hatched/striped patterns, which would add visual interest
+Currently, goals only show for the current day. If a goal goes unchecked, it silently disappears the next day. This plan adds Todoist-style overdue tracking: missed goals carry forward with contextual date labels ("Yesterday" or "8 Feb") in red, and completing them late still clears the obligation.
 
-## Fixes
+## How It Works
 
-### 1. DailyMeter compact mode -- prevent label wrapping (`src/components/namaz/DailyMeter.tsx`)
-- Add `whitespace-nowrap` to the "Daily Progress" label so it stays on one line
-- Slightly reduce percentage size from `text-4xl` to `text-3xl` on mobile to give more breathing room
-- Use responsive sizing: `text-3xl sm:text-4xl`
-
-### 2. DateDisplay compact mode -- prevent Hijri date wrapping (`src/components/calendar/DateDisplay.tsx`)
-- Add `whitespace-nowrap` to the Hijri date span
-- Use responsive font size: `text-sm sm:text-base` for the Hijri date to scale down on very narrow screens
-
-### 3. Add a color-coded progress bar inside the header card (`src/pages/Dashboard.tsx`)
-Inspired by the noise-level reference, add a thin progress bar between the date/progress row and the prayer section. The bar will:
-- Use `bg-white/20` track with a lime/accent-colored fill (`bg-[hsl(75,70%,55%)]`) for a pop of color against the gradient background
-- Add diagonal stripe pattern via a CSS background on the fill indicator using repeating-linear-gradient (similar to the hatched pattern in the reference)
-- This requires a small addition to the Progress component: accept optional `indicatorClassName` prop, or simply render a custom inline bar in Dashboard
-
-### 4. Custom striped progress bar in Dashboard (`src/pages/Dashboard.tsx`)
-Instead of modifying the shared Progress component, render a simple custom bar directly in the TimeOfDayCard:
+```text
+Goal due Feb 8 (daily)
++---------+-------------------+---------------------------+
+| Feb 8   | Shows normally    | No label needed           |
+| Feb 9   | Still shows       | Red label: "Yesterday"    |
+| Feb 10+ | Still shows       | Red label: "8 Feb"        |
+| Ticked  | Clears overdue    | Refreshes to next due date|
++---------+-------------------+---------------------------+
 ```
-<div className="mt-3 h-2 w-full rounded-full bg-white/20 overflow-hidden">
-  <div
-    className="h-full rounded-full bg-[hsl(75,70%,55%)] transition-all"
-    style={{
-      width: `${overallPercentage}%`,
-      backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(255,255,255,0.2) 3px, rgba(255,255,255,0.2) 6px)',
-    }}
-  />
-</div>
+
+## Changes
+
+### 1. New utility: `getOverdueGoals` in `src/lib/recurrence.ts`
+
+Add a function that looks back up to 7 days (configurable) from today. For each past day, it checks which goals were due using the existing `isGoalDueOnDate()` logic. It then cross-references with completions for those dates. Any goal that was due but has no completion is returned as "overdue" with metadata:
+- `overdueDate`: the Gregorian date when it was due
+- `overdueDateLabel`: "Yesterday" or formatted date (e.g., "8 Feb")
+- `isOverdue: true`
+- `overdueHijriDate`: the Hijri date string (for recording completion against the correct date)
+
+Also add a helper `getOverdueDateLabel(dueDate: Date, today: Date): string` that returns "Yesterday" for 1-day-old and "8 Feb" style for older.
+
+### 2. New hook: `src/hooks/useOverdueGoals.ts`
+
+This hook:
+- Gets the current Gregorian/Hijri dates from `CalendarContext`
+- Gets all active goals from `useGoals`
+- Fetches goal completions for the past 7 days (batch query: `completion_date IN (...)` for all past Hijri dates)
+- Uses `getOverdueGoals()` to compute which goals are overdue
+- Provides a `completeOverdue(goalId, overdueHijriDate, overdueGregorianDate)` mutation that inserts a completion for the original due date
+- Deduplicates: if a goal is overdue from multiple days, only the most recent missed occurrence is shown (to avoid flooding the list)
+
+### 3. Update `src/components/goals/TodaysGoals.tsx`
+
+- Accept a new prop `overdueGoals` (array of goals with overdue metadata)
+- Render overdue goals above the today goals, each with a red date label below the title:
+  - `<span className="text-xs text-destructive font-medium">Yesterday</span>`
+  - or `<span className="text-xs text-destructive font-medium">8 Feb</span>`
+- When an overdue goal is ticked, call `completeOverdue()` instead of the regular `toggleCompletion`
+- Show overdue count separately in the section header if any exist (e.g., "2 overdue")
+
+### 4. Update `src/components/goals/GoalCard.tsx` (Goals page)
+
+- Accept optional `overdueLabel?: string` prop
+- When present, render the red date label beneath the title (same style as TodaysGoals)
+- This gives the Goals page the same visual treatment
+
+### 5. Update `src/pages/Goals.tsx`
+
+- Import and use `useOverdueGoals`
+- Pass overdue metadata to `GoalCard` via the `GoalList` component
+- Overdue goals appear at the top of the list, above regular active goals
+
+### 6. Update `src/pages/Dashboard.tsx`
+
+- Import `useOverdueGoals`
+- Pass overdue goals to `TodaysGoals`
+
+### 7. Update `src/hooks/useTodayProgress.ts`
+
+- Overdue goals should NOT count toward today's Ada percentage (they are from past days)
+- They are shown for awareness/action but don't inflate the daily total
+
+## Types
+
+Add to `src/types/goals.ts`:
+```typescript
+export interface OverdueGoal {
+  goal: Goal;
+  overdueDate: Date;          // Gregorian date when it was due
+  overdueDateLabel: string;   // "Yesterday" or "8 Feb"
+  overdueHijriDate: string;   // YYYY-MM-DD Hijri for completion recording
+}
 ```
-This goes right after the date/progress flex row and before the divider line.
+
+## Edge Cases
+
+- **Daily goals**: If unchecked for 3 days, only the most recent missed day is shown (not 3 copies)
+- **Weekly goals**: Only shows as overdue if the specific weekday was missed
+- **One-time goals**: Shows as overdue until completed, then disappears permanently
+- **Completing an overdue goal**: Records completion against the original Hijri date, then the goal naturally appears for its next scheduled occurrence
+- **Lookback window**: 7 days max to avoid performance issues and overwhelming the user
 
 ## Files Changed
-- `src/components/namaz/DailyMeter.tsx` -- whitespace-nowrap on label, responsive percentage size
-- `src/components/calendar/DateDisplay.tsx` -- whitespace-nowrap and responsive font on Hijri date
-- `src/pages/Dashboard.tsx` -- add striped progress bar between header row and prayer section, remove the plain `border-t` divider (the bar acts as the visual separator)
+- `src/lib/recurrence.ts` -- add `getOverdueGoals()` and `getOverdueDateLabel()`
+- `src/types/goals.ts` -- add `OverdueGoal` interface
+- `src/hooks/useOverdueGoals.ts` -- new hook (batch-fetch past completions, compute overdue)
+- `src/components/goals/TodaysGoals.tsx` -- render overdue goals with red labels
+- `src/components/goals/GoalCard.tsx` -- accept optional `overdueLabel` prop
+- `src/components/goals/GoalList.tsx` -- pass overdue metadata through
+- `src/pages/Dashboard.tsx` -- wire up `useOverdueGoals`
+- `src/pages/Goals.tsx` -- wire up `useOverdueGoals`, show overdue at top
 
