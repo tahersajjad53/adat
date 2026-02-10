@@ -17,12 +17,11 @@ const Namaz: React.FC = () => {
   const { missedPrayers, unfulfilledCount, fulfillPrayer, isLoading: missedLoading } = useMissedPrayers();
   const { prayerTimes } = usePrayerTimes();
   
-  // Determine current prayer window for visual theming
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayer = currentPrayerWindow?.current || null;
 
   return (
-    <div className="container py-6 max-w-xl mx-auto space-y-6">
+    <div className="container py-8 max-w-xl mx-auto space-y-8">
       {/* Time-aware visual header card */}
       <TimeOfDayCard currentPrayer={currentPrayer}>
         <div className="flex items-start justify-between">
@@ -33,14 +32,14 @@ const Namaz: React.FC = () => {
 
       {/* Tabs */}
       <Tabs defaultValue="today" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="today">
+        <TabsList className="grid w-full grid-cols-2 rounded-full h-11">
+          <TabsTrigger value="today" className="rounded-full">
             <Clock className="h-4 w-4" />
             Today's Namaz
           </TabsTrigger>
-          <TabsTrigger value="missed">
+          <TabsTrigger value="missed" className="rounded-full">
             <WarningCircle className="h-4 w-4" />
-            Qaza Namaz
+            Qaza
             {unfulfilledCount > 0 && (
               <span className="ml-1.5 flex h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1.5 text-xs font-semibold text-destructive-foreground">
                 {unfulfilledCount > 99 ? '99+' : unfulfilledCount}

@@ -28,7 +28,7 @@ export const PrayerList: React.FC<PrayerListProps> = ({
   }
 
   return (
-    <div className="space-y-3">
+    <div>
       {prayers.map((prayer) => (
         <PrayerCard
           key={prayer.name}
