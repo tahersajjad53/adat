@@ -1,46 +1,20 @@
 
 
-# Fajr Card: Brighter Dawn Gradient and Rising Sun Pattern
+# Frosted Glass Effect on Mobile Bottom Tab Bar
 
-## Gradient Change
+## Change
 
-Update the `.gradient-fajr` class in `src/index.css` from the current muted steel-blue tones to a brighter dawn-inspired blue that evokes early morning light while maintaining white text contrast:
+### File: `src/components/layout/MobileBottomNav.tsx`
 
-**Current:**
-```css
-.gradient-fajr {
-  background: linear-gradient(135deg, 
-    hsl(215 25% 35%) 0%, 
-    hsl(220 30% 45%) 100%);
-}
-```
+Update the `nav` element's classes to replace the solid `bg-background` with a frosted glass effect:
 
-**New:**
-```css
-.gradient-fajr {
-  background: linear-gradient(135deg, 
-    hsl(210 50% 42%) 0%, 
-    hsl(200 55% 52%) 100%);
-}
-```
+- Remove `bg-background`
+- Add `bg-background/70 backdrop-blur-xl backdrop-saturate-150`
+- Keep the existing `border-t border-border` but optionally soften it to `border-t border-border/50` for a more glass-like feel
 
-Higher saturation and slightly lighter values create a vibrant dawn-sky feel while keeping sufficient contrast for white text (WCAG AA).
-
-## Rising Sun SVG Pattern
-
-Replace the star/polygon shape in the `fajr` case of `GeometricShape` in `src/components/namaz/TimeOfDayCard.tsx` with a rising sun motif: a half-circle at the bottom with radiating lines fanning upward, evoking sunrise over the horizon.
-
-```text
-      \  |  /
-       \ | /
-    ----[   ]----
-    ============= (horizon line)
-```
-
-The SVG will use the same `opacity-15` and `text-white` styling as the existing shapes.
+The result: a translucent, blurred background that lets content scroll underneath with a subtle frosted appearance, while keeping nav items readable.
 
 ## Files Changed
 
-- `src/index.css` -- update `.gradient-fajr` to brighter dawn blue
-- `src/components/namaz/TimeOfDayCard.tsx` -- replace fajr star polygon with rising sun pattern
+- `src/components/layout/MobileBottomNav.tsx` -- update nav background classes
 
