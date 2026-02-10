@@ -11,35 +11,35 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
 
 @layer base {
   :root {
-    --background: 45 30% 92%;
-    --foreground: 160 50% 18%;
+    --background: 40 30% 94%;
+    --foreground: 150 10% 15%;
 
-    --card: 45 25% 96%;
-    --card-foreground: 160 50% 18%;
+    --card: 40 25% 97%;
+    --card-foreground: 150 10% 15%;
 
-    --popover: 45 25% 96%;
-    --popover-foreground: 160 50% 18%;
+    --popover: 40 25% 97%;
+    --popover-foreground: 150 10% 15%;
 
     --primary: 160 45% 22%;
     --primary-foreground: 45 30% 96%;
 
-    --secondary: 45 20% 90%;
+    --secondary: 40 20% 91%;
     --secondary-foreground: 160 45% 22%;
 
-    --muted: 45 15% 88%;
-    --muted-foreground: 160 30% 35%;
+    --muted: 40 20% 90%;
+    --muted-foreground: 150 10% 40%;
 
-    --accent: 75 70% 50%;
+    --accent: 68 75% 55%;
     --accent-foreground: 160 50% 15%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 160 15% 80%;
-    --input: 160 15% 85%;
+    --border: 40 15% 82%;
+    --input: 40 15% 87%;
     --ring: 160 45% 22%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
 
     --sidebar-background: 160 45% 22%;
     --sidebar-foreground: 45 25% 94%;
