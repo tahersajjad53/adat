@@ -102,10 +102,6 @@ const Goals: React.FC = () => {
           </div> : <GoalList goals={activeGoals} onToggle={handleToggle} onEdit={handleEdit} onDelete={handleDelete} onReorder={handleReorder} isToggling={isToggling || isCompletingOverdue} overdueLabels={overdueLabels} />}
       </div>
 
-      {/* Mobile FAB */}
-      {isMobile && <Button onClick={handleAdd} size="icon" className="fixed bottom-20 right-4 z-40 h-14 w-14 rounded-full shadow-lg">
-          <Plus className="h-6 w-6" />
-        </Button>}
 
       <GoalFormSheet open={formOpen} onOpenChange={setFormOpen} goal={editingGoal} onSubmit={handleSubmit} isLoading={isCreating || isUpdating} />
     </div>;
