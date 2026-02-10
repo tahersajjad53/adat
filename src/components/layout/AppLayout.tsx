@@ -35,7 +35,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
       <div className="min-h-screen bg-background pb-20">
         {/* Mobile Header */}
-        <header className="sticky top-0 z-40 bg-background border-b border-border">
+        <header className="sticky top-0 z-40 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50">
           <div className="container flex h-14 items-center justify-center">
             <img src={adatLogo} alt="Adat" className="h-6 w-auto logo-forest" />
           </div>
