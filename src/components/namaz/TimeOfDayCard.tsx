@@ -24,19 +24,21 @@ const GeometricShape: React.FC<{ variant: AllPrayerName | null }> = ({ variant }
   
   switch (variant) {
     case 'fajr':
-      // Diamond/star shapes for dawn
+      // Rising sun for dawn
       return (
-        <svg className={cn(baseClasses, "bottom-0 right-0 w-32 h-32")} viewBox="0 0 100 100">
-          <polygon 
-            points="50,5 61,40 95,40 68,60 79,95 50,75 21,95 32,60 5,40 39,40" 
-            fill="currentColor" 
-            className="text-white"
-          />
-          <polygon 
-            points="50,25 56,42 75,42 60,52 66,70 50,58 34,70 40,52 25,42 44,42" 
-            fill="currentColor" 
-            className="text-white opacity-50"
-          />
+        <svg className={cn(baseClasses, "bottom-0 right-0 w-36 h-36")} viewBox="0 0 100 100">
+          <g fill="currentColor" stroke="currentColor" className="text-white">
+            {/* Horizon line */}
+            <rect x="5" y="68" width="90" height="2" rx="1" />
+            {/* Half sun */}
+            <path d="M50,68 A22,22 0 0,1 28,68 L72,68 Z" fill="currentColor" />
+            {/* Rays */}
+            <line x1="50" y1="38" x2="50" y2="28" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="35" y1="43" x2="28" y2="35" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="65" y1="43" x2="72" y2="35" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="23" y1="55" x2="14" y2="52" strokeWidth="2.5" strokeLinecap="round" />
+            <line x1="77" y1="55" x2="86" y2="52" strokeWidth="2.5" strokeLinecap="round" />
+          </g>
         </svg>
       );
     
