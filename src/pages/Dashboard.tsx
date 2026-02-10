@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -36,11 +36,12 @@ const Dashboard: React.FC = () => {
   const { prayerTimes } = usePrayerTimes();
   const { isCompleted, toggleCompletion, isToggling } = useGoalCompletions();
   const { overdueGoals, completeOverdue, isCompletingOverdue } = useOverdueGoals();
+  const overdueGoalIds = useMemo(() => new Set(overdueGoals.map(o => o.goal.id)), [overdueGoals]);
   const {
     prayerCompleted, prayerTotal,
     goalsCompleted, goalsTotal, goalsDueToday,
     overallPercentage,
-  } = useTodayProgress(prayers, prayersLoading);
+  } = useTodayProgress(prayers, prayersLoading, overdueGoalIds);
 
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayerName = currentPrayerWindow?.current || null;
