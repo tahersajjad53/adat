@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useConfetti } from '@/components/ui/confetti';
+import { cn } from '@/lib/utils';
 import type { Goal, OverdueGoal } from '@/types/goals';
 
 interface TodaysGoalsProps {
@@ -47,15 +48,13 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
 
   const hasOverdue = overdueGoals.length > 0;
   const totalDisplay = goalsTotal + overdueGoals.length;
-  const completedDisplay = goalsCompleted;
-  const totalForCounter = goalsTotal;
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-2">
           <Archery className="h-5 w-5 text-primary" />
-          <h2 className="text-xl font-bold font-display tracking-tight">Today's Goals</h2>
+          <h2 className="text-2xl font-bold font-display tracking-tight">Goals</h2>
         </div>
         <div className="flex items-center gap-2">
           {hasOverdue && (
@@ -64,25 +63,25 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
             </span>
           )}
           <span className="label-caps">
-            {completedDisplay}/{totalForCounter}
+            {goalsCompleted}/{goalsTotal}
           </span>
         </div>
       </div>
 
       {totalDisplay === 0 ? (
-        <div className="text-center py-6">
-          <p className="text-sm text-muted-foreground mb-3">No goals scheduled for today</p>
+        <div className="text-center py-8">
+          <p className="text-sm text-muted-foreground mb-4">No goals scheduled for today</p>
           <Button variant="outline" size="sm" onClick={() => navigate('/goals')}>
             Manage Goals
           </Button>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div>
           {/* Overdue goals first */}
           {overdueGoals.map((overdue) => (
             <div
               key={`overdue-${overdue.goal.id}`}
-              className="flex items-center gap-4 rounded-xl border border-destructive/30 bg-card p-4 transition-colors hover:bg-muted/50"
+              className="flex items-center gap-4 py-4 separator-dotted last:border-b-0"
             >
               <Checkbox
                 ref={(el) => {
@@ -102,7 +101,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                 tabIndex={0}
                 onKeyDown={(e) => { if (e.key === 'Enter') navigate('/goals'); }}
               >
-                <span className="text-base font-medium">{overdue.goal.title}</span>
+                <span className="text-lg font-display font-semibold">{overdue.goal.title}</span>
                 <p className="text-xs font-medium text-destructive mt-0.5">
                   {overdue.overdueDateLabel}
                 </p>
@@ -116,7 +115,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
             return (
               <div
                 key={goal.id}
-                className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+                className="flex items-center gap-4 py-4 separator-dotted last:border-b-0"
               >
                 <Checkbox
                   ref={(el) => {
@@ -136,17 +135,19 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                   onKeyDown={(e) => { if (e.key === 'Enter') navigate('/goals'); }}
                 >
                   <span
-                    className={`text-base font-medium ${
-                      completed ? 'line-through text-muted-foreground' : ''
-                    }`}
+                    className={cn(
+                      'text-lg font-display font-semibold',
+                      completed && 'line-through text-muted-foreground'
+                    )}
                   >
                     {goal.title}
                   </span>
                   {goal.description && (
                     <p
-                      className={`text-sm text-muted-foreground font-normal line-clamp-1 mt-0.5 ${
-                        completed ? 'line-through' : ''
-                      }`}
+                      className={cn(
+                        'text-sm text-muted-foreground font-normal line-clamp-1 mt-0.5',
+                        completed && 'line-through'
+                      )}
                     >
                       {goal.description}
                     </p>

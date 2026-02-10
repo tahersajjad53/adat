@@ -15,18 +15,13 @@ export const MissedPrayerCard: React.FC<MissedPrayerCardProps> = ({
 }) => {
   return (
     <div
-      className={cn(
-        'flex items-center justify-between rounded-lg border p-4 transition-all',
-        prayer.isFulfilled
-          ? 'border-primary/30 bg-primary/5'
-          : 'border-destructive/30 bg-destructive/5'
-      )}
+      className="flex items-center justify-between py-3 separator-dotted last:border-b-0 transition-colors"
     >
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span
             className={cn(
-              'font-medium',
+              'font-display font-semibold text-base',
               prayer.isFulfilled && 'line-through text-muted-foreground'
             )}
           >
@@ -37,13 +32,8 @@ export const MissedPrayerCard: React.FC<MissedPrayerCardProps> = ({
           )}
         </div>
         
-        <div className="text-sm text-muted-foreground mt-1 space-y-0.5">
-          <p>{prayer.hijriDisplay}</p>
-          <p className="text-xs">{prayer.gregorianDisplay}</p>
-        </div>
-        
         {prayer.isFulfilled && prayer.qazaCompletedAt && (
-          <p className="text-xs text-primary mt-2">
+          <p className="text-xs text-primary mt-1">
             Fulfilled on {prayer.qazaCompletedAt.toLocaleDateString('en-US', {
               month: 'short',
               day: 'numeric',

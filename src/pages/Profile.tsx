@@ -146,7 +146,7 @@ const Profile: React.FC = () => {
   if (activeSection === 'account') {
     return (
       <div className="container py-8">
-        <div className="max-w-xl mx-auto space-y-6">
+        <div className="max-w-xl mx-auto space-y-8">
           <button
             onClick={() => setActiveSection('menu')}
             className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -156,11 +156,11 @@ const Profile: React.FC = () => {
           </button>
 
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Account Information</h1>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Account</h1>
             <p className="text-base text-muted-foreground mt-1 font-normal">Manage your personal details and location.</p>
           </div>
 
-          <section className="space-y-4">
+          <section className="space-y-5">
             <div className="space-y-2">
               <Label htmlFor="fullName">Full Name</Label>
               <Input
@@ -183,7 +183,7 @@ const Profile: React.FC = () => {
           </section>
 
           <section className="space-y-4">
-            <h2 className="text-lg font-semibold">Location</h2>
+            <h2 className="text-xl font-display font-semibold">Location</h2>
             <p className="text-sm text-muted-foreground">
               Your location is used to calculate accurate prayer times.
             </p>
@@ -201,10 +201,10 @@ const Profile: React.FC = () => {
           </section>
 
           {(selectedCity || customCoords) && (
-            <section className="p-4 border border-border rounded-xl bg-muted/30">
-              <h3 className="font-medium mb-2">Prayer Times Preview</h3>
+            <section className="py-4 separator-dotted">
+              <h3 className="font-display font-semibold mb-3">Prayer Times Preview</h3>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Today's Maghrib:</span>
+                <span className="text-muted-foreground">Today's Maghrib</span>
                 <span className="font-medium">{maghribTime || 'Loading...'}</span>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
@@ -253,22 +253,22 @@ const Profile: React.FC = () => {
   // Main menu
   return (
     <div className="container py-8">
-      <div className="max-w-xl mx-auto space-y-6">
+      <div className="max-w-xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Profile</h1>
           <p className="text-base text-muted-foreground mt-1 font-normal">Manage your account settings.</p>
         </div>
 
-        <div className="space-y-3">
+        <div>
           {/* Sabeel */}
           <button
             onClick={() => setActiveSection('sabeel')}
-            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+            className="w-full flex items-center justify-between py-5 separator-dotted transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg"
           >
             <div className="flex items-center gap-3">
               <Community className="h-5 w-5 text-primary" />
               <div className="text-left">
-                <span className="text-base font-medium">Sabeel</span>
+                <span className="text-lg font-display font-semibold">Sabeel</span>
                 <p className="text-sm text-muted-foreground">Manage dues and obligations</p>
               </div>
             </div>
@@ -278,12 +278,12 @@ const Profile: React.FC = () => {
           {/* Account Information */}
           <button
             onClick={() => setActiveSection('account')}
-            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+            className="w-full flex items-center justify-between py-5 separator-dotted transition-colors hover:bg-muted/30 -mx-2 px-2 rounded-lg"
           >
             <div className="flex items-center gap-3">
               <User className="h-5 w-5 text-primary" />
               <div className="text-left">
-                <span className="text-base font-medium">Account Information</span>
+                <span className="text-lg font-display font-semibold">Account</span>
                 <p className="text-sm text-muted-foreground">Name, email, and location settings</p>
               </div>
             </div>
@@ -293,10 +293,10 @@ const Profile: React.FC = () => {
           {/* Sign Out */}
           <button
             onClick={signOut}
-            className="w-full flex items-center gap-3 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-destructive/5 text-destructive"
+            className="w-full flex items-center gap-3 py-5 transition-colors hover:bg-destructive/5 -mx-2 px-2 rounded-lg text-destructive"
           >
             <LogOut className="h-5 w-5" />
-            <span className="text-base font-medium">Sign Out</span>
+            <span className="text-lg font-display font-semibold">Sign Out</span>
           </button>
         </div>
       </div>
