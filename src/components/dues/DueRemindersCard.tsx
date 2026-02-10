@@ -4,6 +4,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useConfetti } from '@/components/ui/confetti';
 import { useDueReminders } from '@/hooks/useDueReminders';
 import { showCelebrationToast } from '@/components/ui/celebration-toast';
+import { PaymentConfirmDialog } from '@/components/dues/PaymentConfirmDialog';
 import { cn } from '@/lib/utils';
 import type { DueReminder } from '@/types/dues';
 export function DueRemindersCard() {
@@ -21,8 +22,17 @@ export function DueRemindersCard() {
   } = useConfetti();
   const checkboxRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
   const [markingId, setMarkingId] = React.useState<string | null>(null);
-  const handleToggle = async (reminder: DueReminder, isPaid: boolean) => {
+  const [pendingReminder, setPendingReminder] = React.useState<DueReminder | null>(null);
+
+  const handleCheckboxTap = (reminder: DueReminder, isPaid: boolean) => {
     if (isPaid) return;
+    setPendingReminder(reminder);
+  };
+
+  const handleConfirm = async () => {
+    if (!pendingReminder) return;
+    const reminder = pendingReminder;
+    setPendingReminder(null);
     setMarkingId(reminder.id);
     triggerConfetti(checkboxRefs.current.get(reminder.id));
     try {
@@ -53,7 +63,7 @@ export function DueRemindersCard() {
         return <div key={reminder.id} className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50">
               <Checkbox ref={el => {
             if (el) checkboxRefs.current.set(reminder.id, el);else checkboxRefs.current.delete(reminder.id);
-          }} checked={isPaid} onCheckedChange={() => handleToggle(reminder, isPaid)} disabled={isPaid || markingId === reminder.id} className="h-5 w-5" />
+          }} checked={isPaid} onCheckedChange={() => handleCheckboxTap(reminder, isPaid)} disabled={isPaid || markingId === reminder.id} className="h-5 w-5" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-1.5">
                   <span className={cn('text-base font-medium', isPaid && 'line-through text-muted-foreground')}>
@@ -70,5 +80,13 @@ export function DueRemindersCard() {
       })}
       </div>
       <ConfettiPortal />
+      <PaymentConfirmDialog
+        open={!!pendingReminder}
+        onOpenChange={(open) => { if (!open) setPendingReminder(null); }}
+        dueName={pendingReminder?.title ?? ''}
+        amount={String(pendingReminder?.amount ?? '')}
+        onConfirm={handleConfirm}
+        isLoading={!!markingId}
+      />
     </div>;
 }
