@@ -24,6 +24,7 @@ interface GoalListProps {
   onDelete: (goalId: string) => void;
   onReorder: (orderedIds: string[]) => void;
   isToggling?: boolean;
+  overdueLabels?: Map<string, string>;
 }
 
 const GoalList: React.FC<GoalListProps> = ({
@@ -33,6 +34,7 @@ const GoalList: React.FC<GoalListProps> = ({
   onDelete,
   onReorder,
   isToggling = false,
+  overdueLabels,
 }) => {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -71,6 +73,7 @@ const GoalList: React.FC<GoalListProps> = ({
               onEdit={onEdit}
               onDelete={onDelete}
               isToggling={isToggling}
+              overdueLabel={overdueLabels?.get(goal.id)}
             />
           ))}
         </div>

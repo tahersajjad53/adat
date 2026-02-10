@@ -21,6 +21,7 @@ interface GoalCardProps {
   onEdit: (goal: GoalWithStatus) => void;
   onDelete: (goalId: string) => void;
   isToggling?: boolean;
+  overdueLabel?: string;
 }
 
 const GoalCard: React.FC<GoalCardProps> = ({
@@ -29,6 +30,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
   onEdit,
   onDelete,
   isToggling = false,
+  overdueLabel,
 }) => {
   const {
     attributes,
@@ -59,7 +61,9 @@ const GoalCard: React.FC<GoalCardProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={`group flex items-start gap-4 rounded-xl border border-border bg-card p-4 transition-colors ${
+      className={`group flex items-start gap-4 rounded-xl border ${
+        overdueLabel ? 'border-destructive/30' : 'border-border'
+      } bg-card p-4 transition-colors ${
         isDragging ? 'opacity-50 shadow-lg' : ''
       } ${goal.isCompleted ? 'opacity-75' : ''}`}
     >
@@ -106,6 +110,11 @@ const GoalCard: React.FC<GoalCardProps> = ({
         {goal.description && (
           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
             {goal.description}
+          </p>
+        )}
+        {overdueLabel && (
+          <p className="text-xs font-medium text-destructive mt-0.5">
+            {overdueLabel}
           </p>
         )}
       </div>

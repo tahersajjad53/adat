@@ -3,6 +3,7 @@ import { Archery, Plus } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import { useGoals } from '@/hooks/useGoals';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
+import { useOverdueGoals } from '@/hooks/useOverdueGoals';
 import { useIsMobile } from '@/hooks/use-mobile';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import GoalList from '@/components/goals/GoalList';
@@ -11,6 +12,7 @@ import type { Goal, GoalInput, GoalWithStatus } from '@/types/goals';
 const Goals: React.FC = () => {
   const { goals, isLoading, createGoal, updateGoal, deleteGoal, reorderGoals, isCreating, isUpdating } = useGoals();
   const { isCompleted, toggleCompletion, isToggling } = useGoalCompletions();
+  const { overdueGoals, completeOverdue, isCompletingOverdue } = useOverdueGoals();
   const isMobile = useIsMobile();
 
   const [formOpen, setFormOpen] = useState(false);
@@ -48,12 +50,27 @@ const Goals: React.FC = () => {
   };
 
   const handleToggle = (goalId: string) => {
-    toggleCompletion(goalId);
+    // Check if this is an overdue goal first
+    const isOverdue = overdueGoals.some(o => o.goal.id === goalId);
+    if (isOverdue) {
+      completeOverdue(goalId);
+    } else {
+      toggleCompletion(goalId);
+    }
   };
 
   const handleReorder = (orderedIds: string[]) => {
     reorderGoals(orderedIds);
   };
+
+  // Build overdue labels map for GoalList
+  const overdueLabels = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const o of overdueGoals) {
+      map.set(o.goal.id, o.overdueDateLabel);
+    }
+    return map;
+  }, [overdueGoals]);
 
   const activeGoals = goalsWithStatus.filter((g) => g.is_active);
 
@@ -94,7 +111,8 @@ const Goals: React.FC = () => {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onReorder={handleReorder}
-            isToggling={isToggling}
+            isToggling={isToggling || isCompletingOverdue}
+            overdueLabels={overdueLabels}
           />
         )}
       </div>

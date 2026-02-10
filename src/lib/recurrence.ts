@@ -1,11 +1,7 @@
 // Recurrence utilities for goal scheduling
 import type { Goal, RecurrencePattern } from '@/types/goals';
-
-export interface HijriDate {
-  day: number;
-  month: number;
-  year: number;
-}
+import type { HijriDate } from '@/lib/hijri';
+export type { HijriDate };
 
 /**
  * Check if a goal is due on a specific date
@@ -201,4 +197,58 @@ function getCustomDescription(pattern: RecurrencePattern | null | undefined): st
     default:
       return 'Custom';
   }
+}
+
+/**
+ * Get a human-readable label for an overdue date relative to today.
+ * Returns "Yesterday" for 1-day overdue, or "8 Feb" style for older.
+ */
+export function getOverdueDateLabel(dueDate: Date, today: Date): string {
+  const dueDay = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
+  const todayDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const diffMs = todayDay.getTime() - dueDay.getTime();
+  const diffDays = Math.round(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 1) return 'Yesterday';
+  return dueDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
+}
+
+/**
+ * Find overdue goals by looking back N days from today.
+ * Returns only the most recent missed occurrence per goal.
+ */
+export function findOverdueGoals(
+  goals: Goal[],
+  today: Date,
+  todayHijri: HijriDate,
+  pastCompletionDates: Set<string>, // Set of "goalId:hijriDateStr" keys
+  lookbackDays: number = 7,
+  getHijriForDate: (date: Date) => HijriDate,
+): Array<{ goal: Goal; overdueDate: Date; overdueHijriDate: HijriDate }> {
+  const result: Array<{ goal: Goal; overdueDate: Date; overdueHijriDate: HijriDate }> = [];
+  const seenGoalIds = new Set<string>();
+
+  // Look back from yesterday (most recent first)
+  for (let daysAgo = 1; daysAgo <= lookbackDays; daysAgo++) {
+    const pastDate = new Date(today);
+    pastDate.setDate(pastDate.getDate() - daysAgo);
+    const pastHijri = getHijriForDate(pastDate);
+
+    for (const goal of goals) {
+      if (!goal.is_active) continue;
+      if (seenGoalIds.has(goal.id)) continue; // Only most recent missed occurrence
+
+      if (isGoalDueOnDate(goal, pastHijri, pastDate)) {
+        const hijriStr = `${pastHijri.year}-${String(pastHijri.month).padStart(2, '0')}-${String(pastHijri.day).padStart(2, '0')}`;
+        const key = `${goal.id}:${hijriStr}`;
+
+        if (!pastCompletionDates.has(key)) {
+          result.push({ goal, overdueDate: pastDate, overdueHijriDate: pastHijri });
+          seenGoalIds.add(goal.id);
+        }
+      }
+    }
+  }
+
+  return result;
 }
