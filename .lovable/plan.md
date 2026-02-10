@@ -1,45 +1,53 @@
 
 
-# Fix FMB Hub Payment Bug + Remove Toast Close Icon
+# Confirmation Dialog Before Marking Dues as Paid
 
-## Issue 1: Remove the X close icon from the celebration toast
+## Overview
 
-Simple removal of the close button in `src/components/ui/celebration-toast.tsx`. The toast already auto-dismisses after 5 seconds, so the close button is unnecessary.
+Add a branded confirmation dialog that appears when a user taps a dues checkbox. Since marking a due as paid cannot be undone, this gives the user a moment to verify before committing. The dialog will mirror the celebration toast's visual style -- decorative pattern banner at the top, warm tones, and friendly copy.
 
-### File: `src/components/ui/celebration-toast.tsx`
-- Remove the `X` import from iconoir-react
-- Remove the `onDismiss` prop from the component interface
-- Remove the close button element entirely
-- Remove the `onDismiss` callback from the `toast.custom()` call
+## Design
 
-## Issue 2: FMB Hub due not getting marked as paid (BUG)
+```text
++----------------------------------+
+|  /////////////////////////////// |
+|  //  Gradient + Pattern Banner // |
+|  //  (same pattern-celebration)// |
+|  /////////////////////////////// |
+|                                  |
+|  Confirm Payment                 |
+|  Mark [Due Name] ([Amount]) as   |
+|  paid? This cannot be undone.    |
+|                                  |
+|  [Cancel]           [Yes, Paid]  |
++----------------------------------+
+```
 
-### Root Cause
+- Same `pattern-celebration` banner as the toast for visual consistency
+- Gentle, clear copy: title "Confirm Payment", description mentioning the due name and amount, with a note that it cannot be undone
+- Two pill-shaped buttons: ghost "Cancel" and primary "Yes, Paid"
+- Uses the existing Radix AlertDialog (already installed) for accessible modal behavior
 
-There are **two separate instances** of `useDuePayments()` that don't share state:
+## Changes
 
-1. **Instance 1** -- inside `useDueReminders()` hook (line 67 of `useDueReminders.ts`). This is the one that performs `markAsPaid` and refetches payments after recording.
-2. **Instance 2** -- called directly in `DueRemindersCard` (line 19-20 of `DueRemindersCard.tsx`). This is the one used to check `isPaymentMadeThisMonth` for rendering the checkbox state.
+### 1. Create `src/components/dues/PaymentConfirmDialog.tsx`
 
-When the user ticks FMB Hub:
-- `markAsPaid` runs via Instance 1 -- the payment is recorded in the database and Instance 1 refetches its internal `payments` state.
-- But the checkbox's `checked` prop reads `isPaymentMadeThisMonth` from Instance 2 -- which has **stale state** and never refetched. So the checkbox stays unchecked.
-- The toast fires because `markAsPaid` succeeded, creating the confusing situation where the toast says "marked as paid" but the checkbox is still empty.
+A new component wrapping `AlertDialog` with branded styling:
+- Props: `open`, `onOpenChange`, `dueName`, `amount`, `onConfirm`, `isLoading`
+- Decorative `.pattern-celebration` banner at the top of the dialog content
+- Title: "Confirm Payment" in display font
+- Description: "[Due Name] - [Amount] will be marked as paid for this month. This cannot be undone."
+- Footer with Cancel (ghost) and "Yes, Paid" (primary) buttons
+- Rounded corners (`rounded-2xl`) matching the app's design language
 
-### Fix
+### 2. Update `src/components/dues/DueRemindersCard.tsx`
 
-Expose `isPaymentMadeThisMonth` from the `useDueReminders` hook (which already has access to it internally) and remove the redundant second `useDuePayments()` call from `DueRemindersCard`.
-
-### File: `src/hooks/useDueReminders.ts`
-- Add `isPaymentMadeThisMonth` to the `UseDueRemindersReturn` interface
-- Return `isPaymentMadeThisMonth` from the hook
-
-### File: `src/components/dues/DueRemindersCard.tsx`
-- Remove the separate `import { useDuePayments }` and the `useDuePayments()` call
-- Destructure `isPaymentMadeThisMonth` from `useDueReminders()` instead
+- Add state for the pending reminder: `pendingReminder` (the reminder awaiting confirmation)
+- When checkbox is tapped, instead of immediately calling `markAsPaid`, set `pendingReminder` to open the dialog
+- On dialog confirm: run the existing `handleToggle` logic (confetti, markAsPaid, celebration toast)
+- On dialog cancel: clear `pendingReminder`, no action taken
 
 ## Files Changed
-- `src/components/ui/celebration-toast.tsx` -- remove close button
-- `src/hooks/useDueReminders.ts` -- expose `isPaymentMadeThisMonth` in return value
-- `src/components/dues/DueRemindersCard.tsx` -- use single source of truth for payment state
 
+- `src/components/dues/PaymentConfirmDialog.tsx` -- new branded confirmation dialog component
+- `src/components/dues/DueRemindersCard.tsx` -- intercept checkbox tap to show confirmation first
