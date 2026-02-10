@@ -1,25 +1,14 @@
 import React from 'react';
 import { toast } from 'sonner';
-import { X } from 'iconoir-react';
 
 interface CelebrationToastProps {
   dueName: string;
   amount: string;
-  onDismiss: () => void;
 }
 
-const CelebrationToast: React.FC<CelebrationToastProps> = ({ dueName, amount, onDismiss }) => {
+const CelebrationToast: React.FC<CelebrationToastProps> = ({ dueName, amount }) => {
   return (
     <div className="relative overflow-hidden rounded-2xl bg-card border border-border shadow-lg w-[360px]">
-      {/* Close button */}
-      <button
-        onClick={onDismiss}
-        className="absolute top-3 right-3 z-10 text-muted-foreground hover:text-foreground transition-colors"
-        aria-label="Dismiss"
-      >
-        <X className="h-4 w-4" />
-      </button>
-
       {/* Decorative pattern banner */}
       <div className="pattern-celebration h-20 w-full" />
 
@@ -37,11 +26,10 @@ const CelebrationToast: React.FC<CelebrationToastProps> = ({ dueName, amount, on
 };
 
 export function showCelebrationToast(dueName: string, amount: string) {
-  toast.custom((id) => (
+  toast.custom(() => (
     <CelebrationToast
       dueName={dueName}
       amount={amount}
-      onDismiss={() => toast.dismiss(id)}
     />
   ), {
     duration: 5000,
