@@ -3,7 +3,6 @@ import { Bell, Check, Calendar, HalfMoon } from 'iconoir-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useConfetti } from '@/components/ui/confetti';
 import { useDueReminders } from '@/hooks/useDueReminders';
-import { useDuePayments } from '@/hooks/useDuePayments';
 import { showCelebrationToast } from '@/components/ui/celebration-toast';
 import { cn } from '@/lib/utils';
 import type { DueReminder } from '@/types/dues';
@@ -13,11 +12,9 @@ export function DueRemindersCard() {
     paidCount,
     totalCount,
     isLoading,
-    markAsPaid
-  } = useDueReminders();
-  const {
+    markAsPaid,
     isPaymentMadeThisMonth
-  } = useDuePayments();
+  } = useDueReminders();
   const {
     triggerConfetti,
     ConfettiPortal

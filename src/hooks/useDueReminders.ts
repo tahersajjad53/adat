@@ -39,6 +39,7 @@ interface UseDueRemindersReturn {
   totalCount: number;
   isLoading: boolean;
   markAsPaid: (reminder: DueReminder) => Promise<void>;
+  isPaymentMadeThisMonth: (dueType: DueType, referenceId: string, calendarType: CalendarType) => boolean;
 }
 
 // Helper to get due day based on reminder settings
@@ -315,5 +316,6 @@ export function useDueReminders(): UseDueRemindersReturn {
     totalCount: reminders.length,
     isLoading: sabeelsLoading || paymentsLoading,
     markAsPaid,
+    isPaymentMadeThisMonth,
   };
 }
