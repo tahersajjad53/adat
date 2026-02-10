@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Home, Clock, User, LogOut, Archery } from 'iconoir-react';
+import { Home, Clock, User, LogOut, Archery, Plus } from 'iconoir-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -27,7 +27,11 @@ const navItems = [
   { title: 'Goals', url: '/goals', icon: Archery },
 ];
 
-export function AppSidebar() {
+interface AppSidebarProps {
+  onAddGoal: () => void;
+}
+
+export function AppSidebar({ onAddGoal }: AppSidebarProps) {
   const { user, signOut } = useAuth();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
@@ -83,6 +87,19 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton tooltip="Add Goal" onClick={onAddGoal}>
+                  <Plus className="h-4 w-4" />
+                  <span>Add Goal</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
