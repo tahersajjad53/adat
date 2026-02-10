@@ -1,53 +1,57 @@
 
 
-# Confirmation Dialog Before Marking Dues as Paid
+# Improve Account Information Layout
 
 ## Overview
 
-Add a branded confirmation dialog that appears when a user taps a dues checkbox. Since marking a due as paid cannot be undone, this gives the user a moment to verify before committing. The dialog will mirror the celebration toast's visual style -- decorative pattern banner at the top, warm tones, and friendly copy.
-
-## Design
-
-```text
-+----------------------------------+
-|  /////////////////////////////// |
-|  //  Gradient + Pattern Banner // |
-|  //  (same pattern-celebration)// |
-|  /////////////////////////////// |
-|                                  |
-|  Confirm Payment                 |
-|  Mark [Due Name] ([Amount]) as   |
-|  paid? This cannot be undone.    |
-|                                  |
-|  [Cancel]           [Yes, Paid]  |
-+----------------------------------+
-```
-
-- Same `pattern-celebration` banner as the toast for visual consistency
-- Gentle, clear copy: title "Confirm Payment", description mentioning the due name and amount, with a note that it cannot be undone
-- Two pill-shaped buttons: ghost "Cancel" and primary "Yes, Paid"
-- Uses the existing Radix AlertDialog (already installed) for accessible modal behavior
+Reorganize the Account Information section by clustering related fields into visually distinct groups with appropriate spacing, and remove the Prayer Times Preview box.
 
 ## Changes
 
-### 1. Create `src/components/dues/PaymentConfirmDialog.tsx`
+### File: `src/pages/Profile.tsx`
 
-A new component wrapping `AlertDialog` with branded styling:
-- Props: `open`, `onOpenChange`, `dueName`, `amount`, `onConfirm`, `isLoading`
-- Decorative `.pattern-celebration` banner at the top of the dialog content
-- Title: "Confirm Payment" in display font
-- Description: "[Due Name] - [Amount] will be marked as paid for this month. This cannot be undone."
-- Footer with Cancel (ghost) and "Yes, Paid" (primary) buttons
-- Rounded corners (`rounded-2xl`) matching the app's design language
+**Remove Prayer Times Preview**
+- Delete the entire conditional section that renders the "Prayer Times Preview" box (the `section` with Maghrib time display)
+- Remove the `maghribTime` state and the `useEffect` that calls `fetchMaghribTime` since they're no longer needed
+- Remove the `fetchMaghribTime` import
 
-### 2. Update `src/components/dues/DueRemindersCard.tsx`
+**Cluster Layout**
+Wrap related fields in grouped containers with consistent internal spacing and vertical gaps between groups:
 
-- Add state for the pending reminder: `pendingReminder` (the reminder awaiting confirmation)
-- When checkbox is tapped, instead of immediately calling `markAsPaid`, set `pendingReminder` to open the dialog
-- On dialog confirm: run the existing `handleToggle` logic (confetti, markAsPaid, celebration toast)
-- On dialog cancel: clear `pendingReminder`, no action taken
+1. **Personal Details cluster** -- Full Name + Email fields grouped together in a bordered rounded card-like container with internal padding
+2. **Location cluster** -- Location heading, description, LocationSelector, and GPS coordinates grouped in a separate bordered rounded container
+
+```text
+[Back]
+
+Account Information
+Manage your personal details and location.
+
++----------------------------------+
+|  Full Name                       |
+|  [___________________________]   |
+|                                  |
+|  Email                           |
+|  [user@email.com         ]       |
+|  Email cannot be changed.        |
++----------------------------------+
+
++----------------------------------+
+|  Location                        |
+|  Your location is used to...     |
+|                                  |
+|  [Location Selector]             |
+|  GPS coords (if custom)          |
++----------------------------------+
+
+[ Save Changes ]
+```
+
+- Each cluster uses `rounded-xl border border-border bg-card p-4 space-y-3` for a card-like grouping
+- Gap between clusters: `space-y-4` on the parent
+- Remove the standalone `section` wrappers and `h2` for Location -- fold the heading into the cluster card instead
 
 ## Files Changed
 
-- `src/components/dues/PaymentConfirmDialog.tsx` -- new branded confirmation dialog component
-- `src/components/dues/DueRemindersCard.tsx` -- intercept checkbox tap to show confirmation first
+- `src/pages/Profile.tsx` -- restructure account section layout, remove prayer preview and related state/imports
+
