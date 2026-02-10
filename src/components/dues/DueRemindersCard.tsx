@@ -31,17 +31,17 @@ export function DueRemindersCard() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Bell className="h-5 w-5 text-primary" />
-          <h2 className="text-2xl font-bold font-display tracking-tight">Dues</h2>
+          <h2 className="text-xl font-bold font-display tracking-tight">Dues Reminders</h2>
         </div>
         <span className="label-caps">
           {paidCount}/{totalCount}
         </span>
       </div>
 
-      <div>
+      <div className="space-y-3">
         {reminders.map((reminder) => {
           const referenceId = reminder.id.split('-').slice(1).join('-');
           const isPaid = isPaymentMadeThisMonth(
@@ -52,7 +52,7 @@ export function DueRemindersCard() {
           return (
             <div
               key={reminder.id}
-              className="flex items-center gap-4 py-4 separator-dotted last:border-b-0"
+              className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
             >
               <Checkbox
                 ref={(el) => {
@@ -68,7 +68,7 @@ export function DueRemindersCard() {
                 <div className="flex items-center gap-1.5">
                   <span
                     className={cn(
-                      'text-lg font-display font-semibold',
+                      'text-base font-medium',
                       isPaid && 'line-through text-muted-foreground'
                     )}
                   >

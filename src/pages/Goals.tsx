@@ -50,6 +50,7 @@ const Goals: React.FC = () => {
   };
 
   const handleToggle = (goalId: string) => {
+    // Check if this is an overdue goal first
     const isOverdue = overdueGoals.some(o => o.goal.id === goalId);
     if (isOverdue) {
       completeOverdue(goalId);
@@ -62,6 +63,7 @@ const Goals: React.FC = () => {
     reorderGoals(orderedIds);
   };
 
+  // Build overdue labels map for GoalList
   const overdueLabels = useMemo(() => {
     const map = new Map<string, string>();
     for (const o of overdueGoals) {
@@ -74,30 +76,30 @@ const Goals: React.FC = () => {
 
   return (
     <div className="container py-8">
-      <div className="max-w-2xl mx-auto space-y-8">
+      <div className="max-w-2xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight font-display">Goals</h1>
-            <p className="text-base text-muted-foreground mt-2 font-normal">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight font-display">Goals</h1>
+            <p className="text-base text-muted-foreground mt-1 font-normal">
               Rooted in Niyat, completed with Ikhlas.
             </p>
           </div>
           {!isMobile && (
             <Button onClick={handleAdd}>
-              <Plus className="mr-2 h-4 w-4" />
-              New Goal
+              <Archery className="mr-2 h-4 w-4" />
+              Add Goal
             </Button>
           )}
         </div>
 
         {isLoading ? (
-          <div className="flex items-center justify-center py-16">
+          <div className="flex items-center justify-center py-12">
             <p className="text-sm text-muted-foreground">Loading goals...</p>
           </div>
         ) : activeGoals.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-center">
-            <Archery className="h-12 w-12 text-muted-foreground/30 mb-4" />
-            <p className="text-muted-foreground font-display text-lg">No goals yet</p>
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <Archery className="h-12 w-12 text-muted-foreground/50 mb-4" />
+            <p className="text-muted-foreground">No goals yet</p>
             <p className="text-sm text-muted-foreground mt-1">
               Create your first goal to start tracking your daily habits.
             </p>

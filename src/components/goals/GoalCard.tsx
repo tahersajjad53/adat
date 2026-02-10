@@ -13,7 +13,6 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getRecurrenceDescription } from '@/lib/recurrence';
 import { useConfetti } from '@/components/ui/confetti';
-import { cn } from '@/lib/utils';
 import type { GoalWithStatus } from '@/types/goals';
 
 interface GoalCardProps {
@@ -62,17 +61,17 @@ const GoalCard: React.FC<GoalCardProps> = ({
     <div
       ref={setNodeRef}
       style={style}
-      className={cn(
-        'group flex items-start gap-4 py-4 separator-dotted last:border-b-0 transition-colors',
-        isDragging && 'opacity-50',
-        goal.isCompleted && 'opacity-75',
-      )}
+      className={`group flex items-start gap-4 rounded-xl border ${
+        overdueLabel ? 'border-destructive/30' : 'border-border'
+      } bg-card p-4 transition-colors ${
+        isDragging ? 'opacity-50 shadow-lg' : ''
+      } ${goal.isCompleted ? 'opacity-75' : ''}`}
     >
       {/* Drag handle */}
       <button
         {...attributes}
         {...listeners}
-        className="mt-1 cursor-grab touch-none text-muted-foreground/30 hover:text-muted-foreground active:cursor-grabbing"
+        className="mt-0.5 cursor-grab touch-none text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing"
         aria-label="Drag to reorder"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -91,7 +90,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
         checked={goal.isCompleted}
         onCheckedChange={handleToggle}
         disabled={isToggling}
-        className="mt-1"
+        className="mt-0.5"
       />
 
       {/* Content */}
@@ -104,19 +103,18 @@ const GoalCard: React.FC<GoalCardProps> = ({
       >
         <div className="flex items-center gap-2">
           <span
-            className={cn(
-              'text-lg font-display font-semibold leading-tight',
-              goal.isCompleted && 'line-through text-muted-foreground'
-            )}
+            className={`text-base font-medium leading-tight ${
+              goal.isCompleted ? 'line-through text-muted-foreground' : ''
+            }`}
           >
             {goal.title}
           </span>
-          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0 rounded-full">
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
             {recurrenceLabel}
           </Badge>
         </div>
         {goal.description && (
-          <p className="text-sm text-muted-foreground mt-0.5 line-clamp-1">
+          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
             {goal.description}
           </p>
         )}
@@ -133,7 +131,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
           <Button
             variant="ghost"
             size="icon"
-            className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100 rounded-full"
+            className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
           >
             <MoreHoriz className="h-4 w-4" />
           </Button>

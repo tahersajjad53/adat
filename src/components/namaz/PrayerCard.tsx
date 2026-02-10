@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { Check, Clock, WarningCircle, HalfMoon } from 'iconoir-react';
@@ -19,6 +20,20 @@ interface PrayerCardProps {
   hijriDate?: HijriDate | null;
 }
 
+const STATUS_STYLES = {
+  upcoming: 'border-border bg-card',
+  current: 'border-primary bg-primary/5 ring-1 ring-primary/20',
+  completed: 'border-primary/50 bg-primary/10',
+  missed: 'border-destructive/50 bg-destructive/5',
+};
+
+const STATUS_ICONS = {
+  upcoming: Clock,
+  current: Clock,
+  completed: Check,
+  missed: WarningCircle,
+};
+
 export const PrayerCard: React.FC<PrayerCardProps> = ({
   name,
   displayName,
@@ -31,6 +46,7 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
   hijriDate,
 }) => {
   const effectiveStatus = isOptional && status === 'missed' ? 'upcoming' : status;
+  const StatusIcon = isOptional ? HalfMoon : STATUS_ICONS[effectiveStatus];
   const checkboxRef = useRef<HTMLButtonElement>(null);
   const { triggerConfetti, ConfettiPortal } = useConfetti();
 
@@ -44,11 +60,14 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-between py-4 separator-dotted last:border-b-0 transition-colors',
-        status === 'current' && !isOptional && 'bg-primary/[0.03] -mx-4 px-4 rounded-xl',
+        'flex items-center justify-between rounded-lg border p-4 transition-all',
+        isOptional 
+          ? 'border-border/50 bg-muted/30' 
+          : STATUS_STYLES[status],
+        compact && 'p-3'
       )}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <Checkbox
           ref={checkboxRef}
           id={`prayer-${name}`}
@@ -58,19 +77,19 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
         />
         <div className="flex flex-col">
           <div className="flex items-center gap-2">
-            <label
+            <Label
               htmlFor={`prayer-${name}`}
               className={cn(
-                'cursor-pointer font-display font-semibold',
+                'cursor-pointer font-medium',
                 isCompleted && 'line-through text-muted-foreground',
                 isOptional && !isCompleted && 'text-muted-foreground',
-                compact ? 'text-base' : 'text-lg'
+                compact ? 'text-sm' : 'text-base'
               )}
             >
               {displayName}
-            </label>
+            </Label>
             {isOptional && (
-              <Badge variant="outline" className="text-[10px] font-normal text-muted-foreground rounded-full">
+              <Badge variant="outline" className="text-xs font-normal text-muted-foreground">
                 Optional
               </Badge>
             )}
@@ -84,11 +103,16 @@ export const PrayerCard: React.FC<PrayerCardProps> = ({
       </div>
 
       <div className="flex items-center gap-2 text-sm text-muted-foreground">
-        <span className="font-medium">{time}</span>
-        {isCompleted && <Check className="h-4 w-4 text-primary" />}
-        {!isCompleted && status === 'missed' && !isOptional && (
-          <WarningCircle className="h-4 w-4 text-destructive" />
-        )}
+        <span>{time}</span>
+        <StatusIcon
+          className={cn(
+            'h-4 w-4',
+            isOptional && 'text-muted-foreground/60',
+            !isOptional && status === 'current' && 'text-primary',
+            !isOptional && status === 'completed' && 'text-primary',
+            !isOptional && status === 'missed' && 'text-destructive'
+          )}
+        />
       </div>
       <ConfettiPortal />
     </div>

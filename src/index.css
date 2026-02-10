@@ -39,7 +39,7 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
     --input: 160 15% 85%;
     --ring: 160 45% 22%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
 
     --sidebar-background: 160 45% 22%;
     --sidebar-foreground: 45 25% 94%;
@@ -108,11 +108,6 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
 
   .label-caps {
     @apply text-xs font-semibold uppercase tracking-widest text-muted-foreground;
-  }
-
-  /* Magazine-style dotted separator */
-  .separator-dotted {
-    border-bottom: 1.5px dotted hsl(var(--border));
   }
   
   /* Logo color filters */
