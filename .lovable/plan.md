@@ -1,43 +1,47 @@
 
-# Deduplicate Overdue + Today Goals
 
-## Problem
-When a recurring goal (e.g., daily "Dua Kamil") is missed, the app shows TWO entries: one overdue copy with a "Yesterday" label AND the regular today copy. The user should only see ONE instance -- the overdue version with its label. Completing it clears the obligation; the goal then naturally reappears for its next occurrence.
+# Rounded Buttons + Colour Palette Refresh
 
-## Approach
-Filter out any goal from the "today" list if it already appears in the overdue list. This is a simple ID-based exclusion applied in two places.
+## Overview
 
-## Changes
+Two changes inspired by the reference health app UI: make all buttons pill-shaped (fully rounded) and refine the colour palette to be warmer, softer, and more aligned with the beige/lime reference.
 
-### 1. `src/pages/Dashboard.tsx`
-- After getting `overdueGoals` and `goalsDueToday`, filter `goalsDueToday` to exclude any goal whose ID is in the overdue list
-- Update `goalsTotal` and `goalsCompleted` counts accordingly
+## 1. Rounded Buttons
 
-### 2. `src/hooks/useTodayProgress.ts`
-- Accept an optional `overdueGoalIds` parameter (a `Set<string>`)
-- When computing `goalsDueToday`, exclude goals whose IDs are in the overdue set
-- This ensures the Ada percentage and counts reflect the deduplicated list
+Change the global `--radius` from `0.5rem` to `1rem` so all UI elements (cards, inputs, dialogs) get rounder corners. Then update the Button component to use `rounded-full` (pill shape) instead of `rounded-md`, matching the reference's approachable, capsule-style buttons.
 
-### 3. `src/components/goals/TodaysGoals.tsx`
-- Update the counter display: the total should be `goalsTotal` (already deduplicated from above), not `goalsTotal + overdueGoals.length`
-- Remove the current `totalDisplay = goalsTotal + overdueGoals.length` line and just use `goalsTotal` directly for the empty-state check (but include overdue count so empty state doesn't show when there are overdue items)
+### Files
+- **`src/index.css`**: Change `--radius: 0.5rem` to `--radius: 1rem`
+- **`src/components/ui/button.tsx`**: Replace `rounded-md` with `rounded-full` in the base CVA class and in the `sm`/`lg` size variants
 
-### 4. `src/pages/Goals.tsx`
-- No structural changes needed here since the Goals page shows all goals as a management list with overdue labels -- it doesn't duplicate entries
+## 2. Colour Palette Update
 
-## Technical Details
+The reference uses:
+- A warm off-white/beige background (less green tint than current)
+- Darker, more neutral foreground text (near-black rather than forest green)
+- Lime-yellow accents on feature cards
+- Softer, warmer greys for borders and muted elements
 
-The key filtering logic in Dashboard.tsx:
-```typescript
-const overdueGoalIds = new Set(overdueGoals.map(o => o.goal.id));
-const filteredGoalsDueToday = goalsDueToday.filter(g => !overdueGoalIds.has(g.id));
-```
+### Adjusted light-mode CSS variables in `src/index.css`:
 
-This is passed to `TodaysGoals` as `goalsDueToday={filteredGoalsDueToday}`.
+| Token | Current | New | Rationale |
+|-------|---------|-----|-----------|
+| `--background` | `45 30% 92%` | `40 30% 94%` | Slightly lighter, warmer cream |
+| `--foreground` | `160 50% 18%` | `150 10% 15%` | Near-black, less green tint for readability |
+| `--card` | `45 25% 96%` | `40 25% 97%` | Brighter card surface |
+| `--card-foreground` | `160 50% 18%` | `150 10% 15%` | Match foreground |
+| `--muted` | `45 15% 88%` | `40 20% 90%` | Warmer muted bg |
+| `--muted-foreground` | `160 30% 35%` | `150 10% 40%` | More neutral grey text |
+| `--border` | `160 15% 80%` | `40 15% 82%` | Warmer border, less green |
+| `--input` | `160 15% 85%` | `40 15% 87%` | Warmer input bg |
+| `--accent` | `75 70% 50%` | `68 75% 55%` | Slightly warmer, brighter lime (closer to the reference yellow-lime) |
+| `--secondary` | `45 20% 90%` | `40 20% 91%` | Warmer secondary |
 
-For `useTodayProgress`, the hook will accept an optional exclusion set so progress calculations stay accurate without double-counting.
+Primary, destructive, popover, ring, and sidebar tokens remain unchanged since the forest green identity and dark mode are intentional.
+
+### Dark mode
+No changes -- the dark palette already works well and isn't represented in the reference.
 
 ## Files Changed
-- `src/hooks/useTodayProgress.ts` -- accept optional `overdueGoalIds` param, exclude from today's count
-- `src/pages/Dashboard.tsx` -- pass overdue IDs to progress hook and filter goals for TodaysGoals
-- `src/components/goals/TodaysGoals.tsx` -- fix total count to not add overdue on top of today
+- `src/index.css` -- update `--radius` and ~10 light-mode colour variables
+- `src/components/ui/button.tsx` -- change `rounded-md` to `rounded-full` in CVA base + size variants
