@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { useGoals } from './useGoals';
-import { findOverdueGoals, getOverdueDateLabel } from '@/lib/recurrence';
+import { findOverdueGoals, findAllMissedDatesForGoal, getOverdueDateLabel } from '@/lib/recurrence';
 import { gregorianToBohra, formatHijriDateKey } from '@/lib/hijri';
 import type { OverdueGoal } from '@/types/goals';
 
@@ -75,18 +75,29 @@ export function useOverdueGoals() {
     }));
   }, [goals, today, todayHijri, location, completionKeys]);
 
-  // Mutation to complete an overdue goal (records against original date)
+  // Mutation to complete an overdue goal (batch-clears all missed dates)
   const completeOverdueMutation = useMutation({
-    mutationFn: async ({ goalId, hijriDate, gregorianDate }: { goalId: string; hijriDate: string; gregorianDate: string }) => {
-      if (!user) throw new Error('Not authenticated');
+    mutationFn: async (goalId: string) => {
+      if (!user || !today || !location) throw new Error('Not authenticated or missing context');
+
+      const goal = goals.find(g => g.id === goalId);
+      if (!goal) throw new Error('Goal not found');
+
+      const getHijri = (date: Date) => gregorianToBohra(date, location.timezone);
+      const allMissed = findAllMissedDatesForGoal(goal, today, completionKeys, LOOKBACK_DAYS, getHijri);
+
+      if (allMissed.length === 0) return;
+
+      const rows = allMissed.map(({ gregorianDate, hijriDate }) => ({
+        user_id: user.id,
+        goal_id: goalId,
+        completion_date: formatHijriDateKey(hijriDate),
+        gregorian_date: gregorianDate.toISOString().split('T')[0],
+      }));
+
       const { error } = await supabase
         .from('goal_completions')
-        .insert({
-          user_id: user.id,
-          goal_id: goalId,
-          completion_date: hijriDate,
-          gregorian_date: gregorianDate,
-        });
+        .insert(rows);
       if (error) throw error;
     },
     onSuccess: () => {
@@ -98,11 +109,7 @@ export function useOverdueGoals() {
   const completeOverdue = (goalId: string) => {
     const overdue = overdueGoals.find(o => o.goal.id === goalId);
     if (!overdue) return;
-    completeOverdueMutation.mutate({
-      goalId,
-      hijriDate: overdue.overdueHijriDate,
-      gregorianDate: overdue.overdueGregorianDate,
-    });
+    completeOverdueMutation.mutate(goalId);
   };
 
   return {
