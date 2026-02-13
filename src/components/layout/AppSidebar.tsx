@@ -19,7 +19,7 @@ import {
 } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { NavLink } from '@/components/NavLink';
-import adatLogo from '@/assets/adat-logo.svg';
+import ibadatLogo from '@/assets/ibadat-logo.svg';
 
 const navItems = [
   { title: 'Today', url: '/today', icon: Home },
@@ -62,8 +62,8 @@ export function AppSidebar({ onAddGoal }: AppSidebarProps) {
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4">
         <img 
-          src={adatLogo} 
-          alt="Adat" 
+          src={ibadatLogo} 
+          alt="Ibadat" 
           className="h-8 w-auto logo-lime" 
         />
       </SidebarHeader>
