@@ -1,25 +1,24 @@
 
 
-# Make Frosted Glass Effect Visible on Mobile Bottom Nav
+## Rebrand: Adat to Ibadat
 
-## Problem
+### Changes
 
-The `bg-background/70` opacity is too high -- at 70% opacity of the same beige background color, the translucency is nearly invisible. The frosted glass effect only becomes apparent when there's a strong contrast between the nav background and the content scrolling underneath.
+1. **Replace logo file** -- Copy `user-uploads://logo.svg` to `src/assets/ibadat-logo.svg` and update all imports across the app (AuthLayout, AppLayout, AppSidebar) to use the new logo file instead of `adat-logo.svg`.
 
-## Solution
+2. **Replace favicon** -- Copy `user-uploads://fav.svg` to `public/favicon.svg` and update `index.html` to reference it.
 
-Reduce the background opacity and fine-tune the blur to make the frosted glass effect clearly visible:
+3. **Update index.html metadata** -- Change the document title and og:title from "Lovable App" to "Ibadat", and update the description to match the app's purpose.
 
-### File: `src/components/layout/MobileBottomNav.tsx`
+4. **Update text references** -- Replace any remaining "Adat" alt-text references in components with "Ibadat".
 
-Update the nav classes:
-- Change `bg-background/70` to `bg-background/50` for more transparency
-- Keep `backdrop-blur-xl backdrop-saturate-150` for the frosted effect
-- Add a subtle top shadow (`shadow-[0_-1px_12px_rgba(0,0,0,0.06)]`) to give the glass panel a lifted feel
+### Files Modified
+- `index.html` -- favicon link, title, meta tags
+- `src/components/auth/AuthLayout.tsx` -- logo import
+- `src/components/layout/AppLayout.tsx` -- logo import
+- `src/components/layout/AppSidebar.tsx` -- logo import
 
-This ensures the effect is visible even when content shares a similar background color, and becomes more dramatic when cards or colored content scroll underneath.
-
-## Files Changed
-
-- `src/components/layout/MobileBottomNav.tsx` -- reduce bg opacity, add subtle shadow
+### Files Added
+- `src/assets/ibadat-logo.svg` (copied from upload)
+- `public/favicon.svg` (copied from upload)
 
