@@ -1,32 +1,51 @@
 
 
-## Fix: Logo Appearing Blue Instead of Green
+## Two Changes: Hide Paid Dues from Today Feed + Payment History per Sabeel
 
-### Root Cause
+### Change 1: Hide Paid Dues from Today Feed (Next Day)
 
-The logo SVG already contains the correct dark green color (`#005240`) in its fill attributes. However, the mobile header applies a CSS filter class called `logo-forest` that was calibrated for the old logo. This filter distorts the color, producing the blue/purple tint visible in the screenshot.
+**Problem**: Currently in `useDueReminders.ts`, the condition `if (shouldShow || isPaid)` keeps paid dues visible indefinitely. Once marked as paid, they should only remain visible on their due day, not carry over to the next day.
 
-### Changes
+**Solution**: In `src/hooks/useDueReminders.ts`, change the filter logic so that paid items are excluded from the reminders list entirely. The reminder should only appear when `shouldShow` is true (meaning it's within the reminder window). Once paid, it no longer needs to be displayed as a reminder -- the checkmark state is already derived from `isPaymentMadeThisMonth`, so if the reminder happens to show on the due day and is already paid, it will appear checked. But once the day passes and `shouldShowReminder` returns false, it disappears.
 
-1. **Remove the `logo-forest` filter from the mobile header logo** in `src/components/layout/AppLayout.tsx`. Since the SVG is already green, no filter is needed -- just display it as-is.
+**File**: `src/hooks/useDueReminders.ts`
+- Line 100: Change `if (shouldShow || isPaid)` to `if (shouldShow && !isPaid)` for sabeel
+- Line 157: Same change for FMB Hub
+- Line 197: Same change for Khumus
+- Line 238: Same change for Zakat
+- Update `paidCount`/`totalCount` logic accordingly since paid items are no longer in the list
 
-2. **Update the sidebar logo** in `src/components/layout/AppSidebar.tsx`. The `logo-lime` filter also needs to be recalibrated or replaced. Since the sidebar has a dark green background, the logo needs to appear in a light/lime color for contrast. The simplest approach is to replace the hue-shifting filter with a `brightness(0) invert(1)` base and then fine-tune to a lime tint, or use a CSS filter calculator to match the target lime color `hsl(68, 75%, 55%)`.
+### Change 2: Payment History per Sabeel
 
-3. **Update the auth layout logo** in `src/components/auth/AuthLayout.tsx`. The desktop splash side uses `invert` on the logo for white text on dark background -- this should still work fine. The mobile auth view shows the logo without a filter, so it will display in the native green.
+**New component**: `src/components/dues/PaymentHistory.tsx`
+- A sheet/dialog that shows a paginated list of all `due_payments` belonging to a specific Sabeel
+- Queries `due_payments` where `reference_id` matches the sabeel ID, or any of its child entity IDs (fmb_hub, khumus entries, zakat entries)
+- Displays 10 items at a time with a "Show More" button to load the next 10
+- Each item shows: due type label (Sabeel/FMB Hub/Khumus/Zakat), person name where applicable, amount paid, and the payment date
+
+**Updated component**: `src/components/dues/SabeelCard.tsx`
+- Add a "History" button inside the collapsible content area (below the Zakat section)
+- Clicking it opens the PaymentHistory sheet for that sabeel
+
+**Updated component**: `src/components/dues/DuesSection.tsx`
+- Add state management for the history sheet (open/close, selected sabeel ID)
 
 ### Technical Details
 
-**File: `src/components/layout/AppLayout.tsx`** (line 40)
-- Change: `className="h-6 w-auto logo-forest"` to `className="h-6 w-auto"`
+**PaymentHistory.tsx structure**:
+- Uses a Sheet (bottom sheet on mobile) triggered from SabeelCard
+- Fetches from `due_payments` table using Supabase client
+- Filter: `reference_id` IN (sabeel.id, sabeel.fmb_hub?.id, ...sabeel.khumus_list.map(k => k.id), ...sabeel.zakats.map(z => z.id))
+- Order by `paid_at` descending
+- Pagination via `range(offset, offset + 9)` with a "Show More" button
+- Maps `due_type` to human-readable labels and resolves person names from the sabeel data
+- Each row: type badge, title/person name, amount, formatted date
 
-**File: `src/components/layout/AppSidebar.tsx`** (line 67)
-- Change: `className="h-8 w-auto logo-lime"` to use a corrected filter that produces the lime accent color on the dark sidebar, or remove the filter if the native green provides sufficient contrast.
+**Files modified**:
+- `src/hooks/useDueReminders.ts` -- filter out paid dues
+- `src/components/dues/SabeelCard.tsx` -- add History button
+- `src/components/dues/DuesSection.tsx` -- wire up history sheet state
 
-**File: `src/index.css`** (lines 122-128)
-- Remove or update the `.logo-forest` and `.logo-lime` filter definitions since they were tuned for the old logo.
-
-### Summary of Files Modified
-- `src/components/layout/AppLayout.tsx` -- remove `logo-forest` class from mobile header logo
-- `src/components/layout/AppSidebar.tsx` -- update or remove `logo-lime` class from sidebar logo
-- `src/index.css` -- clean up or recalibrate the CSS filter classes
+**Files created**:
+- `src/components/dues/PaymentHistory.tsx` -- paginated payment log sheet
 
