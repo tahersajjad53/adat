@@ -97,7 +97,7 @@ export function useDueReminders(): UseDueRemindersReturn {
 
         const isPaid = isPaymentMadeThisMonth('sabeel', sabeel.id, sabeel.calendar_type);
 
-        if (shouldShow || isPaid) {
+        if (shouldShow && !isPaid) {
           const { month: currentMonth, year: currentYear } = getCurrentPeriod(
             sabeel.calendar_type,
             hijri,
@@ -154,7 +154,7 @@ export function useDueReminders(): UseDueRemindersReturn {
 
         const isPaid = isPaymentMadeThisMonth('fmb', fmb.id, fmb.calendar_type);
 
-        if (shouldShow || isPaid) {
+        if (shouldShow && !isPaid) {
           const dueDay = getDueDay(
             fmb.reminder_type,
             fmb.reminder_day,
@@ -194,7 +194,7 @@ export function useDueReminders(): UseDueRemindersReturn {
 
           const isPaid = isPaymentMadeThisMonth('khumus', khumus.id, khumus.calendar_type);
 
-          if (shouldShow || isPaid) {
+          if (shouldShow && !isPaid) {
             const dueDay = getDueDay(
               khumus.reminder_type,
               khumus.reminder_day,
@@ -235,7 +235,7 @@ export function useDueReminders(): UseDueRemindersReturn {
 
           const isPaid = isPaymentMadeThisMonth('zakat', zakat.id, zakat.calendar_type);
 
-          if (shouldShow || isPaid) {
+          if (shouldShow && !isPaid) {
             const dueDay = getDueDay(
               zakat.reminder_type,
               zakat.reminder_day,
@@ -277,13 +277,8 @@ export function useDueReminders(): UseDueRemindersReturn {
     return result;
   }, [currentDate, sabeels, sabeelsLoading, isPaymentMadeThisMonth]);
 
-  // Calculate paid/unpaid counts
-  const paidCount = useMemo(() => {
-    if (!currentDate) return 0;
-    return reminders.filter((r) => 
-      isPaymentMadeThisMonth(r.type, r.id.split('-').slice(1).join('-'), r.calendarType)
-    ).length;
-  }, [reminders, currentDate, isPaymentMadeThisMonth]);
+  // Paid items are now filtered out, so paidCount is always 0 in the visible list
+  const paidCount = 0;
 
   const markAsPaid = async (reminder: DueReminder) => {
     if (!currentDate) return;
