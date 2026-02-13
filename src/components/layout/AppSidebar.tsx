@@ -64,7 +64,7 @@ export function AppSidebar({ onAddGoal }: AppSidebarProps) {
         <img 
           src={ibadatLogo} 
           alt="Ibadat" 
-          className="h-8 w-auto logo-lime" 
+          className="h-8 w-auto brightness-0 invert" 
         />
       </SidebarHeader>
 
