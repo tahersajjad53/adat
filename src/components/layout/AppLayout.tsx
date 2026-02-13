@@ -5,7 +5,7 @@ import { AppSidebar } from './AppSidebar';
 import { MobileBottomNav } from './MobileBottomNav';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import { useGoals } from '@/hooks/useGoals';
-import adatLogo from '@/assets/adat-logo.svg';
+import ibadatLogo from '@/assets/ibadat-logo.svg';
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -37,7 +37,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         {/* Mobile Header */}
         <header className="sticky top-0 z-40 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50">
           <div className="container flex h-14 items-center justify-center">
-            <img src={adatLogo} alt="Adat" className="h-6 w-auto logo-forest" />
+            <img src={ibadatLogo} alt="Ibadat" className="h-6 w-auto logo-forest" />
           </div>
         </header>
         
