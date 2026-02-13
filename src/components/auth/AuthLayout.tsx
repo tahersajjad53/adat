@@ -10,7 +10,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
   return (
     <div className="flex min-h-screen">
       {/* Left side - Splash image */}
-      <div className="hidden lg:flex lg:w-1/2 relative bg-foreground">
+      <div className="hidden lg:flex lg:w-1/2 relative bg-primary">
         <img
           src={splashImage}
           alt="Spiritual sanctuary"
@@ -18,7 +18,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="relative z-10 flex flex-col justify-between p-12 text-primary-foreground">
-          <img src={ibadatLogo} alt="Ibadat" className="w-24 h-auto invert" />
+          <img src={ibadatLogo} alt="Ibadat" className="w-24 h-auto brightness-0 invert" />
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-3 font-display">Your Spiritual Life, Organized</h2>
             <p className="text-lg opacity-90">
