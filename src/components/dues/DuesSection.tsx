@@ -294,10 +294,10 @@ const DuesSection: React.FC = () => {
       {isMobile && (
         <Button
           onClick={handleAddSabeel}
-          size="icon"
-          className="fixed bottom-20 right-4 z-40 h-14 w-14 rounded-full shadow-lg"
+          className="fixed bottom-20 right-4 z-40 shadow-lg"
         >
-          <Plus className="h-6 w-6" />
+          <Plus className="h-5 w-5" />
+          New Sabeel
         </Button>
       )}
     </section>
