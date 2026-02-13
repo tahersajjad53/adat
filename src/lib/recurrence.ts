@@ -252,3 +252,34 @@ export function findOverdueGoals(
 
   return result;
 }
+
+/**
+ * Find ALL missed dates for a single goal within the lookback window.
+ * Used to batch-clear all overdue occurrences at once.
+ */
+export function findAllMissedDatesForGoal(
+  goal: Goal,
+  today: Date,
+  completionKeys: Set<string>,
+  lookbackDays: number,
+  getHijriForDate: (date: Date) => HijriDate,
+): Array<{ gregorianDate: Date; hijriDate: HijriDate }> {
+  const result: Array<{ gregorianDate: Date; hijriDate: HijriDate }> = [];
+
+  for (let daysAgo = 1; daysAgo <= lookbackDays; daysAgo++) {
+    const pastDate = new Date(today);
+    pastDate.setDate(pastDate.getDate() - daysAgo);
+    const pastHijri = getHijriForDate(pastDate);
+
+    if (isGoalDueOnDate(goal, pastHijri, pastDate)) {
+      const hijriStr = `${pastHijri.year}-${String(pastHijri.month).padStart(2, '0')}-${String(pastHijri.day).padStart(2, '0')}`;
+      const key = `${goal.id}:${hijriStr}`;
+
+      if (!completionKeys.has(key)) {
+        result.push({ gregorianDate: pastDate, hijriDate: pastHijri });
+      }
+    }
+  }
+
+  return result;
+}
