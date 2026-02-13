@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ChevronDown, ChevronRight, Moon, Sun, Edit2, Trash2, Plus } from 'lucide-react';
+import { ChevronDown, ChevronRight, Moon, Sun, Edit2, Trash2, Plus, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { formatMonthYear } from '@/lib/calendarUtils';
 import { calculateKhumusAmount, calculateZakatAmount } from '@/types/dues';
 import type { SabeelWithRelations } from '@/types/dues';
+import PaymentHistory from './PaymentHistory';
 
 interface SabeelCardProps {
   sabeel: SabeelWithRelations;
@@ -42,6 +43,7 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
   onDeleteZakat,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
 
   const hasChildren =
     sabeel.fmb_hub ||
@@ -310,9 +312,28 @@ const SabeelCard: React.FC<SabeelCardProps> = ({
                 </p>
               )}
             </div>
+
+            {/* History Button */}
+            <div className="border-t border-border/50 pt-4">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full"
+                onClick={() => setHistoryOpen(true)}
+              >
+                <History className="h-4 w-4 mr-2" />
+                History
+              </Button>
+            </div>
           </div>
         </CollapsibleContent>
       </Collapsible>
+
+      <PaymentHistory
+        open={historyOpen}
+        onOpenChange={setHistoryOpen}
+        sabeel={sabeel}
+      />
     </div>
   );
 };
