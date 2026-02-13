@@ -56,7 +56,7 @@ const Dashboard: React.FC = () => {
     completeOverdue,
     isCompletingOverdue
   } = useOverdueGoals();
-  const overdueGoalIds = useMemo(() => new Set(overdueGoals.map(o => o.goal.id)), [overdueGoals]);
+  const overdueGoalIds = useMemo(() => new Set(overdueGoals.map((o) => o.goal.id)), [overdueGoals]);
   const {
     prayerCompleted,
     prayerTotal,
@@ -157,7 +157,7 @@ const Dashboard: React.FC = () => {
                   </div>}
                 <Checkbox checked={prayerToShow.isCompleted} onCheckedChange={() => togglePrayer(prayerToShow.name)} className="h-6 w-6 border-white/50 data-[state=checked]:bg-white/30 data-[state=checked]:text-white" />
               </div>
-            </div> : overallPercentage === 100 ? <p className="text-white/80 text-sm font-medium">Masha'Allah! All done for today.</p> : <p className="text-white/70 text-sm">No prayer information available</p>}
+            </div> : overallPercentage === 100 ? <p className="text-white/80 text-sm font-medium">All done for the day! </p> : <p className="text-white/70 text-sm">No prayer information available</p>}
         </TimeOfDayCard>
 
         {/* Dues Reminders - only shows when there are active reminders */}
