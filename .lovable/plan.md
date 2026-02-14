@@ -1,29 +1,30 @@
 
 
-# Auto-Authenticate and Navigate to Today View
+# PWA Install Prompt
 
-## Current Behavior
-The app already auto-authenticates returning users -- Supabase persists the session in localStorage, and `AuthProvider` restores it on load. The Auth page (`/`) checks for an existing user and redirects to `/today` via `/dashboard`.
+## Overview
+Add a dismissible banner just above the mobile bottom navigation bar that prompts browser users to install the app as a PWA.
 
-However, there is a potential flash of the login page while the session is being restored, because the Auth page renders its own loading spinner inline rather than blocking before the page renders.
+## How It Works
 
-## What Needs to Change
+1. **Create a custom hook** `src/hooks/usePWAInstall.ts` that:
+   - Listens for the browser's `beforeinstallprompt` event and stores it
+   - Checks if the app is already installed via `display-mode: standalone` media query
+   - Tracks dismissal state in `localStorage` (`pwa-install-dismissed`)
+   - On iOS (no `beforeinstallprompt` support), detects via user agent to show alternative instructions
+   - Exposes `canPrompt`, `isIOS`, `promptInstall()`, and `dismiss()`
 
-The fix is small -- on the root route (`/`), wrap the Auth page so it shows a full-screen loading spinner while the auth state is being resolved, and immediately redirects to `/today` if a session exists, without ever rendering the login form.
+2. **Create a banner component** `src/components/pwa/InstallBanner.tsx`:
+   - A slim, dismissible banner with frosted glass styling matching the existing bottom nav aesthetic (`bg-background/40 backdrop-blur-xl`)
+   - Text: "Install Ibadat for a better experience"
+   - "Install" primary pill button + dismiss "X" button
+   - On iOS: shows "Tap Share then 'Add to Home Screen'" hint instead of the Install button
 
-### Edit: `src/pages/Auth.tsx`
-- The existing `if (loading)` block already shows a spinner, and `if (user)` redirects -- this works correctly.
-- Change the redirect from `/dashboard` to `/today` directly (skipping the extra redirect hop).
-
-### Edit: `src/App.tsx`
-- Change `<Route path="/dashboard" element={<Navigate to="/today" replace />} />` -- this already exists and handles the redirect, but the Auth page should target `/today` directly for a snappier experience.
-
-### Summary of Changes
-1. In `Auth.tsx` line 57: change `<Navigate to="/dashboard" replace />` to `<Navigate to="/today" replace />`
-2. In `Signup.tsx`: same change if it has a similar redirect after signup
-
-This is a one-line change per file. The PWA already handles session persistence and auto-refresh via Supabase's `persistSession: true` and `autoRefreshToken: true` settings. No additional PWA configuration is needed -- the service worker caches the app shell, and the auth token in localStorage ensures instant re-authentication on return visits.
+3. **Place the banner in `src/components/layout/MobileBottomNav.tsx`** -- rendered directly above the nav bar (inside the same fixed container or as a sibling positioned just above it), so it sits between the page content and the bottom tab bar. This keeps it visible and accessible without overlapping content.
 
 ## Files
-- **Edit**: `src/pages/Auth.tsx` -- redirect to `/today` directly
-- **Edit**: `src/pages/Signup.tsx` -- same redirect fix if applicable
+- **Create**: `src/hooks/usePWAInstall.ts`
+- **Create**: `src/components/pwa/InstallBanner.tsx`
+- **Edit**: `src/components/layout/MobileBottomNav.tsx` -- render InstallBanner above the nav tabs
+- **Edit**: `src/components/layout/AppLayout.tsx` -- pass-through or integrate the banner (if needed for state management)
+
