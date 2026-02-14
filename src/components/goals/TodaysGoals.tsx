@@ -18,6 +18,7 @@ interface TodaysGoalsProps {
   overdueGoals?: OverdueGoal[];
   onCompleteOverdue?: (goalId: string) => void;
   isCompletingOverdue?: boolean;
+  onCreateGoal?: () => void;
   // Dynamic goals
   dynamicGoals?: AdminGoal[];
   isDynamicCompleted?: (goalId: string) => boolean;
@@ -35,6 +36,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   overdueGoals = [],
   onCompleteOverdue,
   isCompletingOverdue = false,
+  onCreateGoal,
   dynamicGoals = [],
   isDynamicCompleted,
   onDynamicToggle,
@@ -93,7 +95,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
             "The deed dearest to Allah Ta'ala is that which is most consistent, even if small"
           </p>
           <p className="text-xs text-muted-foreground">— Al-Hadith</p>
-          <Button onClick={() => navigate('/goals')} className="rounded-full">
+          <Button onClick={onCreateGoal} className="rounded-full">
             Create your first goal
           </Button>
         </div>
