@@ -1,15 +1,16 @@
 
 
-# Fix Keyboard Auto-Opening on Mobile Goal Form
+# Fix iOS Keyboard Auto-Opening on Goal Form Sheet
 
 ## Problem
-When tapping the (+) button on the mobile bottom nav, the Goal form sheet opens with `autoFocus` on the title input, which immediately triggers the on-screen keyboard. This causes the form to visually jump/shift as the viewport resizes.
+Removing `autoFocus` from the input wasn't enough. The Radix Dialog primitive (which powers the Sheet component) automatically focuses the first focusable element when it opens. On iOS, this triggers the keyboard.
 
 ## Solution
-Remove the `autoFocus` prop from the title input in `GoalFormSheet.tsx`. The keyboard will only open when the user explicitly taps on an input field.
+Add `onOpenAutoFocus={(e) => e.preventDefault()}` to the `SheetContent` component in the mobile branch of `GoalFormSheet.tsx`. This tells Radix not to auto-focus any element when the sheet opens.
 
 ## Files
-- **Edit**: `src/components/goals/GoalFormSheet.tsx` -- remove `autoFocus` from the title Input (line ~104)
+- **Edit**: `src/components/goals/GoalFormSheet.tsx` -- add `onOpenAutoFocus` handler to `SheetContent` (around line 163)
 
-This is a one-line change.
+## Technical Detail
+The `SheetContent` wraps Radix `Dialog.Content`, which supports an `onOpenAutoFocus` event. Calling `preventDefault()` on it stops the default focus behavior entirely, so the keyboard only appears when the user explicitly taps an input.
 
