@@ -1,42 +1,27 @@
 
 
-## Fix: Overdue Goal Completion Should Clear All Past Misses
+## Auth Page Updates
 
-### Problem
+### Left Panel (AuthLayout.tsx)
 
-When a recurring daily goal is missed for multiple days (e.g., missed Feb 11-13), the system currently:
-1. Shows the most recent miss (Feb 13 = "Yesterday") -- correct
-2. When ticked, only records a completion for that single date (Feb 13)
-3. This causes the next oldest miss (Feb 12) to surface, then Feb 11, creating a chain of old overdue items instead of moving forward
+1. **Title**: Change "Your Spiritual Life, Organized" to "Your Companion for Consistent Ibadat"
 
-### Expected Behavior
+2. **Subtitle area**: Replace the current subtitle with the Lisan ud-Dawat text followed by a styled label:
+   - Line 1: عبادت نی پابندی ماں آپنو ساتھی
+   - Line 2: Small all-caps label with wide letter-spacing: "DESIGNED FOR DAWOODI BOHRAS"
 
-Ticking an overdue goal should clear the entire backlog of missed occurrences at once, so the goal refreshes to its next scheduled date (e.g., Feb 15 if completed on Feb 14).
+3. **Logo color**: Remove `brightness-0 invert` filters so the logo renders in its native brand green (the SVG is already green by default)
 
-### Solution
+### Right Panel (Auth.tsx)
 
-Modify the `completeOverdue` function in `useOverdueGoals.ts` to insert completions for **all** missed dates of that goal, not just the single displayed one.
+4. **Heading**: Change "Welcome Back" to "السَّلَامُ عَلَيْكُمْ"
 
-### Technical Details
+5. **Subtitle**: Change "Enter your credentials to access your account" to "Track prayers, manage dues, and cultivate daily habits"
 
-**File: `src/hooks/useOverdueGoals.ts`**
+### Mobile
 
-1. Expose the full list of missed dates per goal from `findOverdueGoals`, not just the most recent one.
-
-2. In the `completeOverdueMutation`, instead of inserting a single completion row, insert completions for every missed date of the goal in one batch insert.
-
-**File: `src/lib/recurrence.ts`** -- `findOverdueGoals` function
-
-3. Add a new companion function `findAllOverdueDatesForGoal` (or modify `findOverdueGoals` to collect all missed dates per goal instead of stopping at the first). The existing function uses `seenGoalIds` to skip after the first hit -- we need all hits for the batch-complete operation.
-
-**Detailed changes:**
-
-- `src/lib/recurrence.ts`: Add a helper `findAllMissedDatesForGoal(goal, today, completionKeys, lookbackDays, getHijriForDate)` that returns all missed date pairs (gregorian + hijri) within the lookback window for a single goal.
-- `src/hooks/useOverdueGoals.ts`:
-  - In `completeOverdue(goalId)`, call the new helper to get all missed dates for that goal
-  - Change the mutation to batch-insert completions for all missed dates at once (Supabase `.insert([...array])`)
-  - The UI display logic stays the same (only the most recent miss is shown per goal)
+6. **Logo size**: Increase the mobile logo from `w-20` to `w-28` for better visibility
 
 ### Files Modified
-- `src/lib/recurrence.ts` -- add helper to find all missed dates for a goal
-- `src/hooks/useOverdueGoals.ts` -- batch-insert completions for all missed dates when completing an overdue goal
+- `src/components/auth/AuthLayout.tsx` -- left panel text, logo styling, mobile logo size
+- `src/pages/Auth.tsx` -- right panel heading and subtitle text
