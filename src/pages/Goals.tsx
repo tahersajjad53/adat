@@ -150,12 +150,14 @@ const Goals: React.FC = () => {
             <p className="text-sm text-muted-foreground">Loading goals...</p>
           </div>
         ) : mergedGoals.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <Archery className="h-12 w-12 text-muted-foreground/50 mb-4" />
-            <p className="text-muted-foreground">No goals yet</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Create your first goal to start tracking your daily habits.
+          <div className="flex flex-col items-center justify-center py-16 text-center space-y-6">
+            <p className="text-lg italic text-muted-foreground max-w-sm">
+              "He who is mindful of the journey's distance prepares for it."
             </p>
+            <Button onClick={handleAdd}>
+              <Archery className="mr-2 h-4 w-4" />
+              Create your first goal
+            </Button>
           </div>
         ) : (
           <GoalList
