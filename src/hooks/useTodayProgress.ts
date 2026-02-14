@@ -5,6 +5,7 @@ import { useCalendar } from '@/contexts/CalendarContext';
 import { getGoalsDueOnDate } from '@/lib/recurrence';
 import type { Goal } from '@/types/goals';
 import type { PrayerStatus } from './usePrayerLog';
+import type { AdminGoal } from '@/types/adminGoals';
 
 export interface TodayProgressData {
   // Prayers
@@ -27,7 +28,13 @@ export interface TodayProgressData {
   isLoading: boolean;
 }
 
-export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolean, overdueGoalIds?: Set<string>): TodayProgressData {
+export function useTodayProgress(
+  prayers: PrayerStatus[],
+  prayersLoading: boolean,
+  overdueGoalIds?: Set<string>,
+  dynamicGoals: AdminGoal[] = [],
+  isDynamicCompleted: (id: string) => boolean = () => false,
+): TodayProgressData {
   const { currentDate } = useCalendar();
   const { goals, isLoading: goalsLoading } = useGoals();
   const { isCompleted, isLoading: completionsLoading } = useGoalCompletions();
@@ -58,14 +65,18 @@ export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolea
       goalsCompleted = goalsDueToday.filter(goal => isCompleted(goal.id)).length;
     }
 
-    const goalsTotal = goalsDueToday.length;
+    // Dynamic goals progress
+    const dynamicTotal = dynamicGoals.length;
+    const dynamicCompleted = dynamicGoals.filter(g => isDynamicCompleted(g.id)).length;
+
+    const goalsTotal = goalsDueToday.length + dynamicTotal;
     const goalsPercentage = goalsTotal > 0 
-      ? Math.round((goalsCompleted / goalsTotal) * 100) 
+      ? Math.round(((goalsCompleted + dynamicCompleted) / goalsTotal) * 100) 
       : 100; // 100% if no goals due
 
     // Combined progress
     const overallTotal = prayerTotal + goalsTotal;
-    const overallCompleted = prayerCompleted + goalsCompleted;
+    const overallCompleted = prayerCompleted + goalsCompleted + dynamicCompleted;
     const overallPercentage = overallTotal > 0 
       ? Math.round((overallCompleted / overallTotal) * 100) 
       : 0;
@@ -74,7 +85,7 @@ export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolea
       prayerCompleted,
       prayerTotal,
       prayerPercentage,
-      goalsCompleted,
+      goalsCompleted: goalsCompleted + dynamicCompleted,
       goalsTotal,
       goalsPercentage,
       goalsDueToday,
@@ -82,7 +93,7 @@ export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolea
       overallTotal,
       overallPercentage,
     };
-  }, [goals, prayers, hijriDate, gregorianDate, isCompleted, overdueGoalIds]);
+  }, [goals, prayers, hijriDate, gregorianDate, isCompleted, overdueGoalIds, dynamicGoals, isDynamicCompleted]);
 
   return {
     ...progressData,
