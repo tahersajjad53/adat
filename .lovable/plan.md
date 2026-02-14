@@ -1,44 +1,44 @@
 
 
-# Update Open Graph Image and SEO Improvements
+# Full PWA Setup with vite-plugin-pwa
 
-## 1. Add the OG image to the project
-Copy `user-uploads://OG-ibadat.png` to `public/og-image.png` (must be in `public/` since meta tags need a direct URL).
+## Overview
+Install `vite-plugin-pwa`, copy the provided icon assets, configure the service worker, and remove the old manual manifest.
 
-## 2. Update `index.html` meta tags
+## Changes
 
-**Replace OG image references** with the production URL:
-- `og:image` -> `https://ibadat.app/og-image.png`
-- `twitter:image` -> `https://ibadat.app/og-image.png`
+### 1. Copy icon assets to `public/`
+- `user-uploads://icon-192.png` -> `public/pwa-192x192.png`
+- `user-uploads://icon-512.png` -> `public/pwa-512x512.png`
 
-**Add missing SEO meta tags:**
-- `og:url` -> `https://ibadat.app`
-- `og:image:width` / `og:image:height` (standard OG image is 1200x630)
-- `og:image:alt` -> descriptive alt text
-- `twitter:title` and `twitter:description` (currently missing)
-- `theme-color` meta tag for mobile browser chrome
-- `apple-mobile-web-app-title` for iOS home screen
-- Canonical link tag: `<link rel="canonical" href="https://ibadat.app" />`
+### 2. Install `vite-plugin-pwa`
 
-**Update attribution:**
-- Change `twitter:site` from `@Lovable` to your own handle (or remove it)
+### 3. Update `vite.config.ts`
+Add the `VitePWA` plugin:
+- Inline manifest with name, theme_color, icons referencing the new PNGs and existing SVG favicon
+- Workbox config with `navigateFallbackDenylist: [/^\/~oauth/]` to keep OAuth working
+- `registerType: 'autoUpdate'` for seamless updates
 
-## 3. Update `robots.txt`
-Add a sitemap reference:
+### 4. Update `index.html`
+- Remove `<link rel="manifest" href="/manifest.json" />`
+- Add `<link rel="apple-touch-icon" href="/pwa-192x192.png" />`
+
+### 5. Update `src/main.tsx`
+Add service worker registration:
+```ts
+import { registerSW } from 'virtual:pwa-register';
+registerSW({ immediate: true });
 ```
-Sitemap: https://ibadat.app/sitemap.xml
-```
 
-## 4. Add `public/sitemap.xml`
-Create a basic sitemap listing the public pages (just the root `/` auth page, since everything else is behind authentication).
+### 6. Delete `public/manifest.json`
+The plugin auto-generates the manifest, so the manual file is no longer needed.
 
-## 5. Add `public/manifest.json`
-Create a basic web app manifest with the app name, description, theme color, and icons for PWA/home-screen support.
-
-## Summary of files
-- **Copy**: `user-uploads://OG-ibadat.png` to `public/og-image.png`
-- **Edit**: `index.html` -- update meta tags
-- **Edit**: `public/robots.txt` -- add sitemap line
-- **Create**: `public/sitemap.xml`
-- **Create**: `public/manifest.json`
+## Files Summary
+- **Copy**: `icon-192.png` -> `public/pwa-192x192.png`
+- **Copy**: `icon-512.png` -> `public/pwa-512x512.png`
+- **Install**: `vite-plugin-pwa`
+- **Edit**: `vite.config.ts` -- add VitePWA plugin
+- **Edit**: `index.html` -- swap manifest link for apple-touch-icon
+- **Edit**: `src/main.tsx` -- register service worker
+- **Delete**: `public/manifest.json`
 
