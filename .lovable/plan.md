@@ -1,29 +1,19 @@
 
 
-# Include Dynamic Goals in Daily Progress Meter
+# Hide Sabeel / Dues Functionality (Temporary)
 
-## Problem
-When dynamic goals are toggled on and due today, they appear in the Today's Goals list but are **not** counted in the Ada percentage meter. The progress bar only reflects prayers + user-created goals.
-
-## Solution
-Pass dynamic goal data into `useTodayProgress` so the combined percentage accounts for dynamic goals too.
+Two small changes to hide the dues feature until it's ready for launch:
 
 ## Changes
 
-### 1. `src/hooks/useTodayProgress.ts`
-- Accept two new parameters: `dynamicGoals` (array of AdminGoal objects due today) and `isDynamicCompleted` (function to check completion status).
-- In the `useMemo` calculation, add dynamic goal counts to the overall totals:
-  - `dynamicTotal = dynamicGoals.length`
-  - `dynamicCompleted = dynamicGoals.filter(g => isDynamicCompleted(g.id)).length`
-- Include these in the combined `overallTotal` and `overallCompleted`.
-- Also add dynamic counts to `goalsTotal` and `goalsCompleted` so the breakdown label ("Goals: X/Y") reflects them.
+### 1. Profile Page (`src/pages/Profile.tsx`)
+- Remove the "Sabeel" menu button from the main profile menu
+- Remove the `sabeel` section rendering block (the `if (activeSection === 'sabeel')` branch)
+- Remove the unused `DuesSection` import
 
-### 2. `src/pages/Dashboard.tsx`
-- Pass `dynamicGoals` (from `useDynamicGoals`) and `isDynamicCompleted` (from `useAdminGoalCompletions`) as additional arguments to the `useTodayProgress` hook call.
+### 2. Dashboard (`src/pages/Dashboard.tsx`)
+- Remove the `<DueRemindersCard />` component from the Today feed
+- Remove the unused `DueRemindersCard` import
 
-### 3. `src/pages/Namaz.tsx` (if it also uses `useTodayProgress`)
-- Update the call signature to pass empty defaults for the new parameters if dynamic goals are not relevant on that page.
+No data or database changes -- the underlying hooks and components remain in the codebase for reactivation later.
 
-## Technical Notes
-- Following the existing state-synchronization pattern: data flows in as parameters rather than being fetched independently inside the hook.
-- Dynamic goals that are not enabled will pass as an empty array, so the percentage remains unchanged when the feature is off.
