@@ -1,30 +1,21 @@
 
 
-# PWA Install Prompt
+# Add New Zealand to City List
 
 ## Overview
-Add a dismissible banner just above the mobile bottom navigation bar that prompts browser users to install the app as a PWA.
+Add New Zealand cities to the location selector used during onboarding sign-up.
 
-## How It Works
+## Changes
 
-1. **Create a custom hook** `src/hooks/usePWAInstall.ts` that:
-   - Listens for the browser's `beforeinstallprompt` event and stores it
-   - Checks if the app is already installed via `display-mode: standalone` media query
-   - Tracks dismissal state in `localStorage` (`pwa-install-dismissed`)
-   - On iOS (no `beforeinstallprompt` support), detects via user agent to show alternative instructions
-   - Exposes `canPrompt`, `isIOS`, `promptInstall()`, and `dismiss()`
+### Edit: `src/data/cities.ts`
 
-2. **Create a banner component** `src/components/pwa/InstallBanner.tsx`:
-   - A slim, dismissible banner with frosted glass styling matching the existing bottom nav aesthetic (`bg-background/40 backdrop-blur-xl`)
-   - Text: "Install Ibadat for a better experience"
-   - "Install" primary pill button + dismiss "X" button
-   - On iOS: shows "Tap Share then 'Add to Home Screen'" hint instead of the Install button
+1. Add New Zealand cities to the `CITIES` array (under Asia Pacific section):
+   - Auckland (latitude: -36.8485, longitude: 174.7633, timezone: Asia/Auckland)
+   - Wellington (latitude: -41.2865, longitude: 174.7762, timezone: Pacific/Auckland)
 
-3. **Place the banner in `src/components/layout/MobileBottomNav.tsx`** -- rendered directly above the nav bar (inside the same fixed container or as a sibling positioned just above it), so it sits between the page content and the bottom tab bar. This keeps it visible and accessible without overlapping content.
+2. Add the New Zealand flag emoji to `COUNTRY_FLAGS`:
+   - `NZ: '🇳🇿'`
 
 ## Files
-- **Create**: `src/hooks/usePWAInstall.ts`
-- **Create**: `src/components/pwa/InstallBanner.tsx`
-- **Edit**: `src/components/layout/MobileBottomNav.tsx` -- render InstallBanner above the nav tabs
-- **Edit**: `src/components/layout/AppLayout.tsx` -- pass-through or integrate the banner (if needed for state management)
+- **Edit**: `src/data/cities.ts` -- add NZ cities and flag
 
