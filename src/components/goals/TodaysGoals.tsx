@@ -88,10 +88,13 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
       </div>
 
       {totalDisplay === 0 ? (
-        <div className="text-center py-6">
-          <p className="text-sm text-muted-foreground mb-3">No goals scheduled for today</p>
-          <Button variant="outline" size="sm" onClick={() => navigate('/goals')}>
-            Manage Goals
+        <div className="text-center py-8 space-y-4">
+          <p className="text-sm text-muted-foreground italic max-w-xs mx-auto">
+            "The deed dearest to Allah Ta'ala is that which is most consistent, even if small"
+          </p>
+          <p className="text-xs text-muted-foreground">— Al-Hadith</p>
+          <Button onClick={() => navigate('/goals')} className="rounded-full">
+            Create your first goal
           </Button>
         </div>
       ) : (
