@@ -1,23 +1,16 @@
 
 
-# Add Christchurch to City List
+# Update Empty State on Goals Page
 
-## Problem
-Christchurch, New Zealand is not available as a city option. Users selecting Auckland or Wellington get prayer times calculated for those cities' coordinates, which don't match Christchurch due to its different latitude and longitude.
+## What Changes
+Update only the **Goals page** empty state to display the quote *"He who is mindful of the journey's distance prepares for it."* with a CTA button to create a goal. The Today page remains unchanged.
 
-## Solution
-Add a Christchurch entry to the cities list in `src/data/cities.ts`.
+## File to Edit
 
-## Details
+### `src/pages/Goals.tsx` (lines 152-159)
+Replace the current empty state (Archery icon + "No goals yet" + description text) with:
+- The quote in italic: *"He who is mindful of the journey's distance prepares for it."*
+- A "Create your first goal" button that calls `handleAdd()` to open the goal form sheet directly
 
-**File**: `src/data/cities.ts`
+No other files are changed. The Today page's Al-Hadith quote stays as-is.
 
-Add after the Wellington entry (line 75):
-
-```
-{ id: 'christchurch', name: 'Christchurch', country: 'New Zealand', countryCode: 'NZ', latitude: -43.5321, longitude: 172.6362, timezone: 'Pacific/Auckland' }
-```
-
-**Why times differ**: Christchurch is ~2.5 degrees further south and ~2 degrees different in longitude compared to Wellington. At southern latitudes, even small coordinate differences cause noticeable shifts in prayer times (especially Fajr and Isha). Each city needs its own coordinates for accurate calculations via the Aladhan API.
-
-No other files need changes -- the location selector already dynamically reads from the `CITIES` array, and the `NZ` country flag is already configured.
