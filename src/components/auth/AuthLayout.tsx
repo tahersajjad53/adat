@@ -22,7 +22,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-3 font-display">Your Companion for Consistent Ibadat</h2>
             <p className="text-lg opacity-90 mb-3 text-left">
-              عبادت نی پابندی ماں آپنو ساتھی
+              عبادة ني پابندي ما ساتهي
             </p>
             <span className="text-[10px] uppercase tracking-[0.25em] opacity-70">Designed for Dawoodi Bohras</span>
           </div>
