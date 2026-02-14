@@ -2,7 +2,7 @@ import React from 'react';
 import { Home, Clock, User, Archery, Plus } from 'iconoir-react';
 import { NavLink } from '@/components/NavLink';
 import { cn } from '@/lib/utils';
-
+import { InstallBanner } from '@/components/pwa/InstallBanner';
 const leftItems = [
   { title: 'Today', url: '/today', icon: Home },
   { title: 'Namaz', url: '/namaz', icon: Clock },
@@ -19,8 +19,9 @@ interface MobileBottomNavProps {
 
 export function MobileBottomNav({ onAddGoal }: MobileBottomNavProps) {
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-t border-border/50 shadow-[0_-1px_12px_rgba(0,0,0,0.06)] pb-safe">
-      <div className="flex justify-around items-center h-16">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
+      <InstallBanner />
+      <div className="flex justify-around items-center h-16 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-t border-border/50 shadow-[0_-1px_12px_rgba(0,0,0,0.06)]">
         {leftItems.map((item) => (
           <NavLink
             key={item.title}
