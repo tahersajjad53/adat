@@ -49,7 +49,7 @@ const Dashboard: React.FC = () => {
 
   const {
     prayerCompleted, prayerTotal, goalsCompleted, goalsTotal, goalsDueToday, overallPercentage,
-  } = useTodayProgress(prayers, prayersLoading, overdueGoalIds);
+  } = useTodayProgress(prayers, prayersLoading, overdueGoalIds, dynamicGoals, isDynamicCompleted);
 
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayerName = currentPrayerWindow?.current || null;
