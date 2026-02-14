@@ -379,6 +379,7 @@ export type Database = {
           id: string
           latitude: number | null
           longitude: number | null
+          theme: string | null
           timezone: string | null
           updated_at: string | null
           username: string | null
@@ -392,6 +393,7 @@ export type Database = {
           id: string
           latitude?: number | null
           longitude?: number | null
+          theme?: string | null
           timezone?: string | null
           updated_at?: string | null
           username?: string | null
@@ -405,6 +407,7 @@ export type Database = {
           id?: string
           latitude?: number | null
           longitude?: number | null
+          theme?: string | null
           timezone?: string | null
           updated_at?: string | null
           username?: string | null

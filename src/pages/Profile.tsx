@@ -8,10 +8,10 @@ import { useToast } from '@/hooks/use-toast';
 import LocationSelector from '@/components/profile/LocationSelector';
 
 import { CITIES, type City } from '@/data/cities';
-import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User } from 'iconoir-react';
+import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignPencil } from 'iconoir-react';
+import ThemeSelector from '@/components/profile/ThemeSelector';
 
-
-type ProfileSection = 'menu' | 'sabeel' | 'account';
+type ProfileSection = 'menu' | 'account' | 'theme';
 
 const Profile: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -206,6 +206,29 @@ const Profile: React.FC = () => {
       </div>
     );
   }
+  // Sub-section: Theme
+  if (activeSection === 'theme') {
+    return (
+      <div className="container py-8">
+        <div className="max-w-xl mx-auto space-y-6">
+          <button
+            onClick={() => setActiveSection('menu')}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <NavArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+
+          <div>
+            <h1 className="text-4xl font-normal tracking-tight font-display">Theme</h1>
+            <p className="text-base text-muted-foreground mt-1 font-normal">Choose your visual style.</p>
+          </div>
+
+          <ThemeSelector />
+        </div>
+      </div>
+    );
+  }
 
 
   // Main menu
@@ -228,6 +251,21 @@ const Profile: React.FC = () => {
               <div className="text-left">
                 <span className="text-base font-medium">Account Information</span>
                 <p className="text-sm text-muted-foreground">Name, email, and location settings</p>
+              </div>
+            </div>
+            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
+          </button>
+
+          {/* Theme */}
+          <button
+            onClick={() => setActiveSection('theme')}
+            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center gap-3">
+              <DesignPencil className="h-5 w-5 text-primary" />
+              <div className="text-left">
+                <span className="text-base font-medium">Theme</span>
+                <p className="text-sm text-muted-foreground">Choose your visual style</p>
               </div>
             </div>
             <NavArrowRight className="h-5 w-5 text-muted-foreground" />

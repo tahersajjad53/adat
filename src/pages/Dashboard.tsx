@@ -127,7 +127,7 @@ const Dashboard: React.FC = () => {
               className="h-full rounded-full transition-all"
               style={{
                 width: `${overallPercentage}%`,
-                backgroundColor: 'hsl(75, 70%, 55%)',
+                backgroundColor: 'hsl(var(--accent))',
                 backgroundImage:
                   'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(255,255,255,0.2) 3px, rgba(255,255,255,0.2) 6px)',
               }}
