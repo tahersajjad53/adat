@@ -1,44 +1,47 @@
 
 
-# Full PWA Setup with vite-plugin-pwa
+# Add Google Sign-In to Login and Signup Pages
 
 ## Overview
-Install `vite-plugin-pwa`, copy the provided icon assets, configure the service worker, and remove the old manual manifest.
+Add a "Continue with Google" button on both auth pages, with an "OR" divider separating it from the email/password form. Google provider is already enabled in Supabase.
 
 ## Changes
 
-### 1. Copy icon assets to `public/`
-- `user-uploads://icon-192.png` -> `public/pwa-192x192.png`
-- `user-uploads://icon-512.png` -> `public/pwa-512x512.png`
+### 1. `src/contexts/AuthContext.tsx`
+- Add `signInWithGoogle` method to the context type and provider
+- Uses `supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } })`
 
-### 2. Install `vite-plugin-pwa`
+### 2. `src/pages/Auth.tsx`
+Restructure layout to:
+- Title + subtitle (unchanged)
+- "Continue with Google" button (outline variant, Google "G" SVG icon)
+- "OR" horizontal divider (line — text — line)
+- Existing email/password form
+- "Don't have an account?" link
 
-### 3. Update `vite.config.ts`
-Add the `VitePWA` plugin:
-- Inline manifest with name, theme_color, icons referencing the new PNGs and existing SVG favicon
-- Workbox config with `navigateFallbackDenylist: [/^\/~oauth/]` to keep OAuth working
-- `registerType: 'autoUpdate'` for seamless updates
+### 3. `src/pages/Signup.tsx`
+Same pattern:
+- Title + subtitle
+- "Continue with Google" button
+- "OR" divider
+- Existing signup form fields
+- "Already have an account?" link
 
-### 4. Update `index.html`
-- Remove `<link rel="manifest" href="/manifest.json" />`
-- Add `<link rel="apple-touch-icon" href="/pwa-192x192.png" />`
+### Technical Details
 
-### 5. Update `src/main.tsx`
-Add service worker registration:
-```ts
-import { registerSW } from 'virtual:pwa-register';
-registerSW({ immediate: true });
+**Google button styling**: Outline variant button, full width, with an inline Google "G" SVG (colored logo). Text: "Continue with Google".
+
+**OR divider**: A flex row with two horizontal lines and centered "OR" text in muted-foreground, like:
+```tsx
+<div className="flex items-center gap-3">
+  <Separator className="flex-1" />
+  <span className="text-xs text-muted-foreground uppercase">or</span>
+  <Separator className="flex-1" />
+</div>
 ```
 
-### 6. Delete `public/manifest.json`
-The plugin auto-generates the manifest, so the manual file is no longer needed.
-
-## Files Summary
-- **Copy**: `icon-192.png` -> `public/pwa-192x192.png`
-- **Copy**: `icon-512.png` -> `public/pwa-512x512.png`
-- **Install**: `vite-plugin-pwa`
-- **Edit**: `vite.config.ts` -- add VitePWA plugin
-- **Edit**: `index.html` -- swap manifest link for apple-touch-icon
-- **Edit**: `src/main.tsx` -- register service worker
-- **Delete**: `public/manifest.json`
+## Files
+- **Edit**: `src/contexts/AuthContext.tsx`
+- **Edit**: `src/pages/Auth.tsx`
+- **Edit**: `src/pages/Signup.tsx`
 
