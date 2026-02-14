@@ -53,7 +53,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <div className="w-10" />
             {/* Centered logo */}
             <div className="flex-1 flex justify-center">
-              <img src={ibadatLogo} alt="Ibadat" className="h-6 w-auto" />
+              <img src={ibadatLogo} alt="Ibadat" className="h-6 w-auto logo-themed" />
             </div>
             {/* Right: 3-dot menu on goals page, spacer otherwise */}
             {isGoalsPage ? (

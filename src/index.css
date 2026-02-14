@@ -156,6 +156,15 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
   .label-caps {
     @apply text-xs font-semibold uppercase tracking-widest text-muted-foreground;
   }
+
+  /* Theme-scoped logo recoloring */
+  .theme-khalaf .logo-themed {
+    filter: brightness(0) saturate(100%) invert(45%) sepia(95%) saturate(1500%) hue-rotate(10deg) brightness(105%);
+  }
+
+  .theme-bhukur .logo-themed {
+    filter: brightness(0) saturate(100%) invert(50%) sepia(90%) saturate(1800%) hue-rotate(15deg) brightness(110%);
+  }
   
 
   /* Prayer-time gradients */

@@ -32,7 +32,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
       {/* Right side - Form */}
       <div className="flex-1 flex flex-col px-6 py-12 lg:px-16 bg-background lg:justify-center">
         <div className="lg:hidden mb-auto">
-          <img src={ibadatLogo} alt="Ibadat" className="w-28 h-auto" />
+          <img src={ibadatLogo} alt="Ibadat" className="w-28 h-auto logo-themed" />
         </div>
         <div className="w-full max-w-md mx-auto">
           {children}
