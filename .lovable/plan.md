@@ -1,16 +1,23 @@
 
 
-# Update Empty State on Goals Page
+# Open Goal Creation Form from Today Page Empty State
 
 ## What Changes
-Update only the **Goals page** empty state to display the quote *"He who is mindful of the journey's distance prepares for it."* with a CTA button to create a goal. The Today page remains unchanged.
+Instead of navigating to `/goals`, the Today page empty state should directly open the goal creation form. This requires adding a callback prop to `TodaysGoals` that the parent (`Dashboard.tsx`) provides.
 
-## File to Edit
+## Technical Details
 
-### `src/pages/Goals.tsx` (lines 152-159)
-Replace the current empty state (Archery icon + "No goals yet" + description text) with:
-- The quote in italic: *"He who is mindful of the journey's distance prepares for it."*
-- A "Create your first goal" button that calls `handleAdd()` to open the goal form sheet directly
+### 1. `src/components/goals/TodaysGoals.tsx`
+- Add a new prop `onCreateGoal?: () => void` to the component interface
+- Replace `onClick={() => navigate('/goals')}` on the button (line 96) with `onClick={onCreateGoal}`
+- Make the quote text also clickable with the same `onCreateGoal` handler
 
-No other files are changed. The Today page's Al-Hadith quote stays as-is.
+### 2. `src/pages/Dashboard.tsx`
+- Import `GoalFormSheet` and the `useGoals` hook (for the `addGoal` mutation)
+- Add state: `const [goalFormOpen, setGoalFormOpen] = useState(false)`
+- Create handler: `const handleCreateGoal = () => setGoalFormOpen(true)`
+- Pass `onCreateGoal={handleCreateGoal}` to `<TodaysGoals />`
+- Render `<GoalFormSheet open={goalFormOpen} onOpenChange={setGoalFormOpen} onSubmit={...} />` in the JSX
+
+This way tapping the quote or the CTA button opens the goal creation sheet directly on the Today page without any navigation.
 
