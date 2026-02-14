@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import LocationSelector from '@/components/profile/LocationSelector';
-import DuesSection from '@/components/dues/DuesSection';
+
 import { CITIES, type City } from '@/data/cities';
-import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, Community } from 'iconoir-react';
+import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User } from 'iconoir-react';
 
 
 type ProfileSection = 'menu' | 'sabeel' | 'account';
@@ -207,24 +207,6 @@ const Profile: React.FC = () => {
     );
   }
 
-  // Sub-section: Sabeel
-  if (activeSection === 'sabeel') {
-    return (
-      <div className="container py-8">
-        <div className="max-w-xl mx-auto space-y-6">
-          <button
-            onClick={() => setActiveSection('menu')}
-            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <NavArrowLeft className="h-4 w-4" />
-            Back
-          </button>
-
-          <DuesSection />
-        </div>
-      </div>
-    );
-  }
 
   // Main menu
   return (
@@ -236,21 +218,6 @@ const Profile: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          {/* Sabeel */}
-          <button
-            onClick={() => setActiveSection('sabeel')}
-            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
-          >
-            <div className="flex items-center gap-3">
-              <Community className="h-5 w-5 text-primary" />
-              <div className="text-left">
-                <span className="text-base font-medium">Sabeel</span>
-                <p className="text-sm text-muted-foreground">Manage dues and obligations</p>
-              </div>
-            </div>
-            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
-          </button>
-
           {/* Account Information */}
           <button
             onClick={() => setActiveSection('account')}
