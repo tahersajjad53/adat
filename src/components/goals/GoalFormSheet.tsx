@@ -124,7 +124,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
           placeholder="e.g., Quran tilawat"
           disabled={isLoading}
           required
-          autoFocus
+          
         />
       </div>
 
