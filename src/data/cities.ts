@@ -73,6 +73,7 @@ export const CITIES: City[] = [
   { id: 'melbourne', name: 'Melbourne', country: 'Australia', countryCode: 'AU', latitude: -37.8136, longitude: 144.9631, timezone: 'Australia/Melbourne' },
   { id: 'auckland', name: 'Auckland', country: 'New Zealand', countryCode: 'NZ', latitude: -36.8485, longitude: 174.7633, timezone: 'Pacific/Auckland' },
   { id: 'wellington', name: 'Wellington', country: 'New Zealand', countryCode: 'NZ', latitude: -41.2865, longitude: 174.7762, timezone: 'Pacific/Auckland' },
+  { id: 'christchurch', name: 'Christchurch', country: 'New Zealand', countryCode: 'NZ', latitude: -43.5321, longitude: 172.6362, timezone: 'Pacific/Auckland' },
 ];
 
 // Country flag emojis
