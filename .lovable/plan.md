@@ -1,21 +1,15 @@
 
 
-# Add New Zealand to City List
+# Fix Keyboard Auto-Opening on Mobile Goal Form
 
-## Overview
-Add New Zealand cities to the location selector used during onboarding sign-up.
+## Problem
+When tapping the (+) button on the mobile bottom nav, the Goal form sheet opens with `autoFocus` on the title input, which immediately triggers the on-screen keyboard. This causes the form to visually jump/shift as the viewport resizes.
 
-## Changes
-
-### Edit: `src/data/cities.ts`
-
-1. Add New Zealand cities to the `CITIES` array (under Asia Pacific section):
-   - Auckland (latitude: -36.8485, longitude: 174.7633, timezone: Asia/Auckland)
-   - Wellington (latitude: -41.2865, longitude: 174.7762, timezone: Pacific/Auckland)
-
-2. Add the New Zealand flag emoji to `COUNTRY_FLAGS`:
-   - `NZ: '🇳🇿'`
+## Solution
+Remove the `autoFocus` prop from the title input in `GoalFormSheet.tsx`. The keyboard will only open when the user explicitly taps on an input field.
 
 ## Files
-- **Edit**: `src/data/cities.ts` -- add NZ cities and flag
+- **Edit**: `src/components/goals/GoalFormSheet.tsx` -- remove `autoFocus` from the title Input (line ~104)
+
+This is a one-line change.
 
