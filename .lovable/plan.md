@@ -1,12 +1,17 @@
 
 
-## Fix: Restore Auth.tsx right panel text
+## Make Auth Page the Index Page
 
-The heading and subtitle changes from the approved plan were lost — the file still has the old "Welcome Back" and "Enter your credentials..." text. This is a simple re-application of two text changes:
+Update the routing so that visiting `/` shows the Auth page directly instead of redirecting to `/auth`.
 
-1. **Heading** (line 63): Change "Welcome Back" to "السَّلَامُ عَلَيْكُمْ"
-2. **Subtitle** (lines 64-66): Change "Enter your credentials to access your account" to "Track prayers, manage dues, and cultivate daily habits"
+### Changes
+
+**File: `src/App.tsx`**
+- Change the `/` route from `<Navigate to="/auth" replace />` to render `<Auth />` directly
+- Keep the `/auth` route as well (so existing links still work), or redirect `/auth` to `/`
+
+This ensures users landing on `ibadat.app` see the login page immediately without a redirect.
 
 ### File Modified
-- `src/pages/Auth.tsx` -- lines 63-66 only
+- `src/App.tsx` -- update the `/` route to render Auth directly, redirect `/auth` to `/`
 
