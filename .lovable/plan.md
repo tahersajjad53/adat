@@ -1,16 +1,15 @@
 
 
-# Fix iOS Keyboard Auto-Opening on Goal Form Sheet
+# Add Bottom Padding to Mobile Navigation Bar
 
 ## Problem
-Removing `autoFocus` from the input wasn't enough. The Radix Dialog primitive (which powers the Sheet component) automatically focuses the first focusable element when it opens. On iOS, this triggers the keyboard.
+The mobile bottom navigation bar sits too close to the native OS swipe-up-to-home gesture area, making it feel cramped and easy to accidentally trigger the OS gesture.
 
 ## Solution
-Add `onOpenAutoFocus={(e) => e.preventDefault()}` to the `SheetContent` component in the mobile branch of `GoalFormSheet.tsx`. This tells Radix not to auto-focus any element when the sheet opens.
+Add a small fixed bottom padding (e.g. `pb-2`) inside the nav bar container, in addition to the existing `pb-safe` (which handles the safe area inset on notched devices). This provides extra breathing room even on devices where `safe-area-inset-bottom` is zero or minimal.
 
 ## Files
-- **Edit**: `src/components/goals/GoalFormSheet.tsx` -- add `onOpenAutoFocus` handler to `SheetContent` (around line 163)
+- **Edit**: `src/components/layout/MobileBottomNav.tsx` -- add `pb-2` to the inner nav `div` (the one with `h-16`)
 
-## Technical Detail
-The `SheetContent` wraps Radix `Dialog.Content`, which supports an `onOpenAutoFocus` event. Calling `preventDefault()` on it stops the default focus behavior entirely, so the keyboard only appears when the user explicitly taps an input.
+This is a one-line CSS class addition.
 
