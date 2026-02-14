@@ -1,15 +1,23 @@
 
 
-# Add Bottom Padding to Mobile Navigation Bar
+# Add Christchurch to City List
 
 ## Problem
-The mobile bottom navigation bar sits too close to the native OS swipe-up-to-home gesture area, making it feel cramped and easy to accidentally trigger the OS gesture.
+Christchurch, New Zealand is not available as a city option. Users selecting Auckland or Wellington get prayer times calculated for those cities' coordinates, which don't match Christchurch due to its different latitude and longitude.
 
 ## Solution
-Add a small fixed bottom padding (e.g. `pb-2`) inside the nav bar container, in addition to the existing `pb-safe` (which handles the safe area inset on notched devices). This provides extra breathing room even on devices where `safe-area-inset-bottom` is zero or minimal.
+Add a Christchurch entry to the cities list in `src/data/cities.ts`.
 
-## Files
-- **Edit**: `src/components/layout/MobileBottomNav.tsx` -- add `pb-2` to the inner nav `div` (the one with `h-16`)
+## Details
 
-This is a one-line CSS class addition.
+**File**: `src/data/cities.ts`
 
+Add after the Wellington entry (line 75):
+
+```
+{ id: 'christchurch', name: 'Christchurch', country: 'New Zealand', countryCode: 'NZ', latitude: -43.5321, longitude: 172.6362, timezone: 'Pacific/Auckland' }
+```
+
+**Why times differ**: Christchurch is ~2.5 degrees further south and ~2 degrees different in longitude compared to Wellington. At southern latitudes, even small coordinate differences cause noticeable shifts in prayer times (especially Fajr and Isha). Each city needs its own coordinates for accurate calculations via the Aladhan API.
+
+No other files need changes -- the location selector already dynamically reads from the `CITIES` array, and the `NZ` country flag is already configured.
