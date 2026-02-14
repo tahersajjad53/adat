@@ -227,7 +227,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[90vh] overflow-y-auto">
+        <SheetContent side="bottom" className="h-[90vh] overflow-y-auto" onOpenAutoFocus={(e) => e.preventDefault()}>
           <SheetHeader className="text-left">
             <SheetTitle>{formTitle}</SheetTitle>
             <SheetDescription>{formDescription}</SheetDescription>
