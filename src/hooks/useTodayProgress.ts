@@ -3,6 +3,7 @@ import { useGoals } from './useGoals';
 import { useGoalCompletions } from './useGoalCompletions';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { getGoalsDueOnDate } from '@/lib/recurrence';
+import type { Goal } from '@/types/goals';
 import type { PrayerStatus } from './usePrayerLog';
 
 export interface TodayProgressData {
@@ -15,7 +16,7 @@ export interface TodayProgressData {
   goalsCompleted: number;
   goalsTotal: number;
   goalsPercentage: number;
-  goalsDueToday: ReturnType<typeof getGoalsDueOnDate>;
+  goalsDueToday: Goal[];
 
   // Combined
   overallCompleted: number;
@@ -44,7 +45,7 @@ export function useTodayProgress(prayers: PrayerStatus[], prayersLoading: boolea
       : 0;
 
     // Goals progress
-    let goalsDueToday: ReturnType<typeof getGoalsDueOnDate> = [];
+    let goalsDueToday: Goal[] = [];
     let goalsCompleted = 0;
 
     if (hijriDate && gregorianDate) {

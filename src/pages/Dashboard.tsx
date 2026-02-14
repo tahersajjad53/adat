@@ -16,64 +16,52 @@ import { useGoalCompletions } from '@/hooks/useGoalCompletions';
 import { DueRemindersCard } from '@/components/dues/DueRemindersCard';
 import TodaysGoals from '@/components/goals/TodaysGoals';
 import { useOverdueGoals } from '@/hooks/useOverdueGoals';
-const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{
-  className?: string;
-}>> = {
+import { useDynamicGoals } from '@/hooks/useDynamicGoals';
+import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
+
+const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
   fajr: SunLight,
   dhuhr: SunLight,
   asr: SunLight,
   maghrib: HalfMoon,
   isha: HalfMoon,
-  nisfulLayl: HalfMoon
+  nisfulLayl: HalfMoon,
 };
+
 const Dashboard: React.FC = () => {
-  const {
-    user
-  } = useAuth();
-  const {
-    location,
-    requestLocationPermission
-  } = useCalendar();
+  const { user } = useAuth();
+  const { location, requestLocationPermission } = useCalendar();
   const navigate = useNavigate();
   const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
-  const {
-    prayers,
-    togglePrayer,
-    currentPrayer,
-    nextPrayer,
-    isLoading: prayersLoading
-  } = usePrayerLog();
-  const {
-    prayerTimes
-  } = usePrayerTimes();
-  const {
-    isCompleted,
-    toggleCompletion,
-    isToggling
-  } = useGoalCompletions();
-  const {
-    overdueGoals,
-    completeOverdue,
-    isCompletingOverdue
-  } = useOverdueGoals();
+  const { prayers, togglePrayer, currentPrayer, nextPrayer, isLoading: prayersLoading } = usePrayerLog();
+  const { prayerTimes } = usePrayerTimes();
+  const { isCompleted, toggleCompletion, isToggling } = useGoalCompletions();
+  const { overdueGoals, completeOverdue, isCompletingOverdue } = useOverdueGoals();
   const overdueGoalIds = useMemo(() => new Set(overdueGoals.map((o) => o.goal.id)), [overdueGoals]);
+
+  // Dynamic goals
+  const { dynamicGoals } = useDynamicGoals();
   const {
-    prayerCompleted,
-    prayerTotal,
-    goalsCompleted,
-    goalsTotal,
-    goalsDueToday,
-    overallPercentage
+    isCompleted: isDynamicCompleted,
+    toggleCompletion: toggleDynamic,
+    isToggling: isDynamicToggling,
+  } = useAdminGoalCompletions();
+
+  const {
+    prayerCompleted, prayerTotal, goalsCompleted, goalsTotal, goalsDueToday, overallPercentage,
   } = useTodayProgress(prayers, prayersLoading, overdueGoalIds);
+
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayerName = currentPrayerWindow?.current || null;
+
   useEffect(() => {
     const fetchProfile = async () => {
       if (user) {
-        const {
-          data,
-          error
-        } = await supabase.from('profiles').select('full_name, latitude').eq('id', user.id).maybeSingle();
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('full_name, latitude')
+          .eq('id', user.id)
+          .maybeSingle();
         if (error) {
           console.error('Error fetching profile:', error);
           setNeedsOnboarding(true);
@@ -88,28 +76,31 @@ const Dashboard: React.FC = () => {
     };
     fetchProfile();
   }, [user]);
+
   useEffect(() => {
     if (needsOnboarding === true) {
-      navigate('/auth/onboarding', {
-        replace: true
-      });
+      navigate('/auth/onboarding', { replace: true });
     }
   }, [needsOnboarding, navigate]);
+
   const prayerToShow = currentPrayer || nextPrayer;
   const PrayerIcon = prayerToShow ? PRAYER_ICONS[prayerToShow.name] : SunLight;
 
-  // Build breakdown label
   const breakdownParts: string[] = [`Prayers: ${prayerCompleted}/${prayerTotal}`];
   if (goalsTotal > 0) {
     breakdownParts.push(`Goals: ${goalsCompleted}/${goalsTotal}`);
   }
-  const breakdownLabel = breakdownParts.join(' · ');
+
   if (needsOnboarding === null) {
-    return <div className="flex min-h-[50vh] items-center justify-center">
+    return (
+      <div className="flex min-h-[50vh] items-center justify-center">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
-      </div>;
+      </div>
+    );
   }
-  return <div className="container py-8">
+
+  return (
+    <div className="container py-8">
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Unified Time-Aware Card */}
         <TimeOfDayCard currentPrayer={currentPrayerName}>
@@ -118,21 +109,33 @@ const Dashboard: React.FC = () => {
             <DailyMeter percentage={overallPercentage} compact variant="light" />
           </div>
 
-          {!location?.city && <Button variant="outline" size="sm" onClick={requestLocationPermission} className="mt-3 gap-2 border-white/30 text-white hover:bg-white/10 hover:text-white">
+          {!location?.city && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={requestLocationPermission}
+              className="mt-3 gap-2 border-white/30 text-white hover:bg-white/10 hover:text-white"
+            >
               <MapPin className="h-4 w-4" />
               Set your location
-            </Button>}
+            </Button>
+          )}
 
           {/* Striped progress bar */}
           <div className="mt-3 mb-4 h-2 w-full rounded-full bg-white/20 overflow-hidden">
-            <div className="h-full rounded-full transition-all" style={{
-            width: `${overallPercentage}%`,
-            backgroundColor: 'hsl(75, 70%, 55%)',
-            backgroundImage: 'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(255,255,255,0.2) 3px, rgba(255,255,255,0.2) 6px)'
-          }} />
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${overallPercentage}%`,
+                backgroundColor: 'hsl(75, 70%, 55%)',
+                backgroundImage:
+                  'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(255,255,255,0.2) 3px, rgba(255,255,255,0.2) 6px)',
+              }}
+            />
           </div>
 
-          {prayerToShow ? <div className="flex items-center justify-between">
+          {prayerToShow ? (
+            <div className="flex items-center justify-between">
               <div>
                 <span className="text-xs uppercase tracking-widest text-white/70 font-normal">
                   {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
@@ -151,21 +154,46 @@ const Dashboard: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                {prayerToShow.isCompleted && <div className="flex items-center gap-1 text-white/80 text-sm">
+                {prayerToShow.isCompleted && (
+                  <div className="flex items-center gap-1 text-white/80 text-sm">
                     <Check className="h-4 w-4" />
                     <span>Done</span>
-                  </div>}
-                <Checkbox checked={prayerToShow.isCompleted} onCheckedChange={() => togglePrayer(prayerToShow.name)} className="h-6 w-6 border-white/50 data-[state=checked]:bg-white/30 data-[state=checked]:text-white" />
+                  </div>
+                )}
+                <Checkbox
+                  checked={prayerToShow.isCompleted}
+                  onCheckedChange={() => togglePrayer(prayerToShow.name)}
+                  className="h-6 w-6 border-white/50 data-[state=checked]:bg-white/30 data-[state=checked]:text-white"
+                />
               </div>
-            </div> : <p className="text-white/80 text-sm font-medium">Reflect, rest, renew.</p>}
+            </div>
+          ) : (
+            <p className="text-white/80 text-sm font-medium">Reflect, rest, renew.</p>
+          )}
         </TimeOfDayCard>
 
-        {/* Dues Reminders - only shows when there are active reminders */}
+        {/* Dues Reminders */}
         <DueRemindersCard />
 
         {/* Today's Goals */}
-        <TodaysGoals goalsDueToday={goalsDueToday} goalsCompleted={goalsCompleted} goalsTotal={goalsTotal} isCompleted={isCompleted} onToggle={toggleCompletion} isToggling={isToggling} overdueGoals={overdueGoals} onCompleteOverdue={completeOverdue} isCompletingOverdue={isCompletingOverdue} />
+        <TodaysGoals
+          goalsDueToday={goalsDueToday}
+          goalsCompleted={goalsCompleted}
+          goalsTotal={goalsTotal}
+          isCompleted={isCompleted}
+          onToggle={toggleCompletion}
+          isToggling={isToggling}
+          overdueGoals={overdueGoals}
+          onCompleteOverdue={completeOverdue}
+          isCompletingOverdue={isCompletingOverdue}
+          dynamicGoals={dynamicGoals}
+          isDynamicCompleted={isDynamicCompleted}
+          onDynamicToggle={toggleDynamic}
+          isDynamicToggling={isDynamicToggling}
+        />
       </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Dashboard;

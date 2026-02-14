@@ -14,6 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_goal_completions: {
+        Row: {
+          admin_goal_id: string
+          completed_at: string
+          completion_date: string
+          gregorian_date: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          admin_goal_id: string
+          completed_at?: string
+          completion_date: string
+          gregorian_date: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          admin_goal_id?: string
+          completed_at?: string
+          completion_date?: string
+          gregorian_date?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "admin_goal_completions_admin_goal_id_fkey"
+            columns: ["admin_goal_id"]
+            isOneToOne: false
+            referencedRelation: "admin_goals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      admin_goals: {
+        Row: {
+          created_at: string
+          description: string | null
+          due_date: string | null
+          end_date: string | null
+          id: string
+          is_published: boolean
+          recurrence_days: number[] | null
+          recurrence_pattern: Json | null
+          recurrence_type: string
+          sort_order: number
+          start_date: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          end_date?: string | null
+          id?: string
+          is_published?: boolean
+          recurrence_days?: number[] | null
+          recurrence_pattern?: Json | null
+          recurrence_type?: string
+          sort_order?: number
+          start_date?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          end_date?: string | null
+          id?: string
+          is_published?: boolean
+          recurrence_days?: number[] | null
+          recurrence_pattern?: Json | null
+          recurrence_type?: string
+          sort_order?: number
+          start_date?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       due_payments: {
         Row: {
           amount_due: number
@@ -380,6 +463,45 @@ export type Database = {
         }
         Relationships: []
       }
+      user_preferences: {
+        Row: {
+          dynamic_goals_enabled: boolean
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          dynamic_goals_enabled?: boolean
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          dynamic_goals_enabled?: boolean
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       zakats: {
         Row: {
           assets_value: number | null
@@ -444,13 +566,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       owns_sabeel: {
         Args: { _sabeel_id: string; _user_id: string }
         Returns: boolean
       }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -577,6 +706,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "user"],
+    },
   },
 } as const
