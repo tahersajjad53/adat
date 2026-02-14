@@ -55,6 +55,7 @@ export interface GoalInput {
 export interface GoalWithStatus extends Goal {
   isCompleted: boolean;
   completionId?: string;
+  isDynamic?: boolean;
 }
 
 // Overdue goal metadata for missed goals carried forward

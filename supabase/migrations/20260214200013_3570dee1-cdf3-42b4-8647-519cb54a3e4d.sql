@@ -1,0 +1,1 @@
+ALTER TABLE public.user_preferences ADD COLUMN goal_sort_order jsonb DEFAULT '[]'::jsonb;

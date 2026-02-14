@@ -1,8 +1,6 @@
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useCallback } from 'react';
 import { Archery, Plus, MoreHoriz } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
@@ -14,11 +12,11 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useDynamicGoals } from '@/hooks/useDynamicGoals';
 import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import { getRecurrenceDescription } from '@/lib/recurrence';
-import { useConfetti } from '@/components/ui/confetti';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import GoalList from '@/components/goals/GoalList';
 import type { Goal, GoalInput, GoalWithStatus } from '@/types/goals';
+
+const DYNAMIC_PREFIX = 'dynamic:';
 
 const Goals: React.FC = () => {
   const {
@@ -33,41 +31,81 @@ const Goals: React.FC = () => {
   // Dynamic goals
   const { dynamicGoals, isEnabled: dynamicEnabled } = useDynamicGoals();
   const { isCompleted: isDynamicCompleted, toggleCompletion: toggleDynamic, isToggling: isDynamicToggling } = useAdminGoalCompletions();
-  const { dynamicGoalsEnabled, setDynamicGoalsEnabled } = useUserPreferences();
-  const { triggerConfetti, ConfettiPortal } = useConfetti();
-  const dynamicCheckboxRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const { dynamicGoalsEnabled, goalSortOrder, setDynamicGoalsEnabled, setGoalSortOrder } = useUserPreferences();
 
-  const goalsWithStatus: GoalWithStatus[] = useMemo(
-    () => goals.map((g) => ({ ...g, isCompleted: isCompleted(g.id) })),
+  // Build user goals with status
+  const userGoalsWithStatus: GoalWithStatus[] = useMemo(
+    () => goals.filter(g => g.is_active).map((g) => ({ ...g, isCompleted: isCompleted(g.id) })),
     [goals, isCompleted]
   );
 
+  // Build dynamic goals as GoalWithStatus
+  const dynamicGoalsWithStatus: GoalWithStatus[] = useMemo(
+    () => dynamicGoals.map((g) => ({
+      ...g,
+      user_id: '',
+      recurrence_type: g.recurrence_type as GoalWithStatus['recurrence_type'],
+      recurrence_days: g.recurrence_days ?? null,
+      recurrence_pattern: g.recurrence_pattern as any,
+      is_active: true,
+      id: `${DYNAMIC_PREFIX}${g.id}`,
+      isCompleted: isDynamicCompleted(g.id),
+      isDynamic: true,
+    })),
+    [dynamicGoals, isDynamicCompleted]
+  );
+
+  // Merge and sort using persisted order
+  const mergedGoals: GoalWithStatus[] = useMemo(() => {
+    const allGoals = [...userGoalsWithStatus, ...dynamicGoalsWithStatus];
+    if (goalSortOrder.length === 0) return allGoals;
+
+    const orderMap = new Map(goalSortOrder.map((id, i) => [id, i]));
+    const sorted: GoalWithStatus[] = [];
+    const unsorted: GoalWithStatus[] = [];
+
+    for (const g of allGoals) {
+      if (orderMap.has(g.id)) sorted.push(g);
+      else unsorted.push(g);
+    }
+
+    sorted.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
+    return [...sorted, ...unsorted];
+  }, [userGoalsWithStatus, dynamicGoalsWithStatus, goalSortOrder]);
+
   const handleAdd = () => { setEditingGoal(null); setFormOpen(true); };
-  const handleEdit = (goal: GoalWithStatus) => { setEditingGoal(goal); setFormOpen(true); };
+  const handleEdit = (goal: GoalWithStatus) => { if (!goal.isDynamic) { setEditingGoal(goal); setFormOpen(true); } };
   const handleSubmit = async (data: GoalInput) => {
     if (editingGoal) { await updateGoal(editingGoal.id, data); } else { await createGoal(data); }
   };
   const handleDelete = async (id: string) => { await deleteGoal(id); };
-  const handleToggle = (goalId: string) => {
-    const isOverdue = overdueGoals.some((o) => o.goal.id === goalId);
-    if (isOverdue) { completeOverdue(goalId); } else { toggleCompletion(goalId); }
-  };
-  const handleReorder = (orderedIds: string[]) => { reorderGoals(orderedIds); };
 
-  const handleDynamicToggle = (goalId: string) => {
-    if (!isDynamicCompleted(goalId)) {
-      triggerConfetti(dynamicCheckboxRefs.current.get(goalId));
+  const handleToggle = useCallback((goalId: string) => {
+    if (goalId.startsWith(DYNAMIC_PREFIX)) {
+      const realId = goalId.slice(DYNAMIC_PREFIX.length);
+      toggleDynamic(realId);
+    } else {
+      const isOverdue = overdueGoals.some((o) => o.goal.id === goalId);
+      if (isOverdue) { completeOverdue(goalId); } else { toggleCompletion(goalId); }
     }
-    toggleDynamic(goalId);
-  };
+  }, [overdueGoals, completeOverdue, toggleCompletion, toggleDynamic]);
+
+  const handleReorder = useCallback((orderedIds: string[]) => {
+    // Persist full combined order
+    setGoalSortOrder(orderedIds);
+
+    // Update sort_order for user goals only
+    const userIds = orderedIds.filter(id => !id.startsWith(DYNAMIC_PREFIX));
+    if (userIds.length > 0) {
+      reorderGoals(userIds);
+    }
+  }, [setGoalSortOrder, reorderGoals]);
 
   const overdueLabels = useMemo(() => {
     const map = new Map<string, string>();
     for (const o of overdueGoals) { map.set(o.goal.id, o.overdueDateLabel); }
     return map;
   }, [overdueGoals]);
-
-  const activeGoals = goalsWithStatus.filter((g) => g.is_active);
 
   return (
     <div className="container py-8">
@@ -86,7 +124,6 @@ const Goals: React.FC = () => {
                 Add Goal
               </Button>
             )}
-            {/* 3-dot menu for Dynamic Goals toggle */}
             {!isMobile && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -112,7 +149,7 @@ const Goals: React.FC = () => {
           <div className="flex items-center justify-center py-12">
             <p className="text-sm text-muted-foreground">Loading goals...</p>
           </div>
-        ) : activeGoals.length === 0 && dynamicGoals.length === 0 ? (
+        ) : mergedGoals.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <Archery className="h-12 w-12 text-muted-foreground/50 mb-4" />
             <p className="text-muted-foreground">No goals yet</p>
@@ -121,60 +158,15 @@ const Goals: React.FC = () => {
             </p>
           </div>
         ) : (
-          <div className="space-y-2">
-            {activeGoals.length > 0 && (
-              <GoalList
-                goals={activeGoals}
-                onToggle={handleToggle}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onReorder={handleReorder}
-                isToggling={isToggling || isCompletingOverdue}
-                overdueLabels={overdueLabels}
-              />
-            )}
-
-            {/* Dynamic goals rendered inline after user goals */}
-            {dynamicGoals.map((goal) => {
-              const completed = isDynamicCompleted(goal.id);
-              const recurrenceLabel = getRecurrenceDescription(goal);
-              return (
-                <div
-                  key={`dynamic-${goal.id}`}
-                  className={`flex items-start gap-4 rounded-xl border border-border bg-card p-4 transition-colors ${
-                    completed ? 'opacity-75' : ''
-                  }`}
-                >
-                  <Checkbox
-                    ref={(el) => {
-                      if (el) dynamicCheckboxRefs.current.set(goal.id, el);
-                      else dynamicCheckboxRefs.current.delete(goal.id);
-                    }}
-                    checked={completed}
-                    onCheckedChange={() => handleDynamicToggle(goal.id)}
-                    disabled={isDynamicToggling}
-                    className="mt-0.5"
-                  />
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <span className={`text-base font-medium leading-tight ${completed ? 'line-through text-muted-foreground' : ''}`}>
-                        {goal.title}
-                      </span>
-                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
-                        {recurrenceLabel}
-                      </Badge>
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 text-primary border-primary/30">
-                        Dynamic
-                      </Badge>
-                    </div>
-                    {goal.description && (
-                      <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{goal.description}</p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <GoalList
+            goals={mergedGoals}
+            onToggle={handleToggle}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onReorder={handleReorder}
+            isToggling={isToggling || isCompletingOverdue || isDynamicToggling}
+            overdueLabels={overdueLabels}
+          />
         )}
       </div>
 
@@ -185,7 +177,6 @@ const Goals: React.FC = () => {
         onSubmit={handleSubmit}
         isLoading={isCreating || isUpdating}
       />
-      <ConfettiPortal />
     </div>
   );
 };

@@ -95,13 +95,13 @@ const GoalCard: React.FC<GoalCardProps> = ({
 
       {/* Content */}
       <div
-        className="flex-1 min-w-0 cursor-pointer"
-        onClick={() => onEdit(goal)}
-        role="button"
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter') onEdit(goal); }}
+        className={`flex-1 min-w-0 ${goal.isDynamic ? '' : 'cursor-pointer'}`}
+        onClick={() => { if (!goal.isDynamic) onEdit(goal); }}
+        role={goal.isDynamic ? undefined : 'button'}
+        tabIndex={goal.isDynamic ? undefined : 0}
+        onKeyDown={(e) => { if (!goal.isDynamic && e.key === 'Enter') onEdit(goal); }}
       >
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span
             className={`text-base font-medium leading-tight ${
               goal.isCompleted ? 'line-through text-muted-foreground' : ''
@@ -112,6 +112,11 @@ const GoalCard: React.FC<GoalCardProps> = ({
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
             {recurrenceLabel}
           </Badge>
+          {goal.isDynamic && (
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 text-primary border-primary/30">
+              Dynamic
+            </Badge>
+          )}
         </div>
         {goal.description && (
           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
@@ -125,31 +130,33 @@ const GoalCard: React.FC<GoalCardProps> = ({
         )}
       </div>
 
-      {/* Menu */}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
-          >
-            <MoreHoriz className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="bg-popover">
-          <DropdownMenuItem onClick={() => onEdit(goal)}>
-            <EditPencil className="h-4 w-4 mr-2" />
-            Edit
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => onDelete(goal.id)}
-            className="text-destructive focus:text-destructive"
-          >
-            <Trash className="h-4 w-4 mr-2" />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {/* Menu - hidden for dynamic goals */}
+      {!goal.isDynamic && (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
+            >
+              <MoreHoriz className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="bg-popover">
+            <DropdownMenuItem onClick={() => onEdit(goal)}>
+              <EditPencil className="h-4 w-4 mr-2" />
+              Edit
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDelete(goal.id)}
+              className="text-destructive focus:text-destructive"
+            >
+              <Trash className="h-4 w-4 mr-2" />
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
       <ConfettiPortal />
     </div>
   );

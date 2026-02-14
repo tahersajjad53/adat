@@ -469,18 +469,21 @@ export type Database = {
       user_preferences: {
         Row: {
           dynamic_goals_enabled: boolean
+          goal_sort_order: Json | null
           id: string
           updated_at: string
           user_id: string
         }
         Insert: {
           dynamic_goals_enabled?: boolean
+          goal_sort_order?: Json | null
           id?: string
           updated_at?: string
           user_id: string
         }
         Update: {
           dynamic_goals_enabled?: boolean
+          goal_sort_order?: Json | null
           id?: string
           updated_at?: string
           user_id?: string
