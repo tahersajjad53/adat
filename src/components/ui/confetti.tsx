@@ -18,8 +18,8 @@ const COLORS = [
   'hsl(var(--primary) / 0.7)',
   'hsl(var(--accent))',
   'hsl(var(--accent) / 0.7)',
-  'hsl(142 50% 55%)',   // green accent
-  'hsl(45 90% 60%)',    // gold
+  'hsl(var(--primary) / 0.5)',
+  'hsl(var(--accent) / 0.5)',
 ];
 
 const PARTICLE_COUNT = 24;
