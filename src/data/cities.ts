@@ -71,6 +71,8 @@ export const CITIES: City[] = [
   { id: 'hong-kong', name: 'Hong Kong', country: 'Hong Kong', countryCode: 'HK', latitude: 22.3193, longitude: 114.1694, timezone: 'Asia/Hong_Kong' },
   { id: 'sydney', name: 'Sydney', country: 'Australia', countryCode: 'AU', latitude: -33.8688, longitude: 151.2093, timezone: 'Australia/Sydney' },
   { id: 'melbourne', name: 'Melbourne', country: 'Australia', countryCode: 'AU', latitude: -37.8136, longitude: 144.9631, timezone: 'Australia/Melbourne' },
+  { id: 'auckland', name: 'Auckland', country: 'New Zealand', countryCode: 'NZ', latitude: -36.8485, longitude: 174.7633, timezone: 'Pacific/Auckland' },
+  { id: 'wellington', name: 'Wellington', country: 'New Zealand', countryCode: 'NZ', latitude: -41.2865, longitude: 174.7762, timezone: 'Pacific/Auckland' },
 ];
 
 // Country flag emojis
@@ -94,6 +96,7 @@ export const COUNTRY_FLAGS: Record<string, string> = {
   SG: '🇸🇬',
   HK: '🇭🇰',
   AU: '🇦🇺',
+  NZ: '🇳🇿',
 };
 
 // Group cities by country for display
