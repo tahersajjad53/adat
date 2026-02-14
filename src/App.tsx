@@ -15,6 +15,7 @@ import Onboarding from "./pages/Onboarding";
 import Profile from "./pages/Profile";
 import Namaz from "./pages/Namaz";
 import Goals from "./pages/Goals";
+import Elan from "./pages/Elan";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -77,6 +78,14 @@ const App = () => (
                     <AppLayout>
                       <Namaz />
                     </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/elan"
+                element={
+                  <ProtectedRoute>
+                    <Elan />
                   </ProtectedRoute>
                 }
               />

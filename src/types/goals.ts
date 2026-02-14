@@ -1,13 +1,14 @@
 // Goals feature type definitions
 
-export type RecurrenceType = 'daily' | 'weekly' | 'custom' | 'one-time';
+export type RecurrenceType = 'daily' | 'weekly' | 'custom' | 'one-time' | 'annual';
 
 export interface RecurrencePattern {
-  type: 'interval' | 'monthly';
+  type: 'interval' | 'monthly' | 'annual';
   interval?: number;           // Every N days/weeks
   intervalUnit?: 'days' | 'weeks';
   monthlyDay?: number;         // Day of month (1-30)
   calendarType?: 'hijri' | 'gregorian';
+  annualMonth?: number;        // Month number for annual recurrence (1-12)
 }
 
 export interface Goal {

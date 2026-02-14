@@ -1,18 +1,29 @@
 // Recurrence utilities for goal scheduling
-import type { Goal, RecurrencePattern } from '@/types/goals';
+import type { RecurrencePattern } from '@/types/goals';
 import type { HijriDate } from '@/lib/hijri';
 export type { HijriDate };
+
+/** Minimal shape needed for recurrence checking (works with Goal and AdminGoal) */
+export interface RecurrenceCheckable {
+  is_active?: boolean;
+  start_date: string;
+  end_date?: string | null;
+  recurrence_type: string;
+  recurrence_days?: number[] | null;
+  recurrence_pattern?: RecurrencePattern | null;
+  due_date?: string | null;
+}
 
 /**
  * Check if a goal is due on a specific date
  */
 export function isGoalDueOnDate(
-  goal: Goal,
+  goal: RecurrenceCheckable,
   hijriDate: HijriDate,
   gregorianDate: Date
 ): boolean {
-  // Inactive goals are never due
-  if (!goal.is_active) return false;
+  // Inactive goals are never due (default to active if not specified)
+  if (goal.is_active === false) return false;
 
   // Check if within start/end date range
   const startDate = new Date(goal.start_date);
@@ -36,6 +47,9 @@ export function isGoalDueOnDate(
     case 'one-time':
       return isOneTimeDue(goal, gregorianDate);
 
+    case 'annual':
+      return isAnnualDue(goal, hijriDate, gregorianDate);
+
     default:
       return false;
   }
@@ -44,12 +58,10 @@ export function isGoalDueOnDate(
 /**
  * Check if a weekly goal is due on the given day
  */
-function isWeeklyDue(goal: Goal, gregorianDate: Date): boolean {
+function isWeeklyDue(goal: RecurrenceCheckable, gregorianDate: Date): boolean {
   if (!goal.recurrence_days || goal.recurrence_days.length === 0) {
     return false;
   }
-  
-  // JavaScript: 0 = Sunday, 1 = Monday, ..., 6 = Saturday
   const dayOfWeek = gregorianDate.getDay();
   return goal.recurrence_days.includes(dayOfWeek);
 }
@@ -58,7 +70,7 @@ function isWeeklyDue(goal: Goal, gregorianDate: Date): boolean {
  * Check if a custom recurrence goal is due
  */
 function isCustomDue(
-  goal: Goal,
+  goal: RecurrenceCheckable,
   hijriDate: HijriDate,
   gregorianDate: Date
 ): boolean {
@@ -81,7 +93,7 @@ function isCustomDue(
  * Check if an interval-based goal is due (every N days/weeks)
  */
 function isIntervalDue(
-  goal: Goal,
+  goal: RecurrenceCheckable,
   gregorianDate: Date,
   pattern: RecurrencePattern
 ): boolean {
@@ -122,7 +134,7 @@ function isMonthlyDue(
 /**
  * Check if a one-time goal is due on the specific date
  */
-function isOneTimeDue(goal: Goal, gregorianDate: Date): boolean {
+function isOneTimeDue(goal: RecurrenceCheckable, gregorianDate: Date): boolean {
   if (!goal.due_date) return false;
 
   const dueDate = new Date(goal.due_date);
@@ -134,20 +146,46 @@ function isOneTimeDue(goal: Goal, gregorianDate: Date): boolean {
 }
 
 /**
- * Get all goals that are due on a specific date
+ * Check if an annual goal is due on the specific month+day
  */
-export function getGoalsDueOnDate(
-  goals: Goal[],
+function isAnnualDue(
+  goal: RecurrenceCheckable,
   hijriDate: HijriDate,
   gregorianDate: Date
-): Goal[] {
+): boolean {
+  const pattern = goal.recurrence_pattern as RecurrencePattern | null;
+  if (!pattern || pattern.type !== 'annual' || !pattern.annualMonth || !pattern.monthlyDay) {
+    return false;
+  }
+
+  const calendarType = pattern.calendarType || 'hijri';
+
+  if (calendarType === 'hijri') {
+    return hijriDate.month === pattern.annualMonth && hijriDate.day === pattern.monthlyDay;
+  } else {
+    // Gregorian: month is 1-indexed in pattern, getMonth() is 0-indexed
+    return (
+      gregorianDate.getMonth() + 1 === pattern.annualMonth &&
+      gregorianDate.getDate() === pattern.monthlyDay
+    );
+  }
+}
+
+/**
+ * Get all goals that are due on a specific date
+ */
+export function getGoalsDueOnDate<T extends RecurrenceCheckable>(
+  goals: T[],
+  hijriDate: HijriDate,
+  gregorianDate: Date
+): T[] {
   return goals.filter(goal => isGoalDueOnDate(goal, hijriDate, gregorianDate));
 }
 
 /**
  * Get a human-readable description of the recurrence pattern
  */
-export function getRecurrenceDescription(goal: Goal): string {
+export function getRecurrenceDescription(goal: RecurrenceCheckable): string {
   switch (goal.recurrence_type) {
     case 'daily':
       return 'Daily';
@@ -173,6 +211,18 @@ export function getRecurrenceDescription(goal: Goal): string {
       }
       return 'One-time';
 
+    case 'annual': {
+      const p = goal.recurrence_pattern as RecurrencePattern | null;
+      if (p && p.annualMonth && p.monthlyDay) {
+        const cal = p.calendarType || 'hijri';
+        const monthNames = cal === 'hijri'
+          ? ['', 'Muharram', 'Safar', 'Rabi I', 'Rabi II', 'Jumada I', 'Jumada II', 'Rajab', 'Shabaan', 'Ramadan', 'Shawwal', 'Dhul Qadah', 'Dhul Hijjah']
+          : ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        return `Annual (${p.monthlyDay} ${monthNames[p.annualMonth] || ''})`;
+      }
+      return 'Annual';
+    }
+
     default:
       return 'Unknown';
   }
@@ -185,7 +235,7 @@ function getCustomDescription(pattern: RecurrencePattern | null | undefined): st
     case 'interval':
       if (!pattern.interval || !pattern.intervalUnit) return 'Custom';
       const unit = pattern.interval === 1 
-        ? pattern.intervalUnit.slice(0, -1) // Remove 's' for singular
+        ? pattern.intervalUnit.slice(0, -1)
         : pattern.intervalUnit;
       return `Every ${pattern.interval} ${unit}`;
 
@@ -201,7 +251,6 @@ function getCustomDescription(pattern: RecurrencePattern | null | undefined): st
 
 /**
  * Get a human-readable label for an overdue date relative to today.
- * Returns "Yesterday" for 1-day overdue, or "8 Feb" style for older.
  */
 export function getOverdueDateLabel(dueDate: Date, today: Date): string {
   const dueDay = new Date(dueDate.getFullYear(), dueDate.getMonth(), dueDate.getDate());
@@ -215,28 +264,26 @@ export function getOverdueDateLabel(dueDate: Date, today: Date): string {
 
 /**
  * Find overdue goals by looking back N days from today.
- * Returns only the most recent missed occurrence per goal.
  */
-export function findOverdueGoals(
-  goals: Goal[],
+export function findOverdueGoals<T extends RecurrenceCheckable & { id: string }>(
+  goals: T[],
   today: Date,
   todayHijri: HijriDate,
-  pastCompletionDates: Set<string>, // Set of "goalId:hijriDateStr" keys
+  pastCompletionDates: Set<string>,
   lookbackDays: number = 7,
   getHijriForDate: (date: Date) => HijriDate,
-): Array<{ goal: Goal; overdueDate: Date; overdueHijriDate: HijriDate }> {
-  const result: Array<{ goal: Goal; overdueDate: Date; overdueHijriDate: HijriDate }> = [];
+): Array<{ goal: T; overdueDate: Date; overdueHijriDate: HijriDate }> {
+  const result: Array<{ goal: T; overdueDate: Date; overdueHijriDate: HijriDate }> = [];
   const seenGoalIds = new Set<string>();
 
-  // Look back from yesterday (most recent first)
   for (let daysAgo = 1; daysAgo <= lookbackDays; daysAgo++) {
     const pastDate = new Date(today);
     pastDate.setDate(pastDate.getDate() - daysAgo);
     const pastHijri = getHijriForDate(pastDate);
 
     for (const goal of goals) {
-      if (!goal.is_active) continue;
-      if (seenGoalIds.has(goal.id)) continue; // Only most recent missed occurrence
+      if (goal.is_active === false) continue;
+      if (seenGoalIds.has(goal.id)) continue;
 
       if (isGoalDueOnDate(goal, pastHijri, pastDate)) {
         const hijriStr = `${pastHijri.year}-${String(pastHijri.month).padStart(2, '0')}-${String(pastHijri.day).padStart(2, '0')}`;
@@ -255,10 +302,9 @@ export function findOverdueGoals(
 
 /**
  * Find ALL missed dates for a single goal within the lookback window.
- * Used to batch-clear all overdue occurrences at once.
  */
 export function findAllMissedDatesForGoal(
-  goal: Goal,
+  goal: RecurrenceCheckable & { id: string },
   today: Date,
   completionKeys: Set<string>,
   lookbackDays: number,
