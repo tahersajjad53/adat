@@ -37,7 +37,9 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
         <div className="w-full max-w-md mx-auto">
           {children}
         </div>
-        <div className="lg:hidden mt-auto" />
+        <div className="lg:hidden mt-auto pb-6 text-center">
+          <span className="text-[10px] uppercase tracking-[0.25em] text-muted-foreground/70">Designed for Dawoodi Bohras</span>
+        </div>
       </div>
     </div>
   );
