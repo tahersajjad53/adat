@@ -13,8 +13,10 @@ import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/usePrayerTimes';
 import { useTodayProgress } from '@/hooks/useTodayProgress';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
+import { useGoals } from '@/hooks/useGoals';
 
 import TodaysGoals from '@/components/goals/TodaysGoals';
+import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import { useOverdueGoals } from '@/hooks/useOverdueGoals';
 import { useDynamicGoals } from '@/hooks/useDynamicGoals';
 import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
@@ -38,6 +40,8 @@ const Dashboard: React.FC = () => {
   const { isCompleted, toggleCompletion, isToggling } = useGoalCompletions();
   const { overdueGoals, completeOverdue, isCompletingOverdue } = useOverdueGoals();
   const overdueGoalIds = useMemo(() => new Set(overdueGoals.map((o) => o.goal.id)), [overdueGoals]);
+  const [goalFormOpen, setGoalFormOpen] = useState(false);
+  const { createGoal, isCreating } = useGoals();
 
   // Dynamic goals
   const { dynamicGoals } = useDynamicGoals();
@@ -187,6 +191,14 @@ const Dashboard: React.FC = () => {
           isDynamicCompleted={isDynamicCompleted}
           onDynamicToggle={toggleDynamic}
           isDynamicToggling={isDynamicToggling}
+          onCreateGoal={() => setGoalFormOpen(true)}
+        />
+
+        <GoalFormSheet
+          open={goalFormOpen}
+          onOpenChange={setGoalFormOpen}
+          onSubmit={async (data) => { await createGoal(data); }}
+          isLoading={isCreating}
         />
       </div>
     </div>
