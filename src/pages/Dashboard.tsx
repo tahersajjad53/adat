@@ -13,7 +13,7 @@ import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/usePrayerTimes';
 import { useTodayProgress } from '@/hooks/useTodayProgress';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
-import { DueRemindersCard } from '@/components/dues/DueRemindersCard';
+
 import TodaysGoals from '@/components/goals/TodaysGoals';
 import { useOverdueGoals } from '@/hooks/useOverdueGoals';
 import { useDynamicGoals } from '@/hooks/useDynamicGoals';
@@ -171,9 +171,6 @@ const Dashboard: React.FC = () => {
             <p className="text-white/80 text-sm font-medium">Reflect, rest, renew.</p>
           )}
         </TimeOfDayCard>
-
-        {/* Dues Reminders */}
-        <DueRemindersCard />
 
         {/* Today's Goals */}
         <TodaysGoals
