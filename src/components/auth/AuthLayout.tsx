@@ -18,12 +18,13 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
         <div className="relative z-10 flex flex-col justify-between p-12 text-primary-foreground">
-          <img src={ibadatLogo} alt="Ibadat" className="w-24 h-auto brightness-0 invert" />
+        <img src={ibadatLogo} alt="Ibadat" className="w-24 h-auto" />
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-3 font-display">Your Spiritual Life, Organized</h2>
-            <p className="text-lg opacity-90">
-              Track prayers, manage dues, and cultivate daily habits with intention.
+            <h2 className="text-3xl font-bold mb-3 font-display">Your Companion for Consistent Ibadat</h2>
+            <p className="text-lg opacity-90 mb-3" dir="rtl">
+              عبادت نی پابندی ماں آپنو ساتھی
             </p>
+            <span className="text-xs uppercase tracking-[0.2em] opacity-70">Designed for Dawoodi Bohras</span>
           </div>
         </div>
       </div>
@@ -31,7 +32,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
       {/* Right side - Form */}
       <div className="flex-1 flex flex-col justify-center px-6 py-12 lg:px-16 bg-background">
         <div className="lg:hidden mb-8">
-          <img src={ibadatLogo} alt="Ibadat" className="w-20 h-auto" />
+          <img src={ibadatLogo} alt="Ibadat" className="w-28 h-auto" />
         </div>
         <div className="w-full max-w-md mx-auto">
           {children}
