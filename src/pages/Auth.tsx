@@ -13,7 +13,7 @@ import { toast } from '@/hooks/use-toast';
 
 const loginSchema = z.object({
   email: z.string().trim().email({ message: 'Please enter a valid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+  password: z.string().min(6, { message: 'Password must be at least 6 characters' })
 });
 
 type LoginForm = z.infer<typeof loginSchema>;
@@ -26,8 +26,8 @@ const Auth: React.FC = () => {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: '',
-      password: '',
-    },
+      password: ''
+    }
   });
 
   const onSubmit = async (data: LoginForm) => {
@@ -39,7 +39,7 @@ const Auth: React.FC = () => {
       toast({
         title: 'Login failed',
         description: error.message,
-        variant: 'destructive',
+        variant: 'destructive'
       });
     }
   };
@@ -48,8 +48,8 @@ const Auth: React.FC = () => {
     return (
       <div className="flex min-h-screen items-center justify-center bg-background">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
-      </div>
-    );
+      </div>);
+
   }
 
   if (user) {
@@ -60,9 +60,9 @@ const Auth: React.FC = () => {
     <AuthLayout>
       <div className="space-y-6">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold tracking-tight font-display">السَّلَامُ عَلَيْكُمْ</h1>
+          <h1 className="text-3xl font-bold tracking-tight font-display text-primary">Welcome Back</h1>
           <p className="text-muted-foreground">
-            Track prayers, manage dues, and cultivate daily habits
+            Enter your credentials to access your account
           </p>
         </div>
 
@@ -71,45 +71,45 @@ const Auth: React.FC = () => {
             <FormField
               control={form.control}
               name="email"
-              render={({ field }) => (
-                <FormItem>
+              render={({ field }) =>
+              <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      type="email"
-                      placeholder="you@example.com"
-                      autoComplete="email"
-                      {...field}
-                    />
+                    type="email"
+                    placeholder="you@example.com"
+                    autoComplete="email"
+                    {...field} />
+
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
+              } />
+
 
             <FormField
               control={form.control}
               name="password"
-              render={({ field }) => (
-                <FormItem>
+              render={({ field }) =>
+              <FormItem>
                   <FormLabel>Password</FormLabel>
                   <FormControl>
                     <PasswordInput
-                      placeholder="••••••••"
-                      autoComplete="current-password"
-                      {...field}
-                    />
+                    placeholder="••••••••"
+                    autoComplete="current-password"
+                    {...field} />
+
                   </FormControl>
                   <FormMessage />
                 </FormItem>
-              )}
-            />
+              } />
+
 
             <Button
               type="submit"
               className="w-full"
-              disabled={isSubmitting}
-            >
+              disabled={isSubmitting}>
+
               {isSubmitting ? 'Signing in...' : 'Sign In'}
             </Button>
           </form>
@@ -122,8 +122,8 @@ const Auth: React.FC = () => {
           </Link>
         </p>
       </div>
-    </AuthLayout>
-  );
+    </AuthLayout>);
+
 };
 
 export default Auth;
