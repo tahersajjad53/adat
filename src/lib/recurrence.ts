@@ -228,6 +228,12 @@ export function getRecurrenceDescription(goal: RecurrenceCheckable): string {
   }
 }
 
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
+
 function getCustomDescription(pattern: RecurrencePattern | null | undefined): string {
   if (!pattern) return 'Custom';
 
@@ -242,7 +248,7 @@ function getCustomDescription(pattern: RecurrencePattern | null | undefined): st
     case 'monthly':
       if (!pattern.monthlyDay) return 'Monthly';
       const calType = pattern.calendarType === 'gregorian' ? 'Gregorian' : 'Hijri';
-      return `${pattern.monthlyDay}th of each month (${calType})`;
+      return `${ordinal(pattern.monthlyDay)} of each month (${calType})`;
 
     default:
       return 'Custom';
