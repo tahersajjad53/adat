@@ -47,31 +47,9 @@ const Onboarding: React.FC = () => {
     if (step !== 3 || !user) return;
 
     const run = async () => {
-      const today = new Date().toISOString().split('T')[0];
-      const selected = Array.from(selectedAspirations);
-
-      if (selected.length > 0) {
-        const goals = selected.map((id, i) => {
-          const opt = ASPIRATION_OPTIONS.find(o => o.id === id)!;
-          return {
-            user_id: user.id,
-            title: opt.goalTitle,
-            recurrence_type: opt.recurrence,
-            recurrence_pattern: opt.recurrence === 'custom'
-              ? { type: 'monthly', monthlyDay: 1, calendarType: 'hijri' }
-              : null,
-            start_date: today,
-            sort_order: i,
-            is_active: true,
-          };
-        });
-
-        await supabase.from('goals').insert(goals as any);
-      }
-
-      // Brief pause so the user sees the loading screen
+      await insertSelectedGoals();
       await new Promise(r => setTimeout(r, 2000));
-      navigate(selected.length > 0 ? '/goals' : '/today');
+      navigate(selectedAspirations.size > 0 ? '/goals' : '/today');
     };
 
     run();
@@ -127,6 +105,34 @@ const Onboarding: React.FC = () => {
       if (next.has(id)) next.delete(id); else next.add(id);
       return next;
     });
+  };
+
+  const insertSelectedGoals = async () => {
+    if (!user) return;
+    const today = new Date().toISOString().split('T')[0];
+    const selected = Array.from(selectedAspirations);
+    if (selected.length > 0) {
+      const goals = selected.map((id, i) => {
+        const opt = ASPIRATION_OPTIONS.find(o => o.id === id)!;
+        return {
+          user_id: user.id,
+          title: opt.goalTitle,
+          recurrence_type: opt.recurrence,
+          recurrence_pattern: opt.recurrence === 'custom'
+            ? { type: 'monthly', monthlyDay: 1, calendarType: 'hijri' }
+            : null,
+          start_date: today,
+          sort_order: i,
+          is_active: true,
+        };
+      });
+      await supabase.from('goals').insert(goals as any);
+    }
+  };
+
+  const handleCreateOwn = async () => {
+    await insertSelectedGoals();
+    navigate('/goals?new=1');
   };
 
   const displayName = fullName || user?.email?.split('@')[0] || 'there';
@@ -215,8 +221,16 @@ const Onboarding: React.FC = () => {
             <p className="text-sm text-muted-foreground">
               📍 Using GPS coordinates: {customCoords.latitude.toFixed(4)}, {customCoords.longitude.toFixed(4)}
             </p>
-          )}
-        </div>
+              )}
+            </div>
+
+            <button
+              onClick={handleCreateOwn}
+              className="rounded-full px-5 py-2.5 border border-dashed text-sm font-medium transition-all flex items-center gap-2 border-border text-muted-foreground hover:border-primary/50 hover:text-foreground"
+            >
+              <Plus className="h-3.5 w-3.5" />
+              Create your own
+            </button>
 
         <div className="space-y-3 pt-2">
           <Button onClick={handleContinueLocation} className="w-full" disabled={saving || (!selectedCity && !customCoords)}>
