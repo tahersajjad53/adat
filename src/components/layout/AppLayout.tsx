@@ -71,7 +71,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <MoreHoriz className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover p-4 min-w-[280px]">
+                <DropdownMenuContent align="end" className="bg-popover p-4 min-w-[260px] max-w-[calc(100vw-2rem)]">
                   <div className="space-y-3">
                     <div>
                       <p className="text-sm font-medium">Receive Dynamic Goals</p>
