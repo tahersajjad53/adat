@@ -1,25 +1,35 @@
 
-# Add Annual Recurrence Option to Goal Creation
-
-## Overview
-The annual recurrence type is already fully supported in the backend logic (recurrence checking, descriptions, types) but is missing from the user-facing goal creation form. The admin goal form already has this UI, so we just need to add it to the `RecurrenceSelector` component.
+# Khalaf Accent Color + Status Bar Theme Adaptation
 
 ## Changes
 
-### File: `src/components/goals/RecurrenceSelector.tsx`
-- Add "Annual" as a new `SelectItem` in the "Repeats" dropdown (after "One-time")
-- Add a new UI section (visible when `recurrenceType === 'annual'`) with:
-  - A calendar type selector (Hijri / Gregorian) -- defaulting to Hijri
-  - A month selector dropdown (12 Hijri month names or 12 Gregorian month names, depending on calendar choice)
-  - A day input (number, 1-30)
-- Wire up handlers to call `onRecurrencePatternChange` with `{ type: 'annual', annualMonth, monthlyDay, calendarType }`
-- Add Hijri month names array: Muharram, Safar, Rabi I, Rabi II, Jumada I, Jumada II, Rajab, Shabaan, Ramadan, Shawwal, Dhul Qadah, Dhul Hijjah
-- Gregorian month names: Jan through Dec
+### 1. Khalaf accent color -- switch to steely slate/grey
+**File: `src/index.css`** (`.theme-khalaf` block)
+- Change `--accent: 16 80% 48%` to a cool slate: `--accent: 215 20% 50%` (a steely blue-grey)
+- Change `--accent-foreground: 0 0% 100%` stays white for contrast
+- This gives Khalaf a sophisticated, neutral feel instead of the warm orange accent
+
+**File: `src/components/profile/ThemeSelector.tsx`**
+- Update the Khalaf swatch preview `accent` color from `hsl(16 80% 48%)` to `hsl(215 20% 50%)` so the theme picker accurately reflects the new look
+
+### 2. Status bar (battery/wifi toolbar) adapts to active theme
+The status bar color on mobile is controlled by the `<meta name="theme-color">` tag in `index.html`. Currently it's hardcoded to `#1a1a2e` which doesn't match any theme.
+
+**File: `src/contexts/ThemeContext.tsx`**
+- In `applyThemeClass()`, also update the `<meta name="theme-color">` tag dynamically:
+  - Oudh: `#ece4d4` (warm beige -- `hsl(40 30% 94%)` converted)
+  - Khalaf: `#ffffff` (white -- `hsl(0 0% 100%)`)
+  - Bhukur: `#171717` (near-black -- `hsl(0 0% 9%)`)
+- This ensures the phone's status bar matches the active theme background
 
 ### Technical Details
-- The `RecurrencePattern` type already has `type: 'annual'`, `annualMonth`, `monthlyDay`, and `calendarType` fields
-- The `isAnnualDue()` function in `recurrence.ts` already handles the logic
-- The `getRecurrenceDescription()` function already formats annual goals
-- No database or backend changes needed -- just the UI selector
 
-This mirrors the existing annual UI in `src/components/elan/AdminGoalForm.tsx` but integrated into the shared `RecurrenceSelector` component.
+**`src/index.css`** -- line 73:
+- `--accent: 16 80% 48%` becomes `--accent: 215 20% 50%`
+
+**`src/contexts/ThemeContext.tsx`** -- in `applyThemeClass()`:
+- Add a mapping of theme to hex color
+- Query `document.querySelector('meta[name="theme-color"]')` and update its `content` attribute
+
+**`src/components/profile/ThemeSelector.tsx`** -- line 27:
+- Update `accent: 'hsl(16 80% 48%)'` to `accent: 'hsl(215 20% 50%)'`
