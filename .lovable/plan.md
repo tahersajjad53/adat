@@ -1,27 +1,28 @@
 
-# Remove Orange from Khalaf Theme -- Replace with Grey Hues
 
-## Overview
-Replace all remaining orange (`24 85% 50%` / `24 85% 55%`) references in the Khalaf theme with sophisticated grey tones, creating a fully monochromatic white-and-grey theme.
+# Fix PWA Status Bar to Match Theme
+
+## Problem
+The iOS status bar (battery, wifi, time) still shows a mismatched background because:
+1. The PWA manifest in `vite.config.ts` hardcodes `theme_color` and `background_color` to `#1a1a2e` (doesn't match any theme)
+2. The `index.html` also hardcodes `#1a1a2e` as the initial theme-color
+3. Missing the iOS-specific `apple-mobile-web-app-status-bar-style` meta tag, which controls how the status bar renders in standalone PWA mode
 
 ## Changes
 
-### File: `src/index.css` (`.theme-khalaf` block)
-Replace orange primary and ring with dark charcoal grey, and sidebar primary with a lighter grey:
+### File: `index.html`
+- Change the hardcoded `<meta name="theme-color" content="#1a1a2e">` to `#ece4d4` (Oudh, the default theme) so it matches on first load
+- Add `<meta name="apple-mobile-web-app-capable" content="yes">` to enable standalone mode
+- Add `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">` -- this makes the iOS status bar transparent and overlay the page background, so the page's own background color shows through seamlessly. On dark backgrounds (Bhukur), iOS automatically renders the system icons (time, battery, wifi) in white
 
-| Variable | Current (orange) | New (grey) |
-|---|---|---|
-| `--primary` | `24 85% 50%` | `0 0% 20%` (dark charcoal) |
-| `--primary-foreground` | `0 0% 100%` | `0 0% 100%` (stays white) |
-| `--ring` | `24 85% 50%` | `0 0% 20%` |
-| `--sidebar-primary` | `24 85% 55%` | `0 0% 75%` (light grey for contrast on dark sidebar) |
-| `--sidebar-primary-foreground` | `0 0% 100%` | `0 0% 5%` (near-black text on light grey) |
-| `--sidebar-ring` | `24 85% 55%` | `0 0% 75%` |
+### File: `vite.config.ts`
+- Update `theme_color` from `#1a1a2e` to `#ece4d4` (Oudh default)
+- Update `background_color` from `#1a1a2e` to `#ece4d4` (Oudh default)
+- These are baked into the PWA manifest at build time and used as the initial/splash screen color
 
-### File: `src/index.css` (logo filter, line 162)
-Update the `.theme-khalaf .logo-themed` CSS filter from the current warm/orange hue-rotate to a simple dark grey filter:
-- New filter: `brightness(0) saturate(0)` -- renders the logo as pure black, matching the grey-only palette
+### How it works together
+- On app launch, the PWA manifest and initial meta tag show the Oudh (default) background
+- Once the user's saved theme loads from Supabase, `applyThemeClass()` dynamically updates the `<meta name="theme-color">` to match (already implemented)
+- The `black-translucent` status bar style ensures the page background bleeds into the status bar area on iOS, creating the seamless look
+- On Bhukur (dark), iOS automatically switches system icons to white for visibility
 
-### File: `src/components/profile/ThemeSelector.tsx` (line 26)
-Update the Khalaf swatch preview:
-- `primary`: from `hsl(24 85% 50%)` to `hsl(0 0% 20%)`
