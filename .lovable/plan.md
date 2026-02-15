@@ -1,32 +1,23 @@
 
-
-# Add "Clear Qaza Namaz" with Persistent Backend Effect
+# Improve Dynamic Goals Toggle with Title and Subtitle
 
 ## What Changes
-A 3-dot menu on the Namaz page header with a "Clear Qaza Namaz" option. On confirmation, all unfulfilled missed prayers are marked as fulfilled (`qaza_completed_at` set) in the database. This is persistent -- refreshing will keep the list clear. New missed prayers from future days will still appear.
+Update the Dynamic Goals toggle dropdown in both the Goals page (desktop) and mobile header to include a title, concise subtitle, and a better layout with more breathing room.
 
-## How It Works
-The existing `fulfillPrayer` function already upserts `qaza_completed_at` into the `prayer_logs` table. Clearing all qaza is simply calling the same logic for every unfulfilled prayer in bulk.
+**Content:**
+- Title: "Receive Dynamic Goals"
+- Subtitle: "Community goals for all Mumineen, like 'Pray Moti Us Sawalat' on days requiring rozu."
+- Toggle below the text
 
-## Technical Details
+## Files to Edit
 
-### 1. `src/hooks/useMissedPrayers.ts`
-- Add a `clearAllQaza` async function that:
-  - Filters `missedPrayers` to only unfulfilled ones
-  - Bulk upserts all of them into `prayer_logs` with `qaza_completed_at` set to now (using Supabase's `.upsert()` with an array)
-  - Updates local state to mark all as fulfilled
-- Add `clearAllQaza` to the hook's return interface
+### 1. `src/pages/Goals.tsx` (lines 134-142, desktop dropdown)
+Replace the current single-row layout with a vertical stack:
+- `DropdownMenuContent`: increase `min-w` to `280px`, change `p-3` to `p-4`
+- Replace the horizontal flex div with a vertical layout:
+  - Title as `text-sm font-medium`
+  - Subtitle as `text-xs text-muted-foreground mt-1`
+  - Toggle row with label below, using `flex items-center justify-between mt-3`
 
-### 2. `src/pages/Namaz.tsx`
-- Import `MoreHoriz` from `iconoir-react`, `DropdownMenu` components, `AlertDialog` components, and `Button`
-- Add `clearConfirmOpen` boolean state
-- Destructure `clearAllQaza` from `useMissedPrayers()`
-- Add a 3-dot dropdown menu at the top-right of the page (matching Goals page pattern) with a single "Clear Qaza Namaz" item
-- The item opens an `AlertDialog`:
-  - Title: "Clear Qaza Namaz?"
-  - Description: "This will mark all missed prayers as completed. New missed prayers will continue to appear going forward."
-  - Cancel and Confirm buttons
-- On confirm, call `clearAllQaza()`
-
-No database schema changes or migrations needed -- the existing `prayer_logs` table and its `qaza_completed_at` column handle this already.
-
+### 2. `src/components/layout/AppLayout.tsx` (lines 66-73, mobile dropdown)
+Apply the same vertical layout changes as above to keep mobile and desktop consistent.
