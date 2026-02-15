@@ -33,6 +33,16 @@ const DAY_LABELS = [
   { value: '6', label: 'S' },
 ];
 
+const HIJRI_MONTHS = [
+  'Muharram', 'Safar', 'Rabi I', 'Rabi II', 'Jumada I', 'Jumada II',
+  'Rajab', 'Shabaan', 'Ramadan', 'Shawwal', 'Dhul Qadah', 'Dhul Hijjah',
+];
+
+const GREGORIAN_MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
 const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
   recurrenceType,
   recurrenceDays,
@@ -96,6 +106,35 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
     }
   };
 
+  const handleAnnualCalendarChange = (cal: 'hijri' | 'gregorian') => {
+    onRecurrencePatternChange({
+      type: 'annual',
+      annualMonth: recurrencePattern?.annualMonth || 1,
+      monthlyDay: recurrencePattern?.monthlyDay || 1,
+      calendarType: cal,
+    });
+  };
+
+  const handleAnnualMonthChange = (month: string) => {
+    onRecurrencePatternChange({
+      type: 'annual',
+      annualMonth: parseInt(month, 10),
+      monthlyDay: recurrencePattern?.monthlyDay || 1,
+      calendarType: recurrencePattern?.calendarType || 'hijri',
+    });
+  };
+
+  const handleAnnualDayChange = (value: string) => {
+    const num = parseInt(value, 10);
+    if (isNaN(num) || num < 1 || num > 30) return;
+    onRecurrencePatternChange({
+      type: 'annual',
+      annualMonth: recurrencePattern?.annualMonth || 1,
+      monthlyDay: num,
+      calendarType: recurrencePattern?.calendarType || 'hijri',
+    });
+  };
+
   return (
     <div className="space-y-4">
       <div className="space-y-2">
@@ -113,6 +152,7 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
             <SelectItem value="weekly">Weekly</SelectItem>
             <SelectItem value="custom">Custom</SelectItem>
             <SelectItem value="one-time">One-time</SelectItem>
+            <SelectItem value="annual">Annual</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -223,6 +263,57 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Annual recurrence options */}
+      {recurrenceType === 'annual' && (
+        <div className="space-y-3">
+          <div className="space-y-2">
+            <Label className="text-xs">Calendar</Label>
+            <Select
+              value={recurrencePattern?.calendarType || 'hijri'}
+              onValueChange={(v) => handleAnnualCalendarChange(v as 'hijri' | 'gregorian')}
+              disabled={disabled}
+            >
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hijri">Hijri</SelectItem>
+                <SelectItem value="gregorian">Gregorian</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label className="text-xs">Month</Label>
+            <Select
+              value={String(recurrencePattern?.annualMonth || 1)}
+              onValueChange={handleAnnualMonthChange}
+              disabled={disabled}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {((recurrencePattern?.calendarType || 'hijri') === 'hijri' ? HIJRI_MONTHS : GREGORIAN_MONTHS).map((name, i) => (
+                  <SelectItem key={i + 1} value={String(i + 1)}>{name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Day</span>
+            <Input
+              type="number"
+              min="1"
+              max="30"
+              value={recurrencePattern?.monthlyDay || 1}
+              onChange={(e) => handleAnnualDayChange(e.target.value)}
+              className="w-20"
+              disabled={disabled}
+            />
+          </div>
         </div>
       )}
 
