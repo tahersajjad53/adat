@@ -6,13 +6,18 @@ import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuTrigger,
+  DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { AppSidebar } from './AppSidebar';
 import { MobileBottomNav } from './MobileBottomNav';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import { useGoals } from '@/hooks/useGoals';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 import ibadatLogo from '@/assets/ibadat-logo.svg';
 
 interface AppLayoutProps {
@@ -27,6 +32,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { dynamicGoalsEnabled, setDynamicGoalsEnabled } = useUserPreferences();
 
   const isGoalsPage = location.pathname === '/goals';
+  const isNamazPage = location.pathname === '/namaz';
+  const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
   const handleAddGoal = () => setGoalFormOpen(true);
 
@@ -55,7 +63,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <div className="flex-1 flex justify-center">
               <img src={ibadatLogo} alt="Ibadat" className="h-6 w-auto logo-themed" />
             </div>
-            {/* Right: 3-dot menu on goals page, spacer otherwise */}
+            {/* Right: 3-dot menu on goals/namaz page, spacer otherwise */}
             {isGoalsPage ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -79,6 +87,22 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
+            ) : isNamazPage ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-10 w-10">
+                    <MoreHoriz className="h-5 w-5" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="bg-popover">
+                  <DropdownMenuItem
+                    onClick={() => setClearConfirmOpen(true)}
+                    disabled={unfulfilledCount === 0}
+                  >
+                    Clear Qaza Namaz
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <div className="w-10" />
             )}
@@ -91,6 +115,27 @@ export function AppLayout({ children }: AppLayoutProps) {
         {/* Bottom navigation */}
         <MobileBottomNav onAddGoal={handleAddGoal} />
         <GoalFormSheet open={goalFormOpen} onOpenChange={setGoalFormOpen} onSubmit={handleGoalSubmit} isLoading={isCreating} />
+        <AlertDialog open={clearConfirmOpen} onOpenChange={setClearConfirmOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Clear Qaza Namaz?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will mark all {unfulfilledCount} missed prayers as completed. New missed prayers will continue to appear going forward.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async () => {
+                  await clearAllQaza();
+                  setClearConfirmOpen(false);
+                }}
+              >
+                Clear All
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     );
   }
