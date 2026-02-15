@@ -1,20 +1,21 @@
 
 
-# Fix Dropdown/Date Fields Exceeding Margins
+# Fix Date Input Fields Exceeding Container Width
 
 ## Problem
-The `SelectTrigger` component (used for dropdowns like "Repeats", pattern selectors, and month/year pickers in FMBHub) still uses `rounded-md`, while the `Input` component was updated to `rounded-full`. This inconsistency causes the select dropdowns to look different from other inputs and may cause visual overflow on mobile.
+On mobile (iOS especially), native `<input type="date">` elements render browser-specific date picker controls that push the input wider than its parent container. The `overflow-hidden` class on the input itself clips inner content but doesn't prevent the element from growing beyond bounds.
 
-Native date inputs (`<input type="date">`) with `rounded-full` can also overflow due to browser-rendered date picker controls.
+## Solution
+Add `overflow-hidden` to the wrapping `<div>` containers around date inputs so the parent clips the overflow, and also ensure the inputs themselves are constrained. This is a targeted fix in two files.
 
 ## Changes
 
-### 1. SelectTrigger (`src/components/ui/select.tsx`)
-- Update `rounded-md` to `rounded-full` and `px-3` to `px-4` on the trigger element (line 20) to match the Input component styling.
+### 1. GoalFormSheet (`src/components/goals/GoalFormSheet.tsx`)
+- On the start date wrapper div (line 155), change `className="space-y-2"` to `className="space-y-2 overflow-hidden"`.
+- On the end date wrapper div (line 180), change `className="space-y-2"` to `className="space-y-2 overflow-hidden"`.
 
-### 2. Date Inputs (`src/components/goals/GoalFormSheet.tsx`)
-- Add `className="overflow-hidden"` to the date-type Input elements for start date and end date, ensuring native browser controls stay within bounds.
+### 2. RecurrenceSelector (`src/components/goals/RecurrenceSelector.tsx`)
+- On the "Due date" input (line 324-329, for one-time goals), add `className="overflow-hidden"` to the Input element.
+- On the wrapping div (line 322), change `className="space-y-2"` to `className="space-y-2 overflow-hidden"`.
 
-## Scope
-These are base-level UI primitive changes, so all pages using Select dropdowns (Goals, Dues/FMBHub, Dues/Khumus, RecurrenceSelector, Profile) will automatically get the consistent rounded styling.
-
+These small changes ensure the parent containers clip any native browser date-picker overflow, keeping all fields aligned within the form margins.
