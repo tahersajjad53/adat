@@ -131,13 +131,19 @@ const Goals: React.FC = () => {
                     <MoreHoriz className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover p-3 min-w-[200px]">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium">Dynamic Goals</span>
-                    <Switch
-                      checked={dynamicGoalsEnabled}
-                      onCheckedChange={(checked) => setDynamicGoalsEnabled(checked)}
-                    />
+                <DropdownMenuContent align="end" className="bg-popover p-4 min-w-[280px]">
+                  <div className="space-y-3">
+                    <div>
+                      <p className="text-sm font-medium">Receive Dynamic Goals</p>
+                      <p className="text-xs text-muted-foreground mt-1">Community goals for all Mumineen, like 'Pray Moti Us Sawalat' on days requiring rozu.</p>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Enabled</span>
+                      <Switch
+                        checked={dynamicGoalsEnabled}
+                        onCheckedChange={(checked) => setDynamicGoalsEnabled(checked)}
+                      />
+                    </div>
                   </div>
                 </DropdownMenuContent>
               </DropdownMenu>
