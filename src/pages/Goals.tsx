@@ -1,7 +1,10 @@
-import React, { useState, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
 import { Archery, Plus, MoreHoriz } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from '@/components/ui/dialog';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -27,6 +30,20 @@ const Goals: React.FC = () => {
   const isMobile = useIsMobile();
   const [formOpen, setFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+  const [educationPopupOpen, setEducationPopupOpen] = useState(false);
+
+  // Education popup after 3rd goal
+  useEffect(() => {
+    if (isLoading || goals.length !== 3) return;
+    if (localStorage.getItem('dynamic-goals-education-shown')) return;
+
+    const timer = setTimeout(() => {
+      setEducationPopupOpen(true);
+      localStorage.setItem('dynamic-goals-education-shown', 'true');
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [goals.length, isLoading]);
 
   // Dynamic goals
   const { dynamicGoals, isEnabled: dynamicEnabled } = useDynamicGoals();
@@ -185,6 +202,20 @@ const Goals: React.FC = () => {
         onSubmit={handleSubmit}
         isLoading={isCreating || isUpdating}
       />
+
+      <Dialog open={educationPopupOpen} onOpenChange={setEducationPopupOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Did you know?</DialogTitle>
+            <DialogDescription className="pt-2">
+              You're building great habits! Ibadat also offers <strong>Dynamic Goals</strong> — community goals for all Mumineen that appear alongside yours, like "Pray Moti Us Sawalat" on important days. You can enable them anytime from the menu (⋯) at the top of this page.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button onClick={() => setEducationPopupOpen(false)}>Got it</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
