@@ -26,8 +26,8 @@ export default defineConfig(({ mode }) => ({
         name: "Ibadat",
         short_name: "Ibadat",
         description: "Your Spiritual Life, Organized. Track prayers, manage dues, and cultivate daily habits with intention.",
-        theme_color: "#1a1a2e",
-        background_color: "#1a1a2e",
+        theme_color: "#ece4d4",
+        background_color: "#ece4d4",
         display: "standalone",
         icons: [
           { src: "pwa-192x192.png", sizes: "192x192", type: "image/png" },
