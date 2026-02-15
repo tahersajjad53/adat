@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Archery, Plus, MoreHoriz } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -31,6 +32,15 @@ const Goals: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [educationPopupOpen, setEducationPopupOpen] = useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Auto-open form when arriving from onboarding with ?new=1
+  useEffect(() => {
+    if (searchParams.get('new') === '1') {
+      setFormOpen(true);
+      setSearchParams({}, { replace: true });
+    }
+  }, [searchParams, setSearchParams]);
 
   // Education popup after 3rd goal
   useEffect(() => {
