@@ -126,12 +126,11 @@ const Dashboard: React.FC = () => {
           )}
 
           {/* Striped progress bar */}
-          <div className="mt-3 mb-4 h-2 w-full rounded-full bg-white/20 overflow-hidden">
+          <div className="meter-track mt-3 mb-4 h-2 w-full rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full transition-all"
+              className="meter-fill h-full rounded-full transition-all"
               style={{
                 width: `${overallPercentage}%`,
-                backgroundColor: 'hsl(var(--accent))',
                 backgroundImage:
                   'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(255,255,255,0.2) 3px, rgba(255,255,255,0.2) 6px)',
               }}
