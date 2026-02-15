@@ -1,28 +1,31 @@
 
 
-# Fix PWA Status Bar to Match Theme
+# Fix Android Maskable Icon for PWA
 
 ## Problem
-The iOS status bar (battery, wifi, time) still shows a mismatched background because:
-1. The PWA manifest in `vite.config.ts` hardcodes `theme_color` and `background_color` to `#1a1a2e` (doesn't match any theme)
-2. The `index.html` also hardcodes `#1a1a2e` as the initial theme-color
-3. Missing the iOS-specific `apple-mobile-web-app-status-bar-style` meta tag, which controls how the status bar renders in standalone PWA mode
+The current manifest uses `favicon.svg` with `purpose: "any maskable"` as the maskable icon. SVGs don't work well as Android adaptive/maskable icons -- Android expects a PNG with extra padding (safe zone) so the icon looks correct when cropped into circles, squircles, or rounded squares. This causes the home screen icon to look different (or broken) compared to iOS.
+
+## Solution
+Split the icon declarations so the PNG files serve as both regular and maskable icons, and remove the SVG maskable entry.
 
 ## Changes
 
-### File: `index.html`
-- Change the hardcoded `<meta name="theme-color" content="#1a1a2e">` to `#ece4d4` (Oudh, the default theme) so it matches on first load
-- Add `<meta name="apple-mobile-web-app-capable" content="yes">` to enable standalone mode
-- Add `<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">` -- this makes the iOS status bar transparent and overlay the page background, so the page's own background color shows through seamlessly. On dark backgrounds (Bhukur), iOS automatically renders the system icons (time, battery, wifi) in white
+### File: `vite.config.ts` (icons array, lines 32-36)
+Replace the current icons config with:
 
-### File: `vite.config.ts`
-- Update `theme_color` from `#1a1a2e` to `#ece4d4` (Oudh default)
-- Update `background_color` from `#1a1a2e` to `#ece4d4` (Oudh default)
-- These are baked into the PWA manifest at build time and used as the initial/splash screen color
+```
+icons: [
+  { src: "pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
+  { src: "pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+  { src: "pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
+  { src: "pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+],
+```
 
-### How it works together
-- On app launch, the PWA manifest and initial meta tag show the Oudh (default) background
-- Once the user's saved theme loads from Supabase, `applyThemeClass()` dynamically updates the `<meta name="theme-color">` to match (already implemented)
-- The `black-translucent` status bar style ensures the page background bleeds into the status bar area on iOS, creating the seamless look
-- On Bhukur (dark), iOS automatically switches system icons to white for visibility
+- The `purpose: "any"` entries serve as standard icons (used by iOS and browsers)
+- The `purpose: "maskable"` entries tell Android to use the same PNG for adaptive icon shapes
+- Removes the SVG entry which was causing the mismatch
+
+### Note
+After deploying, you'll need to uninstall and reinstall the PWA on Android for the new manifest icons to take effect. If the icon still appears slightly cropped on Android, the PNG itself may need more padding around the logo (Android's safe zone crops ~10% from each edge), but this change should already be a significant improvement.
 
