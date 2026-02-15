@@ -1,22 +1,20 @@
 
 
-# Make All Input Fields Fully Rounded
+# Fix Dropdown/Date Fields Exceeding Margins
 
-## Overview
-Update form input elements to use `rounded-full` (pill shape) to match the button styling across the entire app.
+## Problem
+The `SelectTrigger` component (used for dropdowns like "Repeats", pattern selectors, and month/year pickers in FMBHub) still uses `rounded-md`, while the `Input` component was updated to `rounded-full`. This inconsistency causes the select dropdowns to look different from other inputs and may cause visual overflow on mobile.
+
+Native date inputs (`<input type="date">`) with `rounded-full` can also overflow due to browser-rendered date picker controls.
 
 ## Changes
 
-### 1. Input component (`src/components/ui/input.tsx`)
-- Change `rounded-md` to `rounded-full` in the className string.
+### 1. SelectTrigger (`src/components/ui/select.tsx`)
+- Update `rounded-md` to `rounded-full` and `px-3` to `px-4` on the trigger element (line 20) to match the Input component styling.
 
-### 2. Textarea component (`src/components/ui/textarea.tsx`)
-- Change `rounded-md` to `rounded-2xl` (since `rounded-full` on a multi-line textarea looks odd, a generous rounding keeps the aesthetic consistent without distortion).
-
-### 3. Command input (`src/components/ui/command.tsx`)
-- The `CommandInput` wraps a standard input inside the combobox/command component (used by LocationSelector etc.). This inherits its own styling and will not need changes since it sits inside a popover container.
+### 2. Date Inputs (`src/components/goals/GoalFormSheet.tsx`)
+- Add `className="overflow-hidden"` to the date-type Input elements for start date and end date, ensuring native browser controls stay within bounds.
 
 ## Scope
-- Only the base UI primitives (`Input`, `Textarea`) are updated, so every page that uses them (Auth, Profile, Goals, Onboarding, etc.) automatically gets the rounded style.
-- Sidebar items, menus, and other non-input elements keep their current rounding.
+These are base-level UI primitive changes, so all pages using Select dropdowns (Goals, Dues/FMBHub, Dues/Khumus, RecurrenceSelector, Profile) will automatically get the consistent rounded styling.
 
