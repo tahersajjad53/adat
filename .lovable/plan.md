@@ -1,33 +1,22 @@
 
 
-# Add "Create Your Own Goal" Option to Onboarding
+# Make All Input Fields Fully Rounded
 
-## What Changes
+## Overview
+Update form input elements to use `rounded-full` (pill shape) to match the button styling across the entire app.
 
-### 1. Onboarding Step 2 (`src/pages/Onboarding.tsx`)
-- Add a "Create your own" chip/button as the last option in the aspirations list, styled distinctly (e.g., dashed border or ghost style) to differentiate it from preset templates.
-- When tapped, it saves any already-selected aspirations as goals (same as current "Continue" flow), then navigates to `/goals?new=1` instead of showing the loading screen.
+## Changes
 
-### 2. Goals Page (`src/pages/Goals.tsx`)
-- On mount, check for `?new=1` query parameter.
-- If present, auto-open the GoalFormSheet and clear the query param from the URL (so refreshing doesn't re-trigger it).
+### 1. Input component (`src/components/ui/input.tsx`)
+- Change `rounded-md` to `rounded-full` in the className string.
 
-## Technical Details
+### 2. Textarea component (`src/components/ui/textarea.tsx`)
+- Change `rounded-md` to `rounded-2xl` (since `rounded-full` on a multi-line textarea looks odd, a generous rounding keeps the aesthetic consistent without distortion).
 
-### `src/pages/Onboarding.tsx`
-- Add a new button after the aspiration chips styled with a dashed border and a Plus icon: "Create your own".
-- On click:
-  1. If any preset aspirations are selected, insert those goals (reuse the existing goal-creation logic from step 3).
-  2. Navigate to `/goals?new=1`.
+### 3. Command input (`src/components/ui/command.tsx`)
+- The `CommandInput` wraps a standard input inside the combobox/command component (used by LocationSelector etc.). This inherits its own styling and will not need changes since it sits inside a popover container.
 
-### `src/pages/Goals.tsx`
-- Add a `useEffect` that reads `searchParams` via `useSearchParams()` from react-router-dom.
-- If `new` param is `"1"`, call `setFormOpen(true)` and remove the param.
-- Import `useSearchParams` from `react-router-dom`.
-
-## Flow
-1. User reaches Step 2 (Aspirations)
-2. They can select presets AND/OR tap "Create your own"
-3. Tapping "Create your own" saves any selected presets, then lands on the Goals page with the form sheet already open
-4. User creates their custom goal and continues naturally
+## Scope
+- Only the base UI primitives (`Input`, `Textarea`) are updated, so every page that uses them (Auth, Profile, Goals, Onboarding, etc.) automatically gets the rounded style.
+- Sidebar items, menus, and other non-input elements keep their current rounding.
 
