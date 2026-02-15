@@ -1,35 +1,27 @@
 
-# Khalaf Accent Color + Status Bar Theme Adaptation
+# Remove Orange from Khalaf Theme -- Replace with Grey Hues
+
+## Overview
+Replace all remaining orange (`24 85% 50%` / `24 85% 55%`) references in the Khalaf theme with sophisticated grey tones, creating a fully monochromatic white-and-grey theme.
 
 ## Changes
 
-### 1. Khalaf accent color -- switch to steely slate/grey
-**File: `src/index.css`** (`.theme-khalaf` block)
-- Change `--accent: 16 80% 48%` to a cool slate: `--accent: 215 20% 50%` (a steely blue-grey)
-- Change `--accent-foreground: 0 0% 100%` stays white for contrast
-- This gives Khalaf a sophisticated, neutral feel instead of the warm orange accent
+### File: `src/index.css` (`.theme-khalaf` block)
+Replace orange primary and ring with dark charcoal grey, and sidebar primary with a lighter grey:
 
-**File: `src/components/profile/ThemeSelector.tsx`**
-- Update the Khalaf swatch preview `accent` color from `hsl(16 80% 48%)` to `hsl(215 20% 50%)` so the theme picker accurately reflects the new look
+| Variable | Current (orange) | New (grey) |
+|---|---|---|
+| `--primary` | `24 85% 50%` | `0 0% 20%` (dark charcoal) |
+| `--primary-foreground` | `0 0% 100%` | `0 0% 100%` (stays white) |
+| `--ring` | `24 85% 50%` | `0 0% 20%` |
+| `--sidebar-primary` | `24 85% 55%` | `0 0% 75%` (light grey for contrast on dark sidebar) |
+| `--sidebar-primary-foreground` | `0 0% 100%` | `0 0% 5%` (near-black text on light grey) |
+| `--sidebar-ring` | `24 85% 55%` | `0 0% 75%` |
 
-### 2. Status bar (battery/wifi toolbar) adapts to active theme
-The status bar color on mobile is controlled by the `<meta name="theme-color">` tag in `index.html`. Currently it's hardcoded to `#1a1a2e` which doesn't match any theme.
+### File: `src/index.css` (logo filter, line 162)
+Update the `.theme-khalaf .logo-themed` CSS filter from the current warm/orange hue-rotate to a simple dark grey filter:
+- New filter: `brightness(0) saturate(0)` -- renders the logo as pure black, matching the grey-only palette
 
-**File: `src/contexts/ThemeContext.tsx`**
-- In `applyThemeClass()`, also update the `<meta name="theme-color">` tag dynamically:
-  - Oudh: `#ece4d4` (warm beige -- `hsl(40 30% 94%)` converted)
-  - Khalaf: `#ffffff` (white -- `hsl(0 0% 100%)`)
-  - Bhukur: `#171717` (near-black -- `hsl(0 0% 9%)`)
-- This ensures the phone's status bar matches the active theme background
-
-### Technical Details
-
-**`src/index.css`** -- line 73:
-- `--accent: 16 80% 48%` becomes `--accent: 215 20% 50%`
-
-**`src/contexts/ThemeContext.tsx`** -- in `applyThemeClass()`:
-- Add a mapping of theme to hex color
-- Query `document.querySelector('meta[name="theme-color"]')` and update its `content` attribute
-
-**`src/components/profile/ThemeSelector.tsx`** -- line 27:
-- Update `accent: 'hsl(16 80% 48%)'` to `accent: 'hsl(215 20% 50%)'`
+### File: `src/components/profile/ThemeSelector.tsx` (line 26)
+Update the Khalaf swatch preview:
+- `primary`: from `hsl(24 85% 50%)` to `hsl(0 0% 20%)`
