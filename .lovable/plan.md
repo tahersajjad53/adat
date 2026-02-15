@@ -1,25 +1,33 @@
 
-# Fix Ordinal Suffix in Recurrence Labels
 
-## Problem
-The recurrence label displays "1th of each month (Hijri)" instead of "1st of each month (Hijri)". The code on line 245 of `src/lib/recurrence.ts` hardcodes the "th" suffix for all day numbers.
+# Add "Create Your Own Goal" Option to Onboarding
 
-## Solution
-Add an ordinal suffix helper function that returns the correct suffix (st, nd, rd, th) for any number, then use it in the label.
+## What Changes
 
-### File: `src/lib/recurrence.ts`
+### 1. Onboarding Step 2 (`src/pages/Onboarding.tsx`)
+- Add a "Create your own" chip/button as the last option in the aspirations list, styled distinctly (e.g., dashed border or ghost style) to differentiate it from preset templates.
+- When tapped, it saves any already-selected aspirations as goals (same as current "Continue" flow), then navigates to `/goals?new=1` instead of showing the loading screen.
 
-Add a small helper function:
-```typescript
-function ordinal(n: number): string {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return n + (s[(v - 20) % 10] || s[v] || s[0]);
-}
-```
+### 2. Goals Page (`src/pages/Goals.tsx`)
+- On mount, check for `?new=1` query parameter.
+- If present, auto-open the GoalFormSheet and clear the query param from the URL (so refreshing doesn't re-trigger it).
 
-Then replace line 245:
-- **Before:** `` `${pattern.monthlyDay}th of each month (${calType})` ``
-- **After:** `` `${ordinal(pattern.monthlyDay)} of each month (${calType})` ``
+## Technical Details
 
-This fixes all cases: 1st, 2nd, 3rd, 4th, 11th, 12th, 13th, 21st, 22nd, 23rd, etc.
+### `src/pages/Onboarding.tsx`
+- Add a new button after the aspiration chips styled with a dashed border and a Plus icon: "Create your own".
+- On click:
+  1. If any preset aspirations are selected, insert those goals (reuse the existing goal-creation logic from step 3).
+  2. Navigate to `/goals?new=1`.
+
+### `src/pages/Goals.tsx`
+- Add a `useEffect` that reads `searchParams` via `useSearchParams()` from react-router-dom.
+- If `new` param is `"1"`, call `setFormOpen(true)` and remove the param.
+- Import `useSearchParams` from `react-router-dom`.
+
+## Flow
+1. User reaches Step 2 (Aspirations)
+2. They can select presets AND/OR tap "Create your own"
+3. Tapping "Create your own" saves any selected presets, then lands on the Goals page with the form sheet already open
+4. User creates their custom goal and continues naturally
+
