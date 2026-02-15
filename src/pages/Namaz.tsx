@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { DailyMeter } from '@/components/namaz/DailyMeter';
@@ -9,56 +9,19 @@ import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 import { usePrayerTimes, getCurrentPrayerWindow } from '@/hooks/usePrayerTimes';
 import { useTodayProgress } from '@/hooks/useTodayProgress';
-import { Clock, WarningCircle, MoreHoriz } from 'iconoir-react';
-import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
+import { Clock, WarningCircle } from 'iconoir-react';
 
 const Namaz: React.FC = () => {
   const { prayers, togglePrayer, isLoading: prayersLoading } = usePrayerLog();
   const { overallPercentage } = useTodayProgress(prayers, prayersLoading);
-  const { missedPrayers, unfulfilledCount, fulfillPrayer, clearAllQaza, isLoading: missedLoading } = useMissedPrayers();
+  const { missedPrayers, unfulfilledCount, fulfillPrayer, isLoading: missedLoading } = useMissedPrayers();
   const { prayerTimes } = usePrayerTimes();
-  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayer = currentPrayerWindow?.current || null;
 
   return (
     <div className="container py-6 max-w-xl mx-auto space-y-6">
-      {/* Header row with 3-dot menu */}
-      <div className="flex items-center justify-end">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHoriz className="h-5 w-5" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => setClearConfirmOpen(true)}
-              disabled={unfulfilledCount === 0}
-            >
-              Clear Qaza Namaz
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
       {/* Time-aware visual header card */}
       <TimeOfDayCard currentPrayer={currentPrayer}>
         <div className="flex items-start justify-between">
@@ -102,28 +65,6 @@ const Namaz: React.FC = () => {
         </TabsContent>
       </Tabs>
 
-      {/* Clear Qaza Confirmation Dialog */}
-      <AlertDialog open={clearConfirmOpen} onOpenChange={setClearConfirmOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Clear Qaza Namaz?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will mark all {unfulfilledCount} missed prayers as completed. New missed prayers will continue to appear going forward.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={async () => {
-                await clearAllQaza();
-                setClearConfirmOpen(false);
-              }}
-            >
-              Clear All
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 };
