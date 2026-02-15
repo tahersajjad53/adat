@@ -319,13 +319,14 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
 
       {/* One-time date picker */}
       {recurrenceType === 'one-time' && (
-        <div className="space-y-2">
+        <div className="space-y-2 overflow-hidden">
           <Label>Due date</Label>
           <Input
             type="date"
             value={dueDate}
             onChange={(e) => onDueDateChange(e.target.value)}
             disabled={disabled}
+            className="overflow-hidden"
           />
         </div>
       )}

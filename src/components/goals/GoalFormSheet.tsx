@@ -152,7 +152,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         disabled={isLoading}
       />
 
-      <div className="space-y-2">
+      <div className="space-y-2 overflow-hidden">
         <Label htmlFor="startDate">Start date</Label>
         <Input
           id="startDate"
@@ -177,7 +177,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       </div>
 
       {hasEndDate && (
-        <div className="space-y-2">
+        <div className="space-y-2 overflow-hidden">
           <Label htmlFor="endDate">End date</Label>
           <Input
           id="endDate"
