@@ -1,31 +1,25 @@
 
-
-# Fix Android Maskable Icon for PWA
+# Fix Ordinal Suffix in Recurrence Labels
 
 ## Problem
-The current manifest uses `favicon.svg` with `purpose: "any maskable"` as the maskable icon. SVGs don't work well as Android adaptive/maskable icons -- Android expects a PNG with extra padding (safe zone) so the icon looks correct when cropped into circles, squircles, or rounded squares. This causes the home screen icon to look different (or broken) compared to iOS.
+The recurrence label displays "1th of each month (Hijri)" instead of "1st of each month (Hijri)". The code on line 245 of `src/lib/recurrence.ts` hardcodes the "th" suffix for all day numbers.
 
 ## Solution
-Split the icon declarations so the PNG files serve as both regular and maskable icons, and remove the SVG maskable entry.
+Add an ordinal suffix helper function that returns the correct suffix (st, nd, rd, th) for any number, then use it in the label.
 
-## Changes
+### File: `src/lib/recurrence.ts`
 
-### File: `vite.config.ts` (icons array, lines 32-36)
-Replace the current icons config with:
-
-```
-icons: [
-  { src: "pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-  { src: "pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-  { src: "pwa-192x192.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
-  { src: "pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
-],
+Add a small helper function:
+```typescript
+function ordinal(n: number): string {
+  const s = ['th', 'st', 'nd', 'rd'];
+  const v = n % 100;
+  return n + (s[(v - 20) % 10] || s[v] || s[0]);
+}
 ```
 
-- The `purpose: "any"` entries serve as standard icons (used by iOS and browsers)
-- The `purpose: "maskable"` entries tell Android to use the same PNG for adaptive icon shapes
-- Removes the SVG entry which was causing the mismatch
+Then replace line 245:
+- **Before:** `` `${pattern.monthlyDay}th of each month (${calType})` ``
+- **After:** `` `${ordinal(pattern.monthlyDay)} of each month (${calType})` ``
 
-### Note
-After deploying, you'll need to uninstall and reinstall the PWA on Android for the new manifest icons to take effect. If the icon still appears slightly cropped on Android, the PNG itself may need more padding around the logo (Android's safe zone crops ~10% from each edge), but this change should already be a significant improvement.
-
+This fixes all cases: 1st, 2nd, 3rd, 4th, 11th, 12th, 13th, 21st, 22nd, 23rd, etc.
