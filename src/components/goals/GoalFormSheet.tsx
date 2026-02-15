@@ -160,6 +160,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
           value={startDate}
           onChange={(e) => setStartDate(e.target.value)}
           disabled={isLoading}
+          className="overflow-hidden"
         />
       </div>
 
@@ -179,11 +180,12 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         <div className="space-y-2">
           <Label htmlFor="endDate">End date</Label>
           <Input
-            id="endDate"
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            disabled={isLoading}
+          id="endDate"
+          type="date"
+          value={endDate}
+          onChange={(e) => setEndDate(e.target.value)}
+          disabled={isLoading}
+          className="overflow-hidden"
           />
         </div>
       )}
