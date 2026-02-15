@@ -23,7 +23,7 @@ const THEMES: ThemeOption[] = [
     label: 'Khalaf',
     colors: {
       bg: 'hsl(0 0% 100%)',
-      primary: 'hsl(24 85% 50%)',
+      primary: 'hsl(0 0% 20%)',
       accent: 'hsl(215 20% 50%)',
     },
   },
