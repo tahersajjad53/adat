@@ -11,11 +11,20 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+const THEME_COLORS: Record<ThemeName, string> = {
+  oudh: '#ece4d4',
+  khalaf: '#ffffff',
+  bhukur: '#171717',
+};
+
 function applyThemeClass(theme: ThemeName) {
   const html = document.documentElement;
   html.classList.remove('theme-khalaf', 'theme-bhukur');
   if (theme === 'khalaf') html.classList.add('theme-khalaf');
   if (theme === 'bhukur') html.classList.add('theme-bhukur');
+
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', THEME_COLORS[theme]);
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {

@@ -24,7 +24,7 @@ const THEMES: ThemeOption[] = [
     colors: {
       bg: 'hsl(0 0% 100%)',
       primary: 'hsl(24 85% 50%)',
-      accent: 'hsl(16 80% 48%)',
+      accent: 'hsl(215 20% 50%)',
     },
   },
   {
