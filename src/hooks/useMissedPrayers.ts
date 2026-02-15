@@ -21,6 +21,7 @@ interface UseMissedPrayersReturn {
   missedPrayers: MissedPrayer[];
   unfulfilledCount: number;
   fulfillPrayer: (prayerId: string) => Promise<void>;
+  clearAllQaza: () => Promise<void>;
   isLoading: boolean;
   error: Error | null;
 }
@@ -191,12 +192,44 @@ export function useMissedPrayers(): UseMissedPrayersReturn {
     }
   }, [user, missedPrayers]);
 
+  // Clear all unfulfilled qaza prayers at once
+  const clearAllQaza = useCallback(async () => {
+    if (!user) return;
+
+    const unfulfilled = missedPrayers.filter((p) => !p.isFulfilled);
+    if (unfulfilled.length === 0) return;
+
+    try {
+      const now = new Date().toISOString();
+      const rows = unfulfilled.map((p) => ({
+        user_id: user.id,
+        prayer_date: p.prayerDate,
+        prayer: p.prayer,
+        gregorian_date: p.gregorianDate.toISOString().split('T')[0],
+        qaza_completed_at: now,
+      }));
+
+      await supabase
+        .from('prayer_logs')
+        .upsert(rows, { onConflict: 'user_id,prayer_date,prayer' });
+
+      setMissedPrayers((prev) =>
+        prev.map((p) =>
+          p.isFulfilled ? p : { ...p, qazaCompletedAt: new Date(now), isFulfilled: true }
+        )
+      );
+    } catch (err) {
+      console.error('Error clearing all qaza:', err);
+    }
+  }, [user, missedPrayers]);
+
   const unfulfilledCount = missedPrayers.filter((p) => !p.isFulfilled).length;
 
   return {
     missedPrayers,
     unfulfilledCount,
     fulfillPrayer,
+    clearAllQaza,
     isLoading,
     error,
   };
