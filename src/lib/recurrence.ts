@@ -25,13 +25,13 @@ export function isGoalDueOnDate(
   // Inactive goals are never due (default to active if not specified)
   if (goal.is_active === false) return false;
 
-  // Check if within start/end date range
-  const startDate = new Date(goal.start_date);
-  if (gregorianDate < startDate) return false;
+  // Normalize to date-only strings for comparison (avoid timezone issues)
+  const gregDateStr = `${gregorianDate.getFullYear()}-${String(gregorianDate.getMonth() + 1).padStart(2, '0')}-${String(gregorianDate.getDate()).padStart(2, '0')}`;
+
+  if (gregDateStr < goal.start_date) return false;
 
   if (goal.end_date) {
-    const endDate = new Date(goal.end_date);
-    if (gregorianDate > endDate) return false;
+    if (gregDateStr > goal.end_date) return false;
   }
 
   switch (goal.recurrence_type) {
