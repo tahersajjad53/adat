@@ -19,6 +19,7 @@ interface TodaysGoalsProps {
   onCompleteOverdue?: (goalId: string) => void;
   isCompletingOverdue?: boolean;
   onCreateGoal?: () => void;
+  hasAnyGoals?: boolean;
   // Dynamic goals
   dynamicGoals?: AdminGoal[];
   isDynamicCompleted?: (goalId: string) => boolean;
@@ -37,6 +38,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   onCompleteOverdue,
   isCompletingOverdue = false,
   onCreateGoal,
+  hasAnyGoals = false,
   dynamicGoals = [],
   isDynamicCompleted,
   onDynamicToggle,
@@ -91,13 +93,26 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
 
       {totalDisplay === 0 ? (
         <div className="text-center py-8 space-y-4">
-          <p className="text-sm text-muted-foreground italic max-w-xs mx-auto">
-            "The deed dearest to Allah Ta'ala is that which is most consistent, even if small"
-          </p>
-          <p className="text-xs text-muted-foreground">— Al-Hadith</p>
-          <Button onClick={onCreateGoal} className="rounded-full">
-            Create your first goal
-          </Button>
+          {hasAnyGoals ? (
+            <>
+              <p className="text-sm text-muted-foreground max-w-xs mx-auto">
+                No goals for today — enjoy the calm.
+              </p>
+              <Button onClick={onCreateGoal} className="rounded-full">
+                Create a goal
+              </Button>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground italic max-w-xs mx-auto">
+                "The deed dearest to Allah Ta'ala is that which is most consistent, even if small"
+              </p>
+              <p className="text-xs text-muted-foreground">— Al-Hadith</p>
+              <Button onClick={onCreateGoal} className="rounded-full">
+                Create your first goal
+              </Button>
+            </>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
