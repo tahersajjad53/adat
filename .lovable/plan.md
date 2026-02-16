@@ -1,35 +1,35 @@
 
 
-# Fix End Date Being Exclusive Instead of Inclusive
+# Dynamic Empty State for Today's Goals
 
 ## Problem
-When a user sets a goal's end date to Feb 16, the goal doesn't appear on Feb 16. This happens because of a timezone mismatch in date comparison:
-
-- `end_date` is stored as a date string like `"2025-02-16"`, and `new Date("2025-02-16")` creates a Date at **UTC midnight** (00:00:00 UTC).
-- `gregorianDate` comes from `new Date()` which includes the **local time** -- e.g., 10:00 AM local time.
-- On the end date itself, the local-time Date is "greater than" the UTC-midnight Date, so the goal is excluded.
-
-The same bug also affects `start_date` -- a goal could appear a day early depending on timezone.
+The "Create your first goal" CTA always shows when no goals are scheduled today, even for returning users who have goals but just don't have any due today. This feels odd for existing users.
 
 ## Solution
-Normalize both sides of the comparison to date-only (strip time) before comparing.
+Pass a flag (or the total goal count) from the Dashboard to `TodaysGoals` so it can distinguish between:
+
+1. **Brand new user (zero goals ever created):** Show the Hadith quote + "Create your first goal" button (current behavior).
+2. **Returning user (has goals, but none due today):** Show a friendlier message like "No goals scheduled today" with a softer CTA like "Create a goal".
 
 ## Technical Details
 
-### File: `src/lib/recurrence.ts` (lines 28-35)
+### 1. Dashboard (`src/pages/Dashboard.tsx`)
+- The `useGoals()` hook is already imported and provides `goals` (all goals).
+- Pass `hasAnyGoals={goals.length > 0}` as a new prop to `TodaysGoals`.
 
-Replace the current start/end date comparison with normalized date-only comparisons:
+### 2. TodaysGoals (`src/components/goals/TodaysGoals.tsx`)
+- Add `hasAnyGoals?: boolean` to the props interface.
+- Update the empty state block (lines 92-101) to branch:
 
-```typescript
-// Normalize to date-only strings for comparison (avoid timezone issues)
-const gregDateStr = `${gregorianDate.getFullYear()}-${String(gregorianDate.getMonth() + 1).padStart(2, '0')}-${String(gregorianDate.getDate()).padStart(2, '0')}`;
-
-if (gregDateStr < goal.start_date) return false;
-
-if (goal.end_date) {
-  if (gregDateStr > goal.end_date) return false;
-}
+```text
+if totalDisplay === 0:
+  if hasAnyGoals:
+    Show: "No goals for today -- enjoy the calm."
+    Button: "Create a goal" (rounded-full)
+  else:
+    Show: Hadith quote (current)
+    Button: "Create your first goal" (current)
 ```
 
-This compares date strings directly (YYYY-MM-DD format), completely avoiding any timezone or time-of-day issues. Since `start_date` and `end_date` are already stored as `YYYY-MM-DD` strings, this is a clean and reliable comparison.
+This is a minimal change -- one new prop and a conditional in the empty state.
 
