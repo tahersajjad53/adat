@@ -1,0 +1,8 @@
+{
+	"appId": "com.adat.app",
+	"appName": "Adat",
+	"webDir": "dist",
+	"server": {
+		"androidScheme": "https"
+	}
+}
