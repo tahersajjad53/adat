@@ -206,7 +206,12 @@ export function getRecurrenceDescription(goal: RecurrenceCheckable): string {
 
     case 'one-time':
       if (goal.due_date) {
-        const date = new Date(goal.due_date);
+        const date = new Date(goal.due_date + 'T00:00:00');
+        const now = new Date();
+        const isToday = date.getFullYear() === now.getFullYear() &&
+          date.getMonth() === now.getMonth() &&
+          date.getDate() === now.getDate();
+        if (isToday) return 'Today';
         return `One-time (${date.toLocaleDateString()})`;
       }
       return 'One-time';
