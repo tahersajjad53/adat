@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "117206371586",
+    "project_id": "ibadat-e1fd2",
+    "storage_bucket": "ibadat-e1fd2.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:117206371586:android:71c8ba3607e6e4d5c8c61b",
+        "android_client_info": {
+          "package_name": "com.adat.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAO0bJXdIpU0Jv0L95JM78M0q5mYCn7xBI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

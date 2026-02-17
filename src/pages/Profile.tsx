@@ -4,14 +4,18 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import LocationSelector from '@/components/profile/LocationSelector';
+import { PushNotifications } from '@capacitor/push-notifications';
+import { Capacitor } from '@capacitor/core';
 
 import { CITIES, type City } from '@/data/cities';
-import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignPencil } from 'iconoir-react';
+import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignPencil, Bell } from 'iconoir-react';
 import ThemeSelector from '@/components/profile/ThemeSelector';
+import { initPushNotifications } from '@/utils/pushNotifications';
 
-type ProfileSection = 'menu' | 'account' | 'theme';
+type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications';
 
 const Profile: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -22,6 +26,7 @@ const Profile: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState<City | undefined>();
   const [customCoords, setCustomCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -55,6 +60,12 @@ const Profile: React.FC = () => {
         }
       }
 
+      // Check notification status
+      if (Capacitor.getPlatform() !== 'web') {
+        const status = await PushNotifications.checkPermissions();
+        setNotificationsEnabled(status.receive === 'granted');
+      }
+
       setLoading(false);
     };
 
@@ -69,6 +80,37 @@ const Profile: React.FC = () => {
     } else if (coords) {
       setCustomCoords(coords);
       setSelectedCity(undefined);
+    }
+  };
+
+  const handleToggleNotifications = async (enabled: boolean) => {
+    if (Capacitor.getPlatform() === 'web') {
+      toast({
+        title: 'Not available',
+        description: 'Push notifications are only available on mobile devices.',
+      });
+      return;
+    }
+
+    if (enabled) {
+      await initPushNotifications();
+      const status = await PushNotifications.checkPermissions();
+      setNotificationsEnabled(status.receive === 'granted');
+
+      if (status.receive === 'granted') {
+        toast({
+          title: 'Notifications enabled',
+          description: 'You will now receive updates and reminders.',
+        });
+      }
+    } else {
+      // Capacitor doesn't provide a way to 'unregister' permissions from the app,
+      // but we could send a signal to the backend to stop sending them.
+      setNotificationsEnabled(false);
+      toast({
+        title: 'Notifications disabled',
+        description: 'To completely stop notifications, please check your system settings.',
+      });
     }
   };
 
@@ -206,6 +248,40 @@ const Profile: React.FC = () => {
       </div>
     );
   }
+
+  // Sub-section: Notifications
+  if (activeSection === 'notifications') {
+    return (
+      <div className="container py-8">
+        <div className="max-w-xl mx-auto space-y-6">
+          <button
+            onClick={() => setActiveSection('menu')}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <NavArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+
+          <div>
+            <h1 className="text-4xl font-normal tracking-tight font-display">Notifications</h1>
+            <p className="text-base text-muted-foreground mt-1 font-normal">Manage how you receive updates.</p>
+          </div>
+
+          <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-base font-medium">Push Notifications</Label>
+              <p className="text-sm text-muted-foreground">Receive reminders for prayers and goals</p>
+            </div>
+            <Switch
+              checked={notificationsEnabled}
+              onCheckedChange={handleToggleNotifications}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Sub-section: Theme
   if (activeSection === 'theme') {
     return (
@@ -251,6 +327,21 @@ const Profile: React.FC = () => {
               <div className="text-left">
                 <span className="text-base font-medium">Account Information</span>
                 <p className="text-sm text-muted-foreground">Name, email, and location settings</p>
+              </div>
+            </div>
+            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
+          </button>
+
+          {/* Notifications */}
+          <button
+            onClick={() => setActiveSection('notifications')}
+            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center gap-3">
+              <Bell className="h-5 w-5 text-primary" />
+              <div className="text-left">
+                <span className="text-base font-medium">Notifications</span>
+                <p className="text-sm text-muted-foreground">Manage your alerts and reminders</p>
               </div>
             </div>
             <NavArrowRight className="h-5 w-5 text-muted-foreground" />

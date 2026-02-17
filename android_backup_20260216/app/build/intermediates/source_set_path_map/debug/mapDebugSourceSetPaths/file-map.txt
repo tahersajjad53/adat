@@ -1,0 +1,34 @@
+com.adat.app-emoji2-1.3.0-0 /Users/taher/.gradle/caches/8.14.3/transforms/1539342b895eb6a3eef58500ac6080b8/transformed/emoji2-1.3.0/res
+com.adat.app-appcompat-1.7.1-1 /Users/taher/.gradle/caches/8.14.3/transforms/17a15432db80bdf78d49246bb9e2d904/transformed/appcompat-1.7.1/res
+com.adat.app-coordinatorlayout-1.3.0-2 /Users/taher/.gradle/caches/8.14.3/transforms/1d1671c83406bb2624dc84c0890b95ed/transformed/coordinatorlayout-1.3.0/res
+com.adat.app-fragment-1.8.9-3 /Users/taher/.gradle/caches/8.14.3/transforms/2bbcb0c90440a0a0684be1d7ec22ffd6/transformed/fragment-1.8.9/res
+com.adat.app-activity-1.11.0-4 /Users/taher/.gradle/caches/8.14.3/transforms/2da28cb06b08478a962994e0b60569b0/transformed/activity-1.11.0/res
+com.adat.app-core-viewtree-1.0.0-5 /Users/taher/.gradle/caches/8.14.3/transforms/37bb6b434b1506da8ec22ac1535807cd/transformed/core-viewtree-1.0.0/res
+com.adat.app-profileinstaller-1.4.0-6 /Users/taher/.gradle/caches/8.14.3/transforms/3eeb4c33302f2b2a0517f50eaceb2b3e/transformed/profileinstaller-1.4.0/res
+com.adat.app-lifecycle-livedata-core-2.6.2-7 /Users/taher/.gradle/caches/8.14.3/transforms/413193869077687d96395b8537020a1b/transformed/lifecycle-livedata-core-2.6.2/res
+com.adat.app-lifecycle-viewmodel-savedstate-2.6.2-8 /Users/taher/.gradle/caches/8.14.3/transforms/47cce2b27286093bd63ccbc5e4311841/transformed/lifecycle-viewmodel-savedstate-2.6.2/res
+com.adat.app-core-runtime-2.2.0-9 /Users/taher/.gradle/caches/8.14.3/transforms/4cf5bbcbf39537b4dd45ace54d66445c/transformed/core-runtime-2.2.0/res
+com.adat.app-lifecycle-viewmodel-2.6.2-10 /Users/taher/.gradle/caches/8.14.3/transforms/4dd6313aa4e17bc2972dabdea73ea1ff/transformed/lifecycle-viewmodel-2.6.2/res
+com.adat.app-savedstate-1.2.1-11 /Users/taher/.gradle/caches/8.14.3/transforms/580cd57c4875e35c17a83451c3a8f887/transformed/savedstate-1.2.1/res
+com.adat.app-annotation-experimental-1.4.1-12 /Users/taher/.gradle/caches/8.14.3/transforms/6aad22d3f9b8545b6f9b2ab9436dc356/transformed/annotation-experimental-1.4.1/res
+com.adat.app-appcompat-resources-1.7.1-13 /Users/taher/.gradle/caches/8.14.3/transforms/6e4586f4500e1db933855829f675bcf3/transformed/appcompat-resources-1.7.1/res
+com.adat.app-lifecycle-process-2.6.2-14 /Users/taher/.gradle/caches/8.14.3/transforms/75c34d17b7ddbb9e035d5ef81a0a35ac/transformed/lifecycle-process-2.6.2/res
+com.adat.app-core-splashscreen-1.2.0-15 /Users/taher/.gradle/caches/8.14.3/transforms/76b1b94a56184fcb9bf57c91cda46644/transformed/core-splashscreen-1.2.0/res
+com.adat.app-startup-runtime-1.1.1-16 /Users/taher/.gradle/caches/8.14.3/transforms/7b53ac0edc57b80bdccc1b629cdba791/transformed/startup-runtime-1.1.1/res
+com.adat.app-webkit-1.14.0-17 /Users/taher/.gradle/caches/8.14.3/transforms/8948df51c72c859394157673b8eaecb6/transformed/webkit-1.14.0/res
+com.adat.app-core-ktx-1.17.0-18 /Users/taher/.gradle/caches/8.14.3/transforms/a74e82196537734a20348591216dc30a/transformed/core-ktx-1.17.0/res
+com.adat.app-emoji2-views-helper-1.3.0-19 /Users/taher/.gradle/caches/8.14.3/transforms/c04044b9b1a1a915804e582ba6891bc5/transformed/emoji2-views-helper-1.3.0/res
+com.adat.app-lifecycle-livedata-2.6.2-20 /Users/taher/.gradle/caches/8.14.3/transforms/c79a54ac85699bf83ec229cabacf0de2/transformed/lifecycle-livedata-2.6.2/res
+com.adat.app-core-1.17.0-21 /Users/taher/.gradle/caches/8.14.3/transforms/dc9ac60a2b3e082ee39f611c905e9db8/transformed/core-1.17.0/res
+com.adat.app-lifecycle-runtime-2.6.2-22 /Users/taher/.gradle/caches/8.14.3/transforms/f4918b39efdb48730e2f72f8d4cd3273/transformed/lifecycle-runtime-2.6.2/res
+com.adat.app-tracing-1.2.0-23 /Users/taher/.gradle/caches/8.14.3/transforms/f54f99cf67e8a7d5f153a9b7a2c81af6/transformed/tracing-1.2.0/res
+com.adat.app-pngs-24 /Users/taher/Documents/Total Tensei/adat-1/android/app/build/generated/res/pngs/debug
+com.adat.app-resValues-25 /Users/taher/Documents/Total Tensei/adat-1/android/app/build/generated/res/resValues/debug
+com.adat.app-updated_navigation_xml-26 /Users/taher/Documents/Total Tensei/adat-1/android/app/build/generated/updated_navigation_xml/debug
+com.adat.app-packageDebugResources-27 /Users/taher/Documents/Total Tensei/adat-1/android/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+com.adat.app-packageDebugResources-28 /Users/taher/Documents/Total Tensei/adat-1/android/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+com.adat.app-debug-29 /Users/taher/Documents/Total Tensei/adat-1/android/app/build/intermediates/merged_res/debug/mergeDebugResources
+com.adat.app-debug-30 /Users/taher/Documents/Total Tensei/adat-1/android/app/src/debug/res
+com.adat.app-main-31 /Users/taher/Documents/Total Tensei/adat-1/android/app/src/main/res
+com.adat.app-debug-32 /Users/taher/Documents/Total Tensei/adat-1/android/capacitor-cordova-android-plugins/build/intermediates/packaged_res/debug/packageDebugResources
+com.adat.app-debug-33 /Users/taher/Documents/Total Tensei/adat-1/node_modules/@capacitor/android/capacitor/build/intermediates/packaged_res/debug/packageDebugResources

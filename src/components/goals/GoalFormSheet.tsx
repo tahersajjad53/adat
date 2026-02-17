@@ -91,6 +91,10 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
     e?.preventDefault();
     if (!title.trim()) return;
 
+    // For one-time goals, we use the due_date as the start_date if it exists,
+    // otherwise fallback to the current startDate
+    const finalStartDate = recurrenceType === 'one-time' && dueDate ? dueDate : startDate;
+
     const data: GoalInput = {
       title: title.trim(),
       description: description.trim() || null,
@@ -98,8 +102,8 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       recurrence_days: recurrenceType === 'weekly' ? recurrenceDays : null,
       recurrence_pattern: recurrenceType === 'custom' ? recurrencePattern : null,
       due_date: recurrenceType === 'one-time' ? dueDate || null : null,
-      start_date: startDate,
-      end_date: hasEndDate && endDate ? endDate : null,
+      start_date: finalStartDate,
+      end_date: recurrenceType !== 'one-time' && hasEndDate && endDate ? endDate : null,
       is_active: isActive,
     };
 
@@ -152,42 +156,46 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         disabled={isLoading}
       />
 
-      <div className="space-y-2 overflow-hidden">
-        <Label htmlFor="startDate">Start date</Label>
-        <Input
-          id="startDate"
-          type="date"
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-          disabled={isLoading}
-          className="overflow-hidden"
-        />
-      </div>
+      {recurrenceType !== 'one-time' && (
+        <>
+          <div className="space-y-2 overflow-hidden">
+            <Label htmlFor="startDate">Start date</Label>
+            <Input
+              id="startDate"
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              disabled={isLoading}
+              className="overflow-hidden"
+            />
+          </div>
 
-      <div className="flex items-center justify-between">
-        <Label htmlFor="hasEndDate" className="cursor-pointer">
-          Set end date
-        </Label>
-        <Switch
-          id="hasEndDate"
-          checked={hasEndDate}
-          onCheckedChange={setHasEndDate}
-          disabled={isLoading}
-        />
-      </div>
+          <div className="flex items-center justify-between">
+            <Label htmlFor="hasEndDate" className="cursor-pointer">
+              Set end date
+            </Label>
+            <Switch
+              id="hasEndDate"
+              checked={hasEndDate}
+              onCheckedChange={setHasEndDate}
+              disabled={isLoading}
+            />
+          </div>
 
-      {hasEndDate && (
-        <div className="space-y-2 overflow-hidden">
-          <Label htmlFor="endDate">End date</Label>
-          <Input
-          id="endDate"
-          type="date"
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-          disabled={isLoading}
-          className="overflow-hidden"
-          />
-        </div>
+          {hasEndDate && (
+            <div className="space-y-2 overflow-hidden">
+              <Label htmlFor="endDate">End date</Label>
+              <Input
+              id="endDate"
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              disabled={isLoading}
+              className="overflow-hidden"
+              />
+            </div>
+          )}
+        </>
       )}
 
       {isEditing && (
