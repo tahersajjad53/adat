@@ -18,6 +18,7 @@ import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import GoalList from '@/components/goals/GoalList';
+import DynamicGoalDetailSheet from '@/components/goals/DynamicGoalDetailSheet';
 import type { Goal, GoalInput, GoalWithStatus } from '@/types/goals';
 
 const DYNAMIC_PREFIX = 'dynamic:';
@@ -32,6 +33,7 @@ const Goals: React.FC = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [educationPopupOpen, setEducationPopupOpen] = useState(false);
+  const [viewingDynamicGoal, setViewingDynamicGoal] = useState<GoalWithStatus | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Auto-open form when arriving from onboarding with ?new=1
@@ -198,6 +200,7 @@ const Goals: React.FC = () => {
             onToggle={handleToggle}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onViewDynamic={(goal) => setViewingDynamicGoal(goal)}
             onReorder={handleReorder}
             isToggling={isToggling || isCompletingOverdue || isDynamicToggling}
             overdueLabels={overdueLabels}
@@ -211,6 +214,12 @@ const Goals: React.FC = () => {
         goal={editingGoal}
         onSubmit={handleSubmit}
         isLoading={isCreating || isUpdating}
+      />
+
+      <DynamicGoalDetailSheet
+        goal={viewingDynamicGoal}
+        open={!!viewingDynamicGoal}
+        onOpenChange={(open) => { if (!open) setViewingDynamicGoal(null); }}
       />
 
       <Dialog open={educationPopupOpen} onOpenChange={setEducationPopupOpen}>

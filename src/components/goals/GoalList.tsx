@@ -22,6 +22,7 @@ interface GoalListProps {
   onToggle: (goalId: string) => void;
   onEdit: (goal: GoalWithStatus) => void;
   onDelete: (goalId: string) => void;
+  onViewDynamic?: (goal: GoalWithStatus) => void;
   onReorder: (orderedIds: string[]) => void;
   isToggling?: boolean;
   overdueLabels?: Map<string, string>;
@@ -32,6 +33,7 @@ const GoalList: React.FC<GoalListProps> = ({
   onToggle,
   onEdit,
   onDelete,
+  onViewDynamic,
   onReorder,
   isToggling = false,
   overdueLabels,
@@ -72,6 +74,7 @@ const GoalList: React.FC<GoalListProps> = ({
               onToggle={onToggle}
               onEdit={onEdit}
               onDelete={onDelete}
+              onViewDynamic={onViewDynamic}
               isToggling={isToggling}
               overdueLabel={overdueLabels?.get(goal.id)}
             />

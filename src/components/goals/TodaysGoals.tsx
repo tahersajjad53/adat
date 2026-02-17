@@ -1,11 +1,18 @@
-import React, { useRef } from 'react';
-import { Archery, Check } from 'iconoir-react';
+import React, { useRef, useState } from 'react';
+import { Archery, Check, Trash } from 'iconoir-react';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { useConfetti } from '@/components/ui/confetti';
-import type { Goal, OverdueGoal } from '@/types/goals';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
+import DynamicGoalDetailSheet from '@/components/goals/DynamicGoalDetailSheet';
+import type { Goal, GoalWithStatus, OverdueGoal } from '@/types/goals';
 import type { AdminGoal } from '@/types/adminGoals';
 
 interface TodaysGoalsProps {
@@ -20,6 +27,7 @@ interface TodaysGoalsProps {
   isCompletingOverdue?: boolean;
   onCreateGoal?: () => void;
   hasAnyGoals?: boolean;
+  onDeleteGoal?: (goalId: string) => void;
   // Dynamic goals
   dynamicGoals?: AdminGoal[];
   isDynamicCompleted?: (goalId: string) => boolean;
@@ -39,6 +47,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   isCompletingOverdue = false,
   onCreateGoal,
   hasAnyGoals = false,
+  onDeleteGoal,
   dynamicGoals = [],
   isDynamicCompleted,
   onDynamicToggle,
@@ -47,6 +56,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   const navigate = useNavigate();
   const { triggerConfetti, ConfettiPortal } = useConfetti();
   const checkboxRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
+  const [viewingDynamic, setViewingDynamic] = useState<GoalWithStatus | null>(null);
 
   const handleToggle = (goalId: string) => {
     if (!isCompleted(goalId)) {
@@ -117,41 +127,58 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
       ) : (
         <div className="space-y-3">
           {/* Overdue goals first */}
-          {overdueGoals.map((overdue) => (
-            <div
-              key={`overdue-${overdue.goal.id}`}
-              className="flex items-center gap-4 rounded-xl border border-destructive/30 bg-card p-4 transition-colors hover:bg-muted/50"
-            >
-              <Checkbox
-                ref={(el) => {
-                  const key = `overdue-${overdue.goal.id}`;
-                  if (el) checkboxRefs.current.set(key, el);
-                  else checkboxRefs.current.delete(key);
-                }}
-                checked={false}
-                onCheckedChange={() => handleOverdueToggle(overdue.goal.id)}
-                disabled={isCompletingOverdue}
-                className="h-5 w-5"
-              />
+          {overdueGoals.map((overdue) => {
+            const row = (
               <div
-                className="flex-1 min-w-0 cursor-pointer"
-                onClick={() => navigate('/goals')}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => { if (e.key === 'Enter') navigate('/goals'); }}
+                key={`overdue-${overdue.goal.id}`}
+                className="flex items-center gap-4 rounded-xl border border-destructive/30 bg-card p-4 transition-colors hover:bg-muted/50"
               >
-                <span className="text-base font-medium">{overdue.goal.title}</span>
-                <p className="text-xs font-medium text-destructive mt-0.5">
-                  {overdue.overdueDateLabel}
-                </p>
+                <Checkbox
+                  ref={(el) => {
+                    const key = `overdue-${overdue.goal.id}`;
+                    if (el) checkboxRefs.current.set(key, el);
+                    else checkboxRefs.current.delete(key);
+                  }}
+                  checked={false}
+                  onCheckedChange={() => handleOverdueToggle(overdue.goal.id)}
+                  disabled={isCompletingOverdue}
+                  className="h-5 w-5"
+                />
+                <div
+                  className="flex-1 min-w-0 cursor-pointer"
+                  onClick={() => navigate('/goals')}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter') navigate('/goals'); }}
+                >
+                  <span className="text-base font-medium">{overdue.goal.title}</span>
+                  <p className="text-xs font-medium text-destructive mt-0.5">
+                    {overdue.overdueDateLabel}
+                  </p>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+
+            return (
+              <ContextMenu key={`overdue-ctx-${overdue.goal.id}`}>
+                <ContextMenuTrigger asChild>{row}</ContextMenuTrigger>
+                <ContextMenuContent className="bg-popover">
+                  <ContextMenuItem
+                    onClick={() => onDeleteGoal?.(overdue.goal.id)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
+            );
+          })}
 
           {/* Today's goals */}
           {goalsDueToday.map((goal) => {
             const completed = isCompleted(goal.id);
-            return (
+            const row = (
               <div
                 key={goal.id}
                 className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
@@ -185,6 +212,21 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                 {completed && <Check className="h-4 w-4 text-primary shrink-0" />}
               </div>
             );
+
+            return (
+              <ContextMenu key={`ctx-${goal.id}`}>
+                <ContextMenuTrigger asChild>{row}</ContextMenuTrigger>
+                <ContextMenuContent className="bg-popover">
+                  <ContextMenuItem
+                    onClick={() => onDeleteGoal?.(goal.id)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
+            );
           })}
 
           {/* Dynamic goals inline */}
@@ -206,7 +248,33 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                   disabled={isDynamicToggling}
                   className="h-5 w-5"
                 />
-                <div className="flex-1 min-w-0">
+                <div
+                  className="flex-1 min-w-0 cursor-pointer"
+                  onClick={() => setViewingDynamic({
+                    ...goal,
+                    user_id: '',
+                    recurrence_type: goal.recurrence_type as GoalWithStatus['recurrence_type'],
+                    recurrence_days: goal.recurrence_days ?? null,
+                    recurrence_pattern: goal.recurrence_pattern as any,
+                    is_active: true,
+                    isCompleted: completed,
+                    isDynamic: true,
+                  })}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') setViewingDynamic({
+                      ...goal,
+                      user_id: '',
+                      recurrence_type: goal.recurrence_type as GoalWithStatus['recurrence_type'],
+                      recurrence_days: goal.recurrence_days ?? null,
+                      recurrence_pattern: goal.recurrence_pattern as any,
+                      is_active: true,
+                      isCompleted: completed,
+                      isDynamic: true,
+                    });
+                  }}
+                >
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={`text-base font-medium ${completed ? 'line-through text-muted-foreground' : ''}`}>
                       {goal.title}
@@ -228,6 +296,12 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
         </div>
       )}
       <ConfettiPortal />
+
+      <DynamicGoalDetailSheet
+        goal={viewingDynamic}
+        open={!!viewingDynamic}
+        onOpenChange={(open) => { if (!open) setViewingDynamic(null); }}
+      />
     </div>
   );
 };

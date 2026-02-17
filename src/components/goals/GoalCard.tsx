@@ -9,6 +9,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getRecurrenceDescription } from '@/lib/recurrence';
@@ -20,6 +26,7 @@ interface GoalCardProps {
   onToggle: (goalId: string) => void;
   onEdit: (goal: GoalWithStatus) => void;
   onDelete: (goalId: string) => void;
+  onViewDynamic?: (goal: GoalWithStatus) => void;
   isToggling?: boolean;
   overdueLabel?: string;
 }
@@ -29,6 +36,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
   onToggle,
   onEdit,
   onDelete,
+  onViewDynamic,
   isToggling = false,
   overdueLabel,
 }) => {
@@ -57,7 +65,15 @@ const GoalCard: React.FC<GoalCardProps> = ({
     onToggle(goal.id);
   };
 
-  return (
+  const handleContentClick = () => {
+    if (goal.isDynamic) {
+      onViewDynamic?.(goal);
+    } else {
+      onEdit(goal);
+    }
+  };
+
+  const cardContent = (
     <div
       ref={setNodeRef}
       style={style}
@@ -95,11 +111,11 @@ const GoalCard: React.FC<GoalCardProps> = ({
 
       {/* Content */}
       <div
-        className={`flex-1 min-w-0 ${goal.isDynamic ? '' : 'cursor-pointer'}`}
-        onClick={() => { if (!goal.isDynamic) onEdit(goal); }}
-        role={goal.isDynamic ? undefined : 'button'}
-        tabIndex={goal.isDynamic ? undefined : 0}
-        onKeyDown={(e) => { if (!goal.isDynamic && e.key === 'Enter') onEdit(goal); }}
+        className="flex-1 min-w-0 cursor-pointer"
+        onClick={handleContentClick}
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter') handleContentClick(); }}
       >
         <div className="flex items-center gap-2 flex-wrap">
           <span
@@ -119,7 +135,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
           )}
         </div>
         {goal.description && (
-          <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+          <p className={`mt-0.5 line-clamp-1 text-muted-foreground ${goal.isDynamic ? 'text-sm' : 'text-xs'}`}>
             {goal.description}
           </p>
         )}
@@ -160,6 +176,32 @@ const GoalCard: React.FC<GoalCardProps> = ({
       <ConfettiPortal />
     </div>
   );
+
+  // Wrap non-dynamic goals in context menu for long-press delete
+  if (!goal.isDynamic) {
+    return (
+      <ContextMenu>
+        <ContextMenuTrigger asChild>
+          {cardContent}
+        </ContextMenuTrigger>
+        <ContextMenuContent className="bg-popover">
+          <ContextMenuItem onClick={() => onEdit(goal)}>
+            <EditPencil className="h-4 w-4 mr-2" />
+            Edit
+          </ContextMenuItem>
+          <ContextMenuItem
+            onClick={() => onDelete(goal.id)}
+            className="text-destructive focus:text-destructive"
+          >
+            <Trash className="h-4 w-4 mr-2" />
+            Delete
+          </ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    );
+  }
+
+  return cardContent;
 };
 
 export default GoalCard;

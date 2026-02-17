@@ -41,7 +41,7 @@ const Dashboard: React.FC = () => {
   const { overdueGoals, completeOverdue, isCompletingOverdue } = useOverdueGoals();
   const overdueGoalIds = useMemo(() => new Set(overdueGoals.map((o) => o.goal.id)), [overdueGoals]);
   const [goalFormOpen, setGoalFormOpen] = useState(false);
-  const { goals, createGoal, isCreating } = useGoals();
+  const { goals, createGoal, deleteGoal, isCreating } = useGoals();
 
   // Dynamic goals
   const { dynamicGoals } = useDynamicGoals();
@@ -187,6 +187,7 @@ const Dashboard: React.FC = () => {
           overdueGoals={overdueGoals}
           onCompleteOverdue={completeOverdue}
           isCompletingOverdue={isCompletingOverdue}
+          onDeleteGoal={deleteGoal}
           dynamicGoals={dynamicGoals}
           isDynamicCompleted={isDynamicCompleted}
           onDynamicToggle={toggleDynamic}
