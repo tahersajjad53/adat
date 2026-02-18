@@ -57,6 +57,7 @@ export type Database = {
           end_date: string | null
           id: string
           is_published: boolean
+          preferred_time: string | null
           recurrence_days: number[] | null
           recurrence_pattern: Json | null
           recurrence_type: string
@@ -72,6 +73,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           is_published?: boolean
+          preferred_time?: string | null
           recurrence_days?: number[] | null
           recurrence_pattern?: Json | null
           recurrence_type?: string
@@ -87,6 +89,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           is_published?: boolean
+          preferred_time?: string | null
           recurrence_days?: number[] | null
           recurrence_pattern?: Json | null
           recurrence_type?: string
@@ -238,6 +241,7 @@ export type Database = {
           end_date: string | null
           id: string
           is_active: boolean
+          preferred_time: string | null
           recurrence_days: number[] | null
           recurrence_pattern: Json | null
           recurrence_type: string
@@ -254,6 +258,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           is_active?: boolean
+          preferred_time?: string | null
           recurrence_days?: number[] | null
           recurrence_pattern?: Json | null
           recurrence_type?: string
@@ -270,6 +275,7 @@ export type Database = {
           end_date?: string | null
           id?: string
           is_active?: boolean
+          preferred_time?: string | null
           recurrence_days?: number[] | null
           recurrence_pattern?: Json | null
           recurrence_type?: string
@@ -379,6 +385,7 @@ export type Database = {
           id: string
           latitude: number | null
           longitude: number | null
+          push_token: string | null
           theme: string | null
           timezone: string | null
           updated_at: string | null
@@ -393,6 +400,7 @@ export type Database = {
           id: string
           latitude?: number | null
           longitude?: number | null
+          push_token?: string | null
           theme?: string | null
           timezone?: string | null
           updated_at?: string | null
@@ -407,6 +415,7 @@ export type Database = {
           id?: string
           latitude?: number | null
           longitude?: number | null
+          push_token?: string | null
           theme?: string | null
           timezone?: string | null
           updated_at?: string | null
