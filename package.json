@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "db:push": "supabase db push",
+    "db:migration:list": "supabase migration list",
     "cap:sync": "npm run build && npx cap sync",
     "cap:android": "npx cap run android",
     "cap:open": "npx cap open android",
