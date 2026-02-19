@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Circle, CircleDot, FileText, Calendar, CalendarCheck, CalendarRange } from 'lucide-react';
+import { Circle, CheckCircle, Page, Calendar, CalendarCheck } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -169,7 +169,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       </div>
 
       {/* Description: Add placeholder when empty */}
-      <CondensedAttributeRow icon={<FileText className="size-4" />}>
+      <CondensedAttributeRow icon={<Page className="size-4" />}>
         <Textarea
           id="goalDescription"
           value={description}
@@ -206,7 +206,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
             />
           </CondensedAttributeRow>
 
-          <CondensedAttributeRow icon={<CalendarRange className="size-4" />}>
+          <CondensedAttributeRow icon={<Calendar className="size-4" />}>
             <div className="flex items-center justify-between w-full">
               <span className="text-sm text-muted-foreground">Set end date</span>
               <Switch
@@ -219,7 +219,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
           </CondensedAttributeRow>
 
           {hasEndDate && (
-            <CondensedAttributeRow icon={<CalendarRange className="size-4" />} label="End date">
+            <CondensedAttributeRow icon={<Calendar className="size-4" />} label="End date">
               <Input
                 id="endDate"
                 type="date"
@@ -234,7 +234,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       )}
 
       {isEditing && (
-        <CondensedAttributeRow icon={<CircleDot className="size-4" />}>
+        <CondensedAttributeRow icon={<CheckCircle className="size-4" />}>
           <div className="flex items-center justify-between w-full">
             <span className="text-sm">Active</span>
             <Switch

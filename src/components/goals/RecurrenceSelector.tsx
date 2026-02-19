@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, Repeat } from 'lucide-react';
+import { Calendar, Repeat } from 'iconoir-react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
