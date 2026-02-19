@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { Circle, FileText, Repeat, Calendar, CalendarCheck, CalendarRange, Globe } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
 import {
@@ -15,6 +15,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import CondensedAttributeRow from '@/components/goals/CondensedAttributeRow';
 import type { AdminGoal, AdminGoalInput } from '@/types/adminGoals';
 
 const HIJRI_MONTHS = [
@@ -139,21 +140,34 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
   const formTitle = isEditing ? 'Edit Goal' : 'Add Goal';
 
   const formContent = (
-    <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-5">
-      <div className="space-y-2">
-        <Label>Title</Label>
-        <Input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g., Moti Salwat before Iftar" disabled={isLoading} required autoFocus />
+    <form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }} className="space-y-2">
+      <div className="flex items-center gap-3 min-h-9">
+        <Circle className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+        <Input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="e.g., Moti Salwat before Iftar"
+          disabled={isLoading}
+          required
+          autoFocus
+          className="flex-1 min-w-0 h-9"
+        />
       </div>
 
-      <div className="space-y-2">
-        <Label>Description (optional)</Label>
-        <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Details..." disabled={isLoading} rows={2} />
-      </div>
+      <CondensedAttributeRow icon={<FileText className="size-4" />}>
+        <Textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Add description"
+          disabled={isLoading}
+          rows={2}
+          className="min-h-[52px] resize-none"
+        />
+      </CondensedAttributeRow>
 
-      <div className="space-y-2">
-        <Label>Repeats</Label>
+      <CondensedAttributeRow icon={<Repeat className="size-4" />}>
         <Select value={recurrenceType} onValueChange={setRecurrenceType} disabled={isLoading}>
-          <SelectTrigger><SelectValue /></SelectTrigger>
+          <SelectTrigger className="h-9"><SelectValue placeholder="Repeats" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="daily">Daily</SelectItem>
             <SelectItem value="weekly">Weekly</SelectItem>
@@ -162,117 +176,122 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
             <SelectItem value="annual">Annual</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </CondensedAttributeRow>
 
       {recurrenceType === 'weekly' && (
-        <div className="space-y-2">
-          <Label>On days</Label>
+        <CondensedAttributeRow icon={<Repeat className="size-4" />} label="On days">
           <ToggleGroup type="multiple" value={recurrenceDays.map(String)} onValueChange={(vals) => setRecurrenceDays(vals.map(Number))} className="justify-start gap-1" disabled={isLoading}>
             {DAY_LABELS.map((d) => (
-              <ToggleGroupItem key={d.value} value={d.value} className="h-9 w-9 rounded-full text-xs font-medium data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">{d.label}</ToggleGroupItem>
+              <ToggleGroupItem key={d.value} value={d.value} className="h-8 w-8 rounded-full text-xs font-medium data-[state=on]:bg-primary data-[state=on]:text-primary-foreground">{d.label}</ToggleGroupItem>
             ))}
           </ToggleGroup>
-        </div>
+        </CondensedAttributeRow>
       )}
 
       {recurrenceType === 'custom' && (
-        <div className="space-y-4">
-          <Select value={customPatternType} onValueChange={(v) => setCustomPatternType(v as any)} disabled={isLoading}>
-            <SelectTrigger><SelectValue /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="interval">Every N days/weeks</SelectItem>
-              <SelectItem value="monthly">Day of month</SelectItem>
-            </SelectContent>
-          </Select>
+        <>
+          <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Pattern">
+            <Select value={customPatternType} onValueChange={(v) => setCustomPatternType(v as any)} disabled={isLoading}>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="interval">Every N days/weeks</SelectItem>
+                <SelectItem value="monthly">Day of month</SelectItem>
+              </SelectContent>
+            </Select>
+          </CondensedAttributeRow>
           {customPatternType === 'interval' && (
-            <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Every</span>
-              <Input type="number" min="1" value={interval} onChange={(e) => setIntervalVal(parseInt(e.target.value) || 2)} className="w-20" disabled={isLoading} />
-              <Select value={intervalUnit} onValueChange={(v) => setIntervalUnit(v as any)} disabled={isLoading}>
-                <SelectTrigger className="w-24"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="days">days</SelectItem>
-                  <SelectItem value="weeks">weeks</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <CondensedAttributeRow icon={<Repeat className="size-4" />}>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-muted-foreground shrink-0">Every</span>
+                <Input type="number" min="1" value={interval} onChange={(e) => setIntervalVal(parseInt(e.target.value) || 2)} className="h-9 w-20" disabled={isLoading} />
+                <Select value={intervalUnit} onValueChange={(v) => setIntervalUnit(v as any)} disabled={isLoading}>
+                  <SelectTrigger className="h-9 w-24"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="days">days</SelectItem>
+                    <SelectItem value="weeks">weeks</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </CondensedAttributeRow>
           )}
           {customPatternType === 'monthly' && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground">Day</span>
-                <Input type="number" min="1" max="30" value={monthlyDay} onChange={(e) => setMonthlyDay(parseInt(e.target.value) || 1)} className="w-20" disabled={isLoading} />
-                <span className="text-sm text-muted-foreground">of each month</span>
-              </div>
-              <Select value={calendarType} onValueChange={(v) => setCalendarType(v as any)} disabled={isLoading}>
-                <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="hijri">Hijri</SelectItem>
-                  <SelectItem value="gregorian">Gregorian</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <>
+              <CondensedAttributeRow icon={<Repeat className="size-4" />}>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm text-muted-foreground shrink-0">Day</span>
+                  <Input type="number" min="1" max="30" value={monthlyDay} onChange={(e) => setMonthlyDay(parseInt(e.target.value) || 1)} className="h-9 w-20" disabled={isLoading} />
+                  <span className="text-sm text-muted-foreground shrink-0">of each month</span>
+                </div>
+              </CondensedAttributeRow>
+              <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Calendar">
+                <Select value={calendarType} onValueChange={(v) => setCalendarType(v as any)} disabled={isLoading}>
+                  <SelectTrigger className="h-9 w-32"><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hijri">Hijri</SelectItem>
+                    <SelectItem value="gregorian">Gregorian</SelectItem>
+                  </SelectContent>
+                </Select>
+              </CondensedAttributeRow>
+            </>
           )}
-        </div>
+        </>
       )}
 
       {recurrenceType === 'annual' && (
-        <div className="space-y-3">
-          <div className="space-y-2">
-            <Label>Calendar</Label>
+        <>
+          <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Calendar">
             <Select value={annualCalendar} onValueChange={(v) => setAnnualCalendar(v as any)} disabled={isLoading}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9 w-32"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="hijri">Hijri</SelectItem>
                 <SelectItem value="gregorian">Gregorian</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div className="space-y-2">
-            <Label>Month</Label>
+          </CondensedAttributeRow>
+          <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Month">
             <Select value={String(annualMonth)} onValueChange={(v) => setAnnualMonth(parseInt(v))} disabled={isLoading}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-9"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {(annualCalendar === 'hijri' ? HIJRI_MONTHS : GREGORIAN_MONTHS).map((m, i) => (
                   <SelectItem key={i + 1} value={String(i + 1)}>{m}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-          </div>
-          <div className="flex items-center gap-2">
-            <Label>Day</Label>
-            <Input type="number" min="1" max="30" value={annualDay} onChange={(e) => setAnnualDay(parseInt(e.target.value) || 1)} className="w-20" disabled={isLoading} />
-          </div>
-        </div>
+          </CondensedAttributeRow>
+          <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Day">
+            <Input type="number" min="1" max="30" value={annualDay} onChange={(e) => setAnnualDay(parseInt(e.target.value) || 1)} className="h-9 w-20" disabled={isLoading} />
+          </CondensedAttributeRow>
+        </>
       )}
 
       {recurrenceType === 'one-time' && (
-        <div className="space-y-2">
-          <Label>Due date</Label>
-          <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} disabled={isLoading} />
-        </div>
+        <CondensedAttributeRow icon={<Calendar className="size-4" />} label="Due date">
+          <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} disabled={isLoading} className="h-9 overflow-hidden" />
+        </CondensedAttributeRow>
       )}
 
-      <div className="space-y-2">
-        <Label>Start date</Label>
-        <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} disabled={isLoading} />
-      </div>
+      <CondensedAttributeRow icon={<CalendarCheck className="size-4" />} label="Start date">
+        <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} disabled={isLoading} className="h-9 overflow-hidden" />
+      </CondensedAttributeRow>
 
-      <div className="flex items-center justify-between">
-        <Label className="cursor-pointer">Set end date</Label>
-        <Switch checked={hasEndDate} onCheckedChange={setHasEndDate} disabled={isLoading} />
-      </div>
+      <CondensedAttributeRow icon={<CalendarRange className="size-4" />}>
+        <div className="flex items-center justify-between w-full">
+          <span className="text-sm text-muted-foreground">Set end date</span>
+          <Switch checked={hasEndDate} onCheckedChange={setHasEndDate} disabled={isLoading} />
+        </div>
+      </CondensedAttributeRow>
       {hasEndDate && (
-        <div className="space-y-2">
-          <Label>End date</Label>
-          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} disabled={isLoading} />
-        </div>
+        <CondensedAttributeRow icon={<CalendarRange className="size-4" />} label="End date">
+          <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} disabled={isLoading} className="h-9 overflow-hidden" />
+        </CondensedAttributeRow>
       )}
 
-      <div className="flex items-center justify-between">
-        <Label className="cursor-pointer">Published</Label>
-        <Switch checked={isPublished} onCheckedChange={setIsPublished} disabled={isLoading} />
-      </div>
+      <CondensedAttributeRow icon={<Globe className="size-4" />}>
+        <div className="flex items-center justify-between w-full">
+          <span className="text-sm">Published</span>
+          <Switch checked={isPublished} onCheckedChange={setIsPublished} disabled={isLoading} />
+        </div>
+      </CondensedAttributeRow>
     </form>
   );
 
