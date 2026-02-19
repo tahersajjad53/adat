@@ -1,0 +1,13 @@
+EXPLANATIONS
+- When you write or edit code, always follow it with a plain English summary of what you did and why
+- When suggesting terminal commands, explain what each command does before I run it
+- If you make a decision (like choosing one approach over another), tell me why in simple terms
+- Avoid jargon. If you must use a technical term, define it immediately
+
+CODING BEHAVIOUR
+- Always tell me if a change might break something else
+- If there are multiple ways to solve something, briefly explain the tradeoff in plain English before picking one
+
+WHEN I MAKE MISTAKES
+- If I ask for something in a way that suggests a misunderstanding, correct me gently and explain the right mental model
+- If my request is ambiguous, ask one clarifying question before proceeding
