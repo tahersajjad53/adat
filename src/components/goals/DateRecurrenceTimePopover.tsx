@@ -181,6 +181,7 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
   const monthOfYear = date ? new Date(date + 'T12:00:00').getMonth() + 1 : 1;
 
   const recurrencePresets = [
+    { label: 'Off', onClick: () => handleRecurrencePreset('one-time') },
     { label: 'Every day', onClick: () => handleRecurrencePreset('daily') },
     {
       label: `Every week on ${DAY_NAMES[dayOfWeek]}`,
@@ -342,7 +343,14 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
       </div>
 
       <div className="border-t pt-4 pb-2">
-        <Button variant="default" className="w-full" onClick={() => setOpen(false)}>
+        <Button
+          variant="default"
+          className="w-full"
+          onClick={() => {
+            // Defer close so parent state from preset/date selection is committed before sheet unmounts
+            setTimeout(() => setOpen(false), 0);
+          }}
+        >
           Done
         </Button>
       </div>

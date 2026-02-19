@@ -63,13 +63,16 @@ export const initPushNotifications = async () => {
       }
     );
 
-    // Method called when tapping on a notification
+    // Method called when tapping on a notification — dispatch for app to handle navigation
     PushNotifications.addListener(
       'pushNotificationActionPerformed',
       (notification) => {
-        console.log('Push notification action performed', notification);
-        // Navigate to specific screen based on notification data
-        // Example: router.push('/notifications');
+        const data = notification.notification?.data ?? notification.notification ?? {};
+        const goalId = typeof data.goal_id === 'string' ? data.goal_id : undefined;
+        const screen = typeof data.screen === 'string' ? data.screen : 'goals';
+        window.dispatchEvent(
+          new CustomEvent('push-notification-open', { detail: { goal_id: goalId, screen } })
+        );
       }
     );
   }

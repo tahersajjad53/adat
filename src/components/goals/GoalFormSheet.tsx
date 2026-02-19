@@ -84,7 +84,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('daily');
+  const [recurrenceType, setRecurrenceType] = useState<RecurrenceType>('one-time');
   const [recurrenceDays, setRecurrenceDays] = useState<number[]>([]);
   const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern | null>(null);
   const [dueDate, setDueDate] = useState('');
@@ -109,7 +109,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       } else {
         setTitle('');
         setDescription('');
-        setRecurrenceType('daily');
+        setRecurrenceType('one-time');
         setRecurrenceDays([]);
         setRecurrencePattern(null);
         setDueDate('');
@@ -134,7 +134,12 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
 
     // For one-time goals, we use the due_date as the start_date if it exists,
     // otherwise fallback to the current startDate
-    const finalStartDate = recurrenceType === 'one-time' && dueDate ? dueDate : startDate;
+    let finalStartDate = recurrenceType === 'one-time' && dueDate ? dueDate : startDate;
+    const todayYmd = new Date().toISOString().split('T')[0];
+    const isValidYmd = (s: string) => /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s + 'T12:00:00'));
+    if (!finalStartDate || !isValidYmd(finalStartDate)) {
+      finalStartDate = todayYmd;
+    }
 
     const data: GoalInput = {
       title: title.trim(),
