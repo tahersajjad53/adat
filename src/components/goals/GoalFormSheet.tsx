@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Circle, CheckCircle, Page, Calendar } from 'iconoir-react';
+import { Circle, CheckCircle, Page, Calendar, Bell } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -22,8 +22,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import DateRecurrenceTimePopover from './DateRecurrenceTimePopover';
+import ReminderSelector from './ReminderSelector';
 import CondensedAttributeRow from './CondensedAttributeRow';
-import type { Goal, GoalInput, RecurrenceType, RecurrencePattern } from '@/types/goals';
+import type { Goal, GoalInput, RecurrenceType, RecurrencePattern, ReminderOffset } from '@/types/goals';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = [
@@ -90,6 +91,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   const [startDate, setStartDate] = useState('');
   const [isActive, setIsActive] = useState(true);
   const [preferredTime, setPreferredTime] = useState<string | null>(null);
+  const [reminderOffset, setReminderOffset] = useState<ReminderOffset | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -103,6 +105,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setStartDate(goal.start_date);
         setIsActive(goal.is_active);
         setPreferredTime(goal.preferred_time ?? null);
+        setReminderOffset(goal.reminder_offset ?? null);
       } else {
         setTitle('');
         setDescription('');
@@ -113,6 +116,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setStartDate(new Date().toISOString().split('T')[0]);
         setIsActive(true);
         setPreferredTime(null);
+        setReminderOffset(null);
       }
     }
   }, [open, goal]);
@@ -143,6 +147,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       start_date: finalStartDate,
       end_date: null,
       preferred_time: preferredTime,
+      reminder_offset: reminderOffset,
       is_active: isActive,
     };
 
@@ -222,6 +227,14 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
           onPreferredTimeChange={setPreferredTime}
           disabled={isLoading}
           isOneTime={recurrenceType === 'one-time'}
+        />
+      </CondensedAttributeRow>
+
+      <CondensedAttributeRow icon={<Bell className="size-4" />}>
+        <ReminderSelector
+          value={reminderOffset}
+          onChange={setReminderOffset}
+          disabled={isLoading}
         />
       </CondensedAttributeRow>
 

@@ -1,29 +1,25 @@
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
+import { supabase } from '@/integrations/supabase/client';
 
 const saveTokenToServer = async (token: string) => {
   try {
-    // TODO: Replace with your actual API endpoint and values
-    // const yourAuthToken = 'YOUR_AUTH_TOKEN';
-    // const currentUserId = 'YOUR_USER_ID';
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      console.log('No authenticated user, skipping push token save');
+      return;
+    }
 
-    console.log('Saving token to server:', token);
+    const { error } = await supabase
+      .from('profiles')
+      .update({ push_token: token })
+      .eq('id', user.id);
 
-    /*
-    await fetch('https://your-api.com/api/save-token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // 'Authorization': `Bearer ${yourAuthToken}`
-      },
-      body: JSON.stringify({
-        token: token,
-        // userId: currentUserId,
-        platform: Capacitor.getPlatform()
-      })
-    });
-    console.log('Token saved to server');
-    */
+    if (error) {
+      console.error('Failed to save push token:', error);
+      return;
+    }
+    console.log('Push token saved to server');
   } catch (error) {
     console.error('Failed to save token:', error);
   }

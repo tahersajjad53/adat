@@ -61,6 +61,7 @@ export function useGoals() {
           start_date: input.start_date || new Date().toISOString().split('T')[0],
           end_date: input.end_date,
           preferred_time: input.preferred_time ?? null,
+          reminder_offset: input.reminder_offset ?? null,
           sort_order: maxOrder + 1,
           is_active: input.is_active ?? true,
         })
