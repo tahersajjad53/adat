@@ -36,7 +36,7 @@ const Profile: React.FC = () => {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, latitude, longitude, city, timezone')
+        .select('full_name, latitude, longitude, city, timezone, push_enabled')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -60,10 +60,11 @@ const Profile: React.FC = () => {
         }
       }
 
-      // Check notification status
-      if (Capacitor.getPlatform() !== 'web') {
+      // Check notification status: enabled only if profile has push_enabled and permission granted
+      if (Capacitor.getPlatform() !== 'web' && data) {
         const status = await PushNotifications.checkPermissions();
-        setNotificationsEnabled(status.receive === 'granted');
+        const pushEnabled = data.push_enabled !== false;
+        setNotificationsEnabled(pushEnabled && status.receive === 'granted');
       }
 
       setLoading(false);
@@ -93,6 +94,14 @@ const Profile: React.FC = () => {
     }
 
     if (enabled) {
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ push_enabled: true })
+        .eq('id', user!.id);
+      if (updateError) {
+        toast({ title: 'Error', description: updateError.message, variant: 'destructive' });
+        return;
+      }
       await initPushNotifications();
       const status = await PushNotifications.checkPermissions();
       setNotificationsEnabled(status.receive === 'granted');
@@ -104,8 +113,14 @@ const Profile: React.FC = () => {
         });
       }
     } else {
-      // Capacitor doesn't provide a way to 'unregister' permissions from the app,
-      // but we could send a signal to the backend to stop sending them.
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({ push_enabled: false, push_token: null })
+        .eq('id', user!.id);
+      if (updateError) {
+        toast({ title: 'Error', description: updateError.message, variant: 'destructive' });
+        return;
+      }
       setNotificationsEnabled(false);
       toast({
         title: 'Notifications disabled',

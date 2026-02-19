@@ -45,6 +45,17 @@ export function useGoals() {
     mutationFn: async (input: GoalInput) => {
       if (!user) throw new Error('Not authenticated');
 
+      const todayYmd = new Date().toISOString().split('T')[0];
+      const isValidYmd = (s: string) =>
+        /^\d{4}-\d{2}-\d{2}$/.test(s) && !Number.isNaN(Date.parse(s + 'T12:00:00'));
+      const startDate =
+        input.start_date && isValidYmd(input.start_date) ? input.start_date : todayYmd;
+
+      const recurrencePattern =
+        input.recurrence_type === 'custom' || input.recurrence_type === 'annual'
+          ? (input.recurrence_pattern as any)
+          : null;
+
       // Get the next sort order
       const maxOrder = goals.reduce((max, g) => Math.max(max, g.sort_order), -1);
 
@@ -55,10 +66,10 @@ export function useGoals() {
           title: input.title,
           description: input.description,
           recurrence_type: input.recurrence_type,
-          recurrence_pattern: input.recurrence_pattern as any,
+          recurrence_pattern: recurrencePattern,
           recurrence_days: input.recurrence_days,
           due_date: input.due_date,
-          start_date: input.start_date || new Date().toISOString().split('T')[0],
+          start_date: startDate,
           end_date: input.end_date,
           preferred_time: input.preferred_time ?? null,
           reminder_offset: input.reminder_offset ?? null,
@@ -78,11 +89,12 @@ export function useGoals() {
         description: 'Your new goal has been added.',
       });
     },
-    onError: (error) => {
+    onError: (error: Error & { message?: string }) => {
       console.error('Error creating goal:', error);
+      const message = error?.message ?? 'Something went wrong. Please try again.';
       toast({
         title: 'Error creating goal',
-        description: 'Something went wrong. Please try again.',
+        description: message,
         variant: 'destructive',
       });
     },
