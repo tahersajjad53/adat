@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Circle, FileText, Repeat, Calendar, CalendarCheck, CalendarRange, Globe } from 'lucide-react';
+import { Circle, Page, Repeat, Calendar, CalendarCheck, Globe } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -154,7 +154,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
         />
       </div>
 
-      <CondensedAttributeRow icon={<FileText className="size-4" />}>
+      <CondensedAttributeRow icon={<Page className="size-4" />}>
         <Textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -274,14 +274,14 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
         <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} disabled={isLoading} className="h-9 overflow-hidden" />
       </CondensedAttributeRow>
 
-      <CondensedAttributeRow icon={<CalendarRange className="size-4" />}>
+      <CondensedAttributeRow icon={<Calendar className="size-4" />}>
         <div className="flex items-center justify-between w-full">
           <span className="text-sm text-muted-foreground">Set end date</span>
           <Switch checked={hasEndDate} onCheckedChange={setHasEndDate} disabled={isLoading} />
         </div>
       </CondensedAttributeRow>
       {hasEndDate && (
-        <CondensedAttributeRow icon={<CalendarRange className="size-4" />} label="End date">
+        <CondensedAttributeRow icon={<Calendar className="size-4" />} label="End date">
           <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} disabled={isLoading} className="h-9 overflow-hidden" />
         </CondensedAttributeRow>
       )}
