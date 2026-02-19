@@ -245,6 +245,7 @@ export type Database = {
           recurrence_days: number[] | null
           recurrence_pattern: Json | null
           recurrence_type: string
+          reminder_offset: string | null
           sort_order: number
           start_date: string
           title: string
@@ -262,6 +263,7 @@ export type Database = {
           recurrence_days?: number[] | null
           recurrence_pattern?: Json | null
           recurrence_type?: string
+          reminder_offset?: string | null
           sort_order?: number
           start_date?: string
           title: string
@@ -279,6 +281,7 @@ export type Database = {
           recurrence_days?: number[] | null
           recurrence_pattern?: Json | null
           recurrence_type?: string
+          reminder_offset?: string | null
           sort_order?: number
           start_date?: string
           title?: string

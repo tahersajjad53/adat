@@ -262,12 +262,14 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
       </div>
 
       {/* Calendar */}
-      <div className="border-t px-2 py-2">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={handleDateSelect}
-        />
+      <div className="border-t px-4 py-3 w-full flex justify-center">
+        <div className="w-fit">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={handleDateSelect}
+          />
+        </div>
       </div>
 
       {/* Time */}

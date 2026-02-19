@@ -2,6 +2,18 @@
 
 export type RecurrenceType = 'daily' | 'weekly' | 'custom' | 'one-time' | 'annual';
 
+export type ReminderOffset =
+  | 'none'
+  | 'at_time'
+  | '5m'
+  | '10m'
+  | '15m'
+  | '30m'
+  | '1h'
+  | '2h'
+  | '1d'
+  | '2d';
+
 export interface RecurrencePattern {
   type: 'interval' | 'monthly' | 'annual';
   interval?: number;           // Every N days/weeks
@@ -23,6 +35,7 @@ export interface Goal {
   start_date: string;
   end_date?: string | null;
   preferred_time?: string | null;    // HH:mm e.g. "09:45"
+  reminder_offset?: ReminderOffset | null;
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -49,6 +62,7 @@ export interface GoalInput {
   start_date?: string;
   end_date?: string | null;
   preferred_time?: string | null;    // HH:mm e.g. "09:45"
+  reminder_offset?: ReminderOffset | null;
   sort_order?: number;
   is_active?: boolean;
 }
