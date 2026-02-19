@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Circle, CheckCircle, Page, Calendar, CalendarCheck } from 'iconoir-react';
+import { Circle, CheckCircle, Page, Calendar } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,11 +21,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import RecurrenceSelector from './RecurrenceSelector';
+import DateRecurrenceTimePopover from './DateRecurrenceTimePopover';
 import CondensedAttributeRow from './CondensedAttributeRow';
 import type { Goal, GoalInput, RecurrenceType, RecurrencePattern } from '@/types/goals';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+const HIJRI_MONTH_NAMES = [
+  'Muharram', 'Safar', 'Rabi I', 'Rabi II', 'Jumada I', 'Jumada II',
+  'Rajab', 'Shabaan', 'Ramadan', 'Shawwal', 'Dhul Qadah', 'Dhul Hijjah',
+];
 
 function formatRecurrenceSummary(
   recurrenceType: RecurrenceType,
@@ -38,6 +46,12 @@ function formatRecurrenceSummary(
     return 'Weekly ' + recurrenceDays.map((d) => DAY_NAMES[d]).join(', ');
   }
   if (recurrenceType === 'one-time') return 'One-time';
+  if (recurrenceType === 'annual' && recurrencePattern?.type === 'annual') {
+    const monthNames = recurrencePattern.calendarType === 'gregorian' ? MONTH_NAMES : HIJRI_MONTH_NAMES;
+    const month = monthNames[(recurrencePattern.annualMonth ?? 1) - 1] ?? '';
+    const day = recurrencePattern.monthlyDay ?? 1;
+    return `Annual: ${day} ${month}`;
+  }
   if (recurrenceType === 'annual') return 'Annual';
   if (recurrenceType === 'custom' && recurrencePattern?.type === 'interval') {
     const n = recurrencePattern.interval ?? 2;
@@ -74,9 +88,8 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   const [recurrencePattern, setRecurrencePattern] = useState<RecurrencePattern | null>(null);
   const [dueDate, setDueDate] = useState('');
   const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [hasEndDate, setHasEndDate] = useState(false);
   const [isActive, setIsActive] = useState(true);
+  const [preferredTime, setPreferredTime] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -88,9 +101,8 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setRecurrencePattern(goal.recurrence_pattern || null);
         setDueDate(goal.due_date || '');
         setStartDate(goal.start_date);
-        setEndDate(goal.end_date || '');
-        setHasEndDate(!!goal.end_date);
         setIsActive(goal.is_active);
+        setPreferredTime(goal.preferred_time ?? null);
       } else {
         setTitle('');
         setDescription('');
@@ -99,9 +111,8 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setRecurrencePattern(null);
         setDueDate('');
         setStartDate(new Date().toISOString().split('T')[0]);
-        setEndDate('');
-        setHasEndDate(false);
         setIsActive(true);
+        setPreferredTime(null);
       }
     }
   }, [open, goal]);
@@ -126,10 +137,12 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       description: description.trim() || null,
       recurrence_type: recurrenceType,
       recurrence_days: recurrenceType === 'weekly' ? recurrenceDays : null,
-      recurrence_pattern: recurrenceType === 'custom' ? recurrencePattern : null,
+      recurrence_pattern:
+        recurrenceType === 'custom' || recurrenceType === 'annual' ? recurrencePattern : null,
       due_date: recurrenceType === 'one-time' ? dueDate || null : null,
       start_date: finalStartDate,
-      end_date: recurrenceType !== 'one-time' && hasEndDate && endDate ? endDate : null,
+      end_date: null,
+      preferred_time: preferredTime,
       is_active: isActive,
     };
 
@@ -181,57 +194,36 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         />
       </CondensedAttributeRow>
 
-      <RecurrenceSelector
-        recurrenceType={recurrenceType}
-        recurrenceDays={recurrenceDays}
-        recurrencePattern={recurrencePattern}
-        dueDate={dueDate}
-        onRecurrenceTypeChange={setRecurrenceType}
-        onRecurrenceDaysChange={setRecurrenceDays}
-        onRecurrencePatternChange={setRecurrencePattern}
-        onDueDateChange={setDueDate}
-        disabled={isLoading}
-      />
-
-      {recurrenceType !== 'one-time' && (
-        <>
-          <CondensedAttributeRow icon={<CalendarCheck className="size-4" />} label="Start date">
-            <Input
-              id="startDate"
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              disabled={isLoading}
-              className="h-9 overflow-hidden"
-            />
-          </CondensedAttributeRow>
-
-          <CondensedAttributeRow icon={<Calendar className="size-4" />}>
-            <div className="flex items-center justify-between w-full">
-              <span className="text-sm text-muted-foreground">Set end date</span>
-              <Switch
-                id="hasEndDate"
-                checked={hasEndDate}
-                onCheckedChange={setHasEndDate}
-                disabled={isLoading}
-              />
-            </div>
-          </CondensedAttributeRow>
-
-          {hasEndDate && (
-            <CondensedAttributeRow icon={<Calendar className="size-4" />} label="End date">
-              <Input
-                id="endDate"
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                disabled={isLoading}
-                className="h-9 overflow-hidden"
-              />
-            </CondensedAttributeRow>
-          )}
-        </>
-      )}
+      <CondensedAttributeRow icon={<Calendar className="size-4" />}>
+        <DateRecurrenceTimePopover
+          date={recurrenceType === 'one-time' ? (dueDate || startDate) : startDate}
+          onDateChange={(d) => {
+            if (recurrenceType === 'one-time') {
+              setDueDate(d);
+              if (d) setStartDate(d);
+            } else {
+              setStartDate(d || new Date().toISOString().split('T')[0]);
+            }
+          }}
+          recurrenceType={recurrenceType}
+          recurrenceDays={recurrenceDays}
+          recurrencePattern={recurrencePattern}
+          onRecurrenceTypeChange={(t) => {
+            setRecurrenceType(t);
+            if (t === 'one-time') {
+              setDueDate(startDate);
+            } else if (!startDate) {
+              setStartDate(new Date().toISOString().split('T')[0]);
+            }
+          }}
+          onRecurrenceDaysChange={setRecurrenceDays}
+          onRecurrencePatternChange={setRecurrencePattern}
+          preferredTime={preferredTime}
+          onPreferredTimeChange={setPreferredTime}
+          disabled={isLoading}
+          isOneTime={recurrenceType === 'one-time'}
+        />
+      </CondensedAttributeRow>
 
       {isEditing && (
         <CondensedAttributeRow icon={<CheckCircle className="size-4" />}>

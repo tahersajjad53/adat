@@ -12,6 +12,8 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import CondensedAttributeRow from './CondensedAttributeRow';
 import type { RecurrenceType, RecurrencePattern } from '@/types/goals';
 
+type CustomSubType = 'weekly' | 'monthly' | 'annual';
+
 interface RecurrenceSelectorProps {
   recurrenceType: RecurrenceType;
   recurrenceDays: number[];
@@ -22,6 +24,8 @@ interface RecurrenceSelectorProps {
   onRecurrencePatternChange: (pattern: RecurrencePattern | null) => void;
   onDueDateChange: (date: string) => void;
   disabled?: boolean;
+  /** When 'custom', only show Weekly/Monthly/Annually sub-selector and config panels (no top-level dropdown) */
+  variant?: 'full' | 'custom';
 }
 
 const DAY_LABELS = [
@@ -44,6 +48,16 @@ const GREGORIAN_MONTHS = [
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
 
+function inferCustomSubType(
+  recurrenceType: RecurrenceType,
+  recurrencePattern: RecurrencePattern | null,
+): CustomSubType {
+  if (recurrenceType === 'weekly') return 'weekly';
+  if (recurrenceType === 'annual') return 'annual';
+  if (recurrenceType === 'custom' && recurrencePattern?.type === 'monthly') return 'monthly';
+  return 'weekly';
+}
+
 const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
   recurrenceType,
   recurrenceDays,
@@ -54,23 +68,30 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
   onRecurrencePatternChange,
   onDueDateChange,
   disabled = false,
+  variant = 'full',
 }) => {
-  const handleIntervalChange = (value: string) => {
-    const num = parseInt(value, 10);
-    if (isNaN(num) || num < 1) return;
-    onRecurrencePatternChange({
-      type: 'interval',
-      interval: num,
-      intervalUnit: recurrencePattern?.intervalUnit || 'days',
-    });
-  };
+  const customSubType = inferCustomSubType(recurrenceType, recurrencePattern);
 
-  const handleIntervalUnitChange = (unit: 'days' | 'weeks') => {
-    onRecurrencePatternChange({
-      type: 'interval',
-      interval: recurrencePattern?.interval || 2,
-      intervalUnit: unit,
-    });
+  const handleCustomSubTypeChange = (subType: CustomSubType) => {
+    if (subType === 'weekly') {
+      onRecurrenceTypeChange('weekly');
+      onRecurrenceDaysChange(recurrenceDays.length > 0 ? recurrenceDays : []);
+    } else if (subType === 'monthly') {
+      onRecurrenceTypeChange('custom');
+      onRecurrencePatternChange({
+        type: 'monthly',
+        monthlyDay: recurrencePattern?.monthlyDay ?? 1,
+        calendarType: recurrencePattern?.calendarType ?? 'hijri',
+      });
+    } else {
+      onRecurrenceTypeChange('annual');
+      onRecurrencePatternChange({
+        type: 'annual',
+        annualMonth: recurrencePattern?.annualMonth ?? 1,
+        monthlyDay: recurrencePattern?.monthlyDay ?? 1,
+        calendarType: recurrencePattern?.calendarType ?? 'hijri',
+      });
+    }
   };
 
   const handleMonthlyDayChange = (value: string) => {
@@ -136,28 +157,32 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
     });
   };
 
+  const showCustomSection = variant === 'custom' || recurrenceType === 'custom';
+
   return (
     <div className="space-y-2">
-      <CondensedAttributeRow icon={<Repeat className="size-4" />}>
-        <Select
-          value={recurrenceType}
-          onValueChange={(v) => onRecurrenceTypeChange(v as RecurrenceType)}
-          disabled={disabled}
-        >
-          <SelectTrigger className="h-9">
-            <SelectValue placeholder="Repeats" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="daily">Daily</SelectItem>
-            <SelectItem value="weekly">Weekly</SelectItem>
-            <SelectItem value="custom">Custom</SelectItem>
-            <SelectItem value="one-time">One-time</SelectItem>
-            <SelectItem value="annual">Annual</SelectItem>
-          </SelectContent>
-        </Select>
-      </CondensedAttributeRow>
+      {variant === 'full' && (
+        <CondensedAttributeRow icon={<Repeat className="size-4" />}>
+          <Select
+            value={recurrenceType}
+            onValueChange={(v) => onRecurrenceTypeChange(v as RecurrenceType)}
+            disabled={disabled}
+          >
+            <SelectTrigger className="h-9">
+              <SelectValue placeholder="Repeats" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="daily">Daily</SelectItem>
+              <SelectItem value="weekly">Weekly</SelectItem>
+              <SelectItem value="custom">Custom</SelectItem>
+              <SelectItem value="one-time">One-time</SelectItem>
+              <SelectItem value="annual">Annual</SelectItem>
+            </SelectContent>
+          </Select>
+        </CondensedAttributeRow>
+      )}
 
-      {recurrenceType === 'weekly' && (
+      {recurrenceType === 'weekly' && variant === 'full' && (
         <CondensedAttributeRow icon={<Repeat className="size-4" />} label="On days">
           <ToggleGroup
             type="multiple"
@@ -180,55 +205,49 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
         </CondensedAttributeRow>
       )}
 
-      {recurrenceType === 'custom' && (
+      {showCustomSection && (
         <>
           <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Pattern">
             <Select
-              value={recurrencePattern?.type || 'interval'}
-              onValueChange={(v) => handleCustomTypeChange(v as 'interval' | 'monthly')}
+              value={customSubType}
+              onValueChange={(v) => handleCustomSubTypeChange(v as CustomSubType)}
               disabled={disabled}
             >
               <SelectTrigger className="h-9">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="interval">Every N days/weeks</SelectItem>
-                <SelectItem value="monthly">Day of month</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="annual">Annually</SelectItem>
               </SelectContent>
             </Select>
           </CondensedAttributeRow>
 
-          {recurrencePattern?.type === 'interval' && (
-            <CondensedAttributeRow icon={<Repeat className="size-4" />}>
-              <div className="flex items-center gap-2">
-                <span className="text-sm text-muted-foreground shrink-0">Every</span>
-                <Input
-                  type="number"
-                  min="1"
-                  max="365"
-                  value={recurrencePattern.interval || 2}
-                  onChange={(e) => handleIntervalChange(e.target.value)}
-                  className="h-9 w-20"
-                  disabled={disabled}
-                />
-                <Select
-                  value={recurrencePattern.intervalUnit || 'days'}
-                  onValueChange={(v) => handleIntervalUnitChange(v as 'days' | 'weeks')}
-                  disabled={disabled}
-                >
-                  <SelectTrigger className="h-9 w-24">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="days">days</SelectItem>
-                    <SelectItem value="weeks">weeks</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          {customSubType === 'weekly' && (
+            <CondensedAttributeRow icon={<Repeat className="size-4" />} label="On days">
+              <ToggleGroup
+                type="multiple"
+                value={recurrenceDays.map(String)}
+                onValueChange={(vals) => onRecurrenceDaysChange(vals.map(Number))}
+                className="justify-start gap-1"
+                disabled={disabled}
+              >
+                {DAY_LABELS.map((day) => (
+                  <ToggleGroupItem
+                    key={day.value}
+                    value={day.value}
+                    className="h-8 w-8 rounded-full text-xs font-medium data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                    aria-label={day.label}
+                  >
+                    {day.label}
+                  </ToggleGroupItem>
+                ))}
+              </ToggleGroup>
             </CondensedAttributeRow>
           )}
 
-          {recurrencePattern?.type === 'monthly' && (
+          {customSubType === 'monthly' && (
             <>
               <CondensedAttributeRow icon={<Repeat className="size-4" />}>
                 <div className="flex items-center gap-2">
@@ -237,7 +256,7 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
                     type="number"
                     min="1"
                     max="30"
-                    value={recurrencePattern.monthlyDay || 1}
+                    value={recurrencePattern?.monthlyDay ?? 1}
                     onChange={(e) => handleMonthlyDayChange(e.target.value)}
                     className="h-9 w-20"
                     disabled={disabled}
@@ -247,7 +266,7 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
               </CondensedAttributeRow>
               <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Calendar">
                 <Select
-                  value={recurrencePattern.calendarType || 'hijri'}
+                  value={recurrencePattern?.calendarType ?? 'hijri'}
                   onValueChange={(v) => handleMonthlyCalendarChange(v as 'hijri' | 'gregorian')}
                   disabled={disabled}
                 >
@@ -262,10 +281,57 @@ const RecurrenceSelector: React.FC<RecurrenceSelectorProps> = ({
               </CondensedAttributeRow>
             </>
           )}
+
+          {customSubType === 'annual' && (
+            <>
+              <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Calendar">
+                <Select
+                  value={recurrencePattern?.calendarType ?? 'hijri'}
+                  onValueChange={(v) => handleAnnualCalendarChange(v as 'hijri' | 'gregorian')}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className="h-9 w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="hijri">Hijri</SelectItem>
+                    <SelectItem value="gregorian">Gregorian</SelectItem>
+                  </SelectContent>
+                </Select>
+              </CondensedAttributeRow>
+              <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Month">
+                <Select
+                  value={String(recurrencePattern?.annualMonth ?? 1)}
+                  onValueChange={handleAnnualMonthChange}
+                  disabled={disabled}
+                >
+                  <SelectTrigger className="h-9">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {((recurrencePattern?.calendarType ?? 'hijri') === 'hijri' ? HIJRI_MONTHS : GREGORIAN_MONTHS).map((name, i) => (
+                      <SelectItem key={i + 1} value={String(i + 1)}>{name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CondensedAttributeRow>
+              <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Day">
+                <Input
+                  type="number"
+                  min="1"
+                  max="30"
+                  value={recurrencePattern?.monthlyDay ?? 1}
+                  onChange={(e) => handleAnnualDayChange(e.target.value)}
+                  className="h-9 w-20"
+                  disabled={disabled}
+                />
+              </CondensedAttributeRow>
+            </>
+          )}
         </>
       )}
 
-      {recurrenceType === 'annual' && (
+      {recurrenceType === 'annual' && variant === 'full' && (
         <>
           <CondensedAttributeRow icon={<Repeat className="size-4" />} label="Calendar">
             <Select

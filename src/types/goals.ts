@@ -22,6 +22,7 @@ export interface Goal {
   due_date?: string | null;          // For one-time goals
   start_date: string;
   end_date?: string | null;
+  preferred_time?: string | null;    // HH:mm e.g. "09:45"
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -47,6 +48,7 @@ export interface GoalInput {
   due_date?: string | null;
   start_date?: string;
   end_date?: string | null;
+  preferred_time?: string | null;    // HH:mm e.g. "09:45"
   sort_order?: number;
   is_active?: boolean;
 }
