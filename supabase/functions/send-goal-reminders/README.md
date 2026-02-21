@@ -22,14 +22,19 @@ If your project has `pg_net` and `pg_cron` enabled:
 
 ### Option B: External cron
 
-Use a cron service (e.g. cron-job.org, GitHub Actions scheduled workflow) to POST to the function URL every 5–15 minutes:
+Use a cron service (e.g. cron-job.org, GitHub Actions scheduled workflow) to POST to the function URLs every 5–15 minutes:
 
 ```bash
+# Goal reminders
 curl -X POST "https://<project_ref>.supabase.co/functions/v1/send-goal-reminders" \
+  -H "Authorization: Bearer <CRON_SECRET>"
+
+# Namaz reminders (prayer-time alerts)
+curl -X POST "https://<project_ref>.supabase.co/functions/v1/send-namaz-reminders" \
   -H "Authorization: Bearer <CRON_SECRET>"
 ```
 
-Set **CRON_SECRET** in Edge Function secrets and use the same value in the `Authorization` header so only your cron job can invoke the function.
+Set **CRON_SECRET** in Edge Function secrets and use the same value in the `Authorization` header so only your cron job can invoke the functions.
 
 ## Behaviour
 

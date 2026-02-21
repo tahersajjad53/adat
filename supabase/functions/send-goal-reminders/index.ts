@@ -52,6 +52,7 @@ interface GoalRow {
 interface ProfileRow {
   push_token: string | null;
   push_enabled: boolean | null;
+  goal_reminders_enabled: boolean | null;
   timezone: string | null;
 }
 
@@ -188,7 +189,7 @@ Deno.serve(async (req) => {
     const userIds = [...new Set(goalsRows.map((g) => g.user_id))];
     const { data: profilesRows } = await supabase
       .from("profiles")
-      .select("id, push_token, push_enabled, timezone")
+      .select("id, push_token, push_enabled, goal_reminders_enabled, timezone")
       .in("id", userIds);
 
     const profileByUserId = new Map<string, ProfileRow>();
@@ -201,7 +202,8 @@ Deno.serve(async (req) => {
       const profile = profileByUserId.get(g.user_id) as ProfileRow | undefined;
       if (
         !profile?.push_token ||
-        profile.push_enabled === false
+        profile.push_enabled === false ||
+        profile.goal_reminders_enabled === false
       )
         continue;
       const tz = profile.timezone ?? "UTC";

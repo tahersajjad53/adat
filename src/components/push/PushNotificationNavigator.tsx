@@ -14,6 +14,8 @@ export function PushNotificationNavigator({ children }: { children: React.ReactN
         } else {
           navigate('/goals');
         }
+      } else if (screen === 'namaz') {
+        navigate('/namaz');
       }
     };
     window.addEventListener('push-notification-open', handler);

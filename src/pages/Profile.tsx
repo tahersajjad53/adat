@@ -26,7 +26,9 @@ const Profile: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState<City | undefined>();
   const [customCoords, setCustomCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [goalRemindersEnabled, setGoalRemindersEnabled] = useState(true);
+  const [namazRemindersEnabled, setNamazRemindersEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -36,7 +38,7 @@ const Profile: React.FC = () => {
 
       const { data, error } = await supabase
         .from('profiles')
-        .select('full_name, latitude, longitude, city, timezone, push_enabled')
+        .select('full_name, latitude, longitude, city, timezone, push_enabled, goal_reminders_enabled, namaz_reminders_enabled')
         .eq('id', user.id)
         .maybeSingle();
 
@@ -46,12 +48,14 @@ const Profile: React.FC = () => {
 
       if (data) {
         setFullName(data.full_name || '');
-        
+        setGoalRemindersEnabled(data.goal_reminders_enabled !== false);
+        setNamazRemindersEnabled(data.namaz_reminders_enabled === true);
+
         if (data.latitude && data.longitude) {
           const matchingCity = CITIES.find(
             city => city.latitude === data.latitude && city.longitude === data.longitude
           );
-          
+
           if (matchingCity) {
             setSelectedCity(matchingCity);
           } else {
@@ -60,11 +64,11 @@ const Profile: React.FC = () => {
         }
       }
 
-      // Check notification status: enabled only if profile has push_enabled and permission granted
+      // Push enabled only if profile has push_enabled and permission granted
       if (Capacitor.getPlatform() !== 'web' && data) {
         const status = await PushNotifications.checkPermissions();
-        const pushEnabled = data.push_enabled !== false;
-        setNotificationsEnabled(pushEnabled && status.receive === 'granted');
+        const pushOn = data.push_enabled !== false;
+        setPushEnabled(pushOn && status.receive === 'granted');
       }
 
       setLoading(false);
@@ -84,7 +88,7 @@ const Profile: React.FC = () => {
     }
   };
 
-  const handleToggleNotifications = async (enabled: boolean) => {
+  const handleTogglePushEnabled = async (enabled: boolean) => {
     if (Capacitor.getPlatform() === 'web') {
       toast({
         title: 'Not available',
@@ -104,12 +108,12 @@ const Profile: React.FC = () => {
       }
       await initPushNotifications();
       const status = await PushNotifications.checkPermissions();
-      setNotificationsEnabled(status.receive === 'granted');
+      setPushEnabled(status.receive === 'granted');
 
       if (status.receive === 'granted') {
         toast({
-          title: 'Notifications enabled',
-          description: 'You will now receive updates and reminders.',
+          title: 'Push notifications enabled',
+          description: 'You can now receive goal and namaz reminders.',
         });
       }
     } else {
@@ -121,12 +125,44 @@ const Profile: React.FC = () => {
         toast({ title: 'Error', description: updateError.message, variant: 'destructive' });
         return;
       }
-      setNotificationsEnabled(false);
+      setPushEnabled(false);
       toast({
-        title: 'Notifications disabled',
+        title: 'Push notifications disabled',
         description: 'To completely stop notifications, please check your system settings.',
       });
     }
+  };
+
+  const handleToggleGoalReminders = async (enabled: boolean) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ goal_reminders_enabled: enabled })
+      .eq('id', user!.id);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setGoalRemindersEnabled(enabled);
+    toast({
+      title: enabled ? 'Goal reminders on' : 'Goal reminders off',
+      description: enabled ? 'You will receive reminders for your goals at the times you set.' : 'You will not receive goal reminders.',
+    });
+  };
+
+  const handleToggleNamazReminders = async (enabled: boolean) => {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ namaz_reminders_enabled: enabled })
+      .eq('id', user!.id);
+    if (error) {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+      return;
+    }
+    setNamazRemindersEnabled(enabled);
+    toast({
+      title: enabled ? 'Namaz reminders on' : 'Namaz reminders off',
+      description: enabled ? "You will receive alerts at each prayer time (e.g. It's time to pray Maghrib)." : 'You will not receive prayer time alerts.',
+    });
   };
 
   const handleSave = async () => {
@@ -282,15 +318,41 @@ const Profile: React.FC = () => {
             <p className="text-base text-muted-foreground mt-1 font-normal">Manage how you receive updates.</p>
           </div>
 
-          <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <Label className="text-base font-medium">Push Notifications</Label>
-              <p className="text-sm text-muted-foreground">Receive reminders for prayers and goals</p>
+          <div className="space-y-4">
+            <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
+              <div className="space-y-0.5">
+                <Label className="text-base font-medium">Enable Push Notifications</Label>
+                <p className="text-sm text-muted-foreground">Required to receive any reminders on this device</p>
+              </div>
+              <Switch
+                checked={pushEnabled}
+                onCheckedChange={handleTogglePushEnabled}
+              />
             </div>
-            <Switch
-              checked={notificationsEnabled}
-              onCheckedChange={handleToggleNotifications}
-            />
+
+            <div className={`rounded-xl border border-border bg-card p-4 flex items-center justify-between ${!pushEnabled ? 'opacity-50' : ''}`}>
+              <div className="space-y-0.5">
+                <Label className="text-base font-medium">Goal Reminders</Label>
+                <p className="text-sm text-muted-foreground">Receive reminders for your goals at the times you set</p>
+              </div>
+              <Switch
+                checked={goalRemindersEnabled}
+                onCheckedChange={handleToggleGoalReminders}
+                disabled={!pushEnabled}
+              />
+            </div>
+
+            <div className={`rounded-xl border border-border bg-card p-4 flex items-center justify-between ${!pushEnabled ? 'opacity-50' : ''}`}>
+              <div className="space-y-0.5">
+                <Label className="text-base font-medium">Namaz Reminders</Label>
+                <p className="text-sm text-muted-foreground">Receive alerts at each prayer time (e.g. It&apos;s time to pray Maghrib)</p>
+              </div>
+              <Switch
+                checked={namazRemindersEnabled}
+                onCheckedChange={handleToggleNamazReminders}
+                disabled={!pushEnabled}
+              />
+            </div>
           </div>
         </div>
       </div>
