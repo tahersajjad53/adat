@@ -385,9 +385,11 @@ export type Database = {
           city: string | null
           created_at: string | null
           full_name: string | null
+          goal_reminders_enabled: boolean
           id: string
           latitude: number | null
           longitude: number | null
+          namaz_reminders_enabled: boolean
           push_enabled: boolean
           push_token: string | null
           theme: string | null
@@ -401,9 +403,11 @@ export type Database = {
           city?: string | null
           created_at?: string | null
           full_name?: string | null
+          goal_reminders_enabled?: boolean
           id: string
           latitude?: number | null
           longitude?: number | null
+          namaz_reminders_enabled?: boolean
           push_enabled?: boolean
           push_token?: string | null
           theme?: string | null
@@ -417,9 +421,11 @@ export type Database = {
           city?: string | null
           created_at?: string | null
           full_name?: string | null
+          goal_reminders_enabled?: boolean
           id?: string
           latitude?: number | null
           longitude?: number | null
+          namaz_reminders_enabled?: boolean
           push_enabled?: boolean
           push_token?: string | null
           theme?: string | null

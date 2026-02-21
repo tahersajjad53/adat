@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">Adat</string>
-    <string name="title_activity_main">Adat</string>
-    <string name="package_name">com.adat.app</string>
-    <string name="custom_url_scheme">com.adat.app</string>
+    <string name="app_name">Ibadat</string>
+    <string name="title_activity_main">Ibadat</string>
+    <string name="package_name">com.ibadat.app</string>
+    <string name="custom_url_scheme">com.ibadat.app</string>
 </resources>
