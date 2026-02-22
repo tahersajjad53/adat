@@ -17,6 +17,7 @@ import Onboarding from "./pages/Onboarding";
 import Profile from "./pages/Profile";
 import Namaz from "./pages/Namaz";
 import Goals from "./pages/Goals";
+import CompletedGoals from "./pages/CompletedGoals";
 import Elan from "./pages/Elan";
 import NotFound from "./pages/NotFound";
 
@@ -61,6 +62,16 @@ const App = () => (
                   <ProtectedRoute>
                     <AppLayout>
                       <Goals />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/goals/completed"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <CompletedGoals />
                     </AppLayout>
                   </ProtectedRoute>
                 }

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { MoreHoriz } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
@@ -31,6 +31,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { createGoal, isCreating } = useGoals();
   const { dynamicGoalsEnabled, setDynamicGoalsEnabled } = useUserPreferences();
 
+  const navigate = useNavigate();
   const isGoalsPage = location.pathname === '/goals';
   const isNamazPage = location.pathname === '/namaz';
   const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
@@ -71,8 +72,11 @@ export function AppLayout({ children }: AppLayoutProps) {
                     <MoreHoriz className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover p-4 min-w-[260px] max-w-[calc(100vw-2rem)]">
-                  <div className="space-y-3">
+                <DropdownMenuContent align="end" className="bg-popover min-w-[260px] max-w-[calc(100vw-2rem)]">
+                  <DropdownMenuItem onClick={() => navigate('/goals/completed')}>
+                    Completed Goals
+                  </DropdownMenuItem>
+                  <div className="p-4 space-y-3 border-t border-border">
                     <div>
                       <p className="text-sm font-medium">Receive Dynamic Goals</p>
                       <p className="text-xs text-muted-foreground mt-1">Community goals for all Mumineen, like 'Pray Moti Us Sawalat' on days requiring rozu.</p>
