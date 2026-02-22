@@ -64,8 +64,20 @@ const Goals: React.FC = () => {
 
   // Build user goals with status
   const userGoalsWithStatus: GoalWithStatus[] = useMemo(
-    () => goals.filter(g => g.is_active).map((g) => ({ ...g, isCompleted: isCompleted(g.id) })),
-    [goals, isCompleted]
+    () => goals.filter(g => g.is_active).map((g) => {
+      let completed = isCompleted(g.id);
+      if (!completed && g.recurrence_type === 'one-time' && g.due_date) {
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+        const isPastDue = g.due_date < todayStr;
+        const isStillOverdue = overdueGoals.some(o => o.goal.id === g.id);
+        if (isPastDue && !isStillOverdue) {
+          completed = true;
+        }
+      }
+      return { ...g, isCompleted: completed };
+    }),
+    [goals, isCompleted, overdueGoals]
   );
 
   // Build dynamic goals as GoalWithStatus
