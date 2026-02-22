@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Archery, Plus, MoreHoriz } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -35,6 +35,7 @@ const Goals: React.FC = () => {
   const [educationPopupOpen, setEducationPopupOpen] = useState(false);
   const [viewingDynamicGoal, setViewingDynamicGoal] = useState<GoalWithStatus | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   // Auto-open form when arriving from onboarding with ?new=1
   useEffect(() => {
@@ -172,8 +173,11 @@ const Goals: React.FC = () => {
                     <MoreHoriz className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover p-4 min-w-[280px]">
-                  <div className="space-y-3">
+                <DropdownMenuContent align="end" className="bg-popover min-w-[280px]">
+                  <DropdownMenuItem onClick={() => navigate('/goals/completed')}>
+                    Completed Goals
+                  </DropdownMenuItem>
+                  <div className="p-4 space-y-3 border-t border-border">
                     <div>
                       <p className="text-sm font-medium">Receive Dynamic Goals</p>
                       <p className="text-xs text-muted-foreground mt-1">Community goals for all Mumineen, like 'Pray Moti Us Sawalat' on days requiring rozu.</p>
