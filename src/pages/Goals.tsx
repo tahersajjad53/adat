@@ -2,7 +2,6 @@ import React, { useState, useMemo, useRef, useCallback, useEffect } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Archery, Plus, MoreHoriz } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog';
@@ -173,23 +172,13 @@ const Goals: React.FC = () => {
                     <MoreHoriz className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover min-w-[280px]">
+                <DropdownMenuContent align="end" className="bg-popover">
                   <DropdownMenuItem onClick={() => navigate('/goals/completed')}>
                     Completed Goals
                   </DropdownMenuItem>
-                  <div className="p-4 space-y-3 border-t border-border">
-                    <div>
-                      <p className="text-sm font-medium">Receive Dynamic Goals</p>
-                      <p className="text-xs text-muted-foreground mt-1">Community goals for all Mumineen, like 'Pray Moti Us Sawalat' on days requiring rozu.</p>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Enabled</span>
-                      <Switch
-                        checked={dynamicGoalsEnabled}
-                        onCheckedChange={(checked) => setDynamicGoalsEnabled(checked)}
-                      />
-                    </div>
-                  </div>
+                  <DropdownMenuItem onClick={() => navigate('/goals/dynamic-goals')}>
+                    Dynamic Goals
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
