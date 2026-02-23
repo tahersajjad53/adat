@@ -19,6 +19,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { getRecurrenceDescription } from '@/lib/recurrence';
 import { useConfetti } from '@/components/ui/confetti';
+import { useCalendar } from '@/contexts/CalendarContext';
 import type { GoalWithStatus } from '@/types/goals';
 
 interface GoalCardProps {
@@ -54,7 +55,8 @@ const GoalCard: React.FC<GoalCardProps> = ({
     transition,
   };
 
-  const recurrenceLabel = getRecurrenceDescription(goal);
+  const { currentDate } = useCalendar();
+  const recurrenceLabel = getRecurrenceDescription(goal, currentDate?.hijri);
   const checkboxRef = useRef<HTMLButtonElement>(null);
   const { triggerConfetti, ConfettiPortal } = useConfetti();
 

@@ -185,7 +185,7 @@ export function getGoalsDueOnDate<T extends RecurrenceCheckable>(
 /**
  * Get a human-readable description of the recurrence pattern
  */
-export function getRecurrenceDescription(goal: RecurrenceCheckable): string {
+export function getRecurrenceDescription(goal: RecurrenceCheckable, hijriDate?: HijriDate): string {
   switch (goal.recurrence_type) {
     case 'daily':
       return 'Daily';
@@ -202,7 +202,7 @@ export function getRecurrenceDescription(goal: RecurrenceCheckable): string {
       return `Weekly (${days})`;
 
     case 'custom':
-      return getCustomDescription(goal.recurrence_pattern);
+      return getCustomDescription(goal.recurrence_pattern, hijriDate);
 
     case 'one-time':
       if (goal.due_date) {
@@ -212,7 +212,8 @@ export function getRecurrenceDescription(goal: RecurrenceCheckable): string {
           date.getMonth() === now.getMonth() &&
           date.getDate() === now.getDate();
         if (isToday) return 'Today';
-        return `One-time (${date.toLocaleDateString()})`;
+        const monthShort = date.toLocaleDateString('en-US', { month: 'short' });
+        return `${date.getDate()} ${monthShort}`;
       }
       return 'One-time';
 
@@ -239,7 +240,7 @@ function ordinal(n: number): string {
   return n + (s[(v - 20) % 10] || s[v] || s[0]);
 }
 
-function getCustomDescription(pattern: RecurrencePattern | null | undefined): string {
+function getCustomDescription(pattern: RecurrencePattern | null | undefined, hijriDate?: HijriDate): string {
   if (!pattern) return 'Custom';
 
   switch (pattern.type) {
@@ -252,8 +253,10 @@ function getCustomDescription(pattern: RecurrencePattern | null | undefined): st
 
     case 'monthly':
       if (!pattern.monthlyDay) return 'Monthly';
-      const calType = pattern.calendarType === 'gregorian' ? 'Gregorian' : 'Hijri';
-      return `${ordinal(pattern.monthlyDay)} of each month (${calType})`;
+      if ((pattern.calendarType || 'hijri') === 'hijri' && hijriDate) {
+        return `${pattern.monthlyDay} ${hijriDate.monthName}`;
+      }
+      return `${ordinal(pattern.monthlyDay)} monthly`;
 
     default:
       return 'Custom';
