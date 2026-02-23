@@ -1,84 +1,34 @@
 
 
-# Improve Recurrence Labels in Goal Cards
+# Simplify Goals 3-Dot Menu
 
-## Changes
+## Problem
+The dropdown menu currently mixes a navigational item ("Completed Goals") with an inline settings panel (Dynamic Goals toggle + explanation). "Completed Goals" looks like a title, and the Dynamic Goals section feels bulky inside a dropdown.
 
-All changes are in **`src/lib/recurrence.ts`**, specifically in `getRecurrenceDescription` and `getCustomDescription`.
+## Solution
+Make both items simple navigational menu items. Tapping "Dynamic Goals" navigates to a new dedicated settings page with the explanation and toggle.
 
-### 1. One-time label: "21 Feb" instead of "One-time (21/02/2026)"
+### Changes
 
-Update the `one-time` case (lines 207-217) to format the date as `d MMM` (e.g., "21 Feb") and drop the "One-time" prefix. Keep "Today" for same-day goals.
+**1. New page: `src/pages/DynamicGoalsSettings.tsx`**
+- Simple page with a back button, title, explanation text, and the on/off toggle
+- Reuses the existing `useUserPreferences` hook for the toggle state
+- Consistent styling with the rest of the app (same container/max-width pattern)
 
-### 2. Monthly Hijri label: "29 Shaban" instead of "29th of each month (Hijri)"
+**2. New route in `src/App.tsx`**
+- Add `/goals/dynamic-goals` route pointing to the new page
 
-The function currently doesn't receive the current Hijri date, so it can't resolve the month name. The fix:
+**3. Simplify menu in `src/pages/Goals.tsx` (desktop)**
+- Replace the inline Dynamic Goals panel with a simple `DropdownMenuItem` that navigates to `/goals/dynamic-goals`
+- Both items ("Completed Goals" and "Dynamic Goals") become identical-looking menu items
 
-- Add an optional `hijriDate?: HijriDate` parameter to `getRecurrenceDescription`
-- For monthly Hijri goals, if `hijriDate` is provided, show `"{day} {hijriDate.monthName}"` (e.g., "29 Shaban")
-- Fallback to `"{ordinal(day)} monthly"` if no hijri date provided
-- For monthly Gregorian goals, show `"{ordinal(day)} monthly"` (compact, no "(Gregorian)" suffix)
-- Pass this through from `getCustomDescription`
+**4. Simplify menu in `src/components/layout/AppLayout.tsx` (mobile)**
+- Same change: replace the inline panel (lines 79-91) with a simple `DropdownMenuItem` navigating to `/goals/dynamic-goals`
+- Remove the `Switch` import and `dynamicGoalsEnabled`/`setDynamicGoalsEnabled` from this file since they move to the new page
 
-### 3. Update callers to pass Hijri date (GoalCard, DynamicGoalDetailSheet)
+### Result
+The 3-dot menu becomes a clean, minimal list:
+- Completed Goals (navigates to `/goals/completed`)
+- Dynamic Goals (navigates to `/goals/dynamic-goals`)
 
-Both callers need to obtain the current Hijri date from `CalendarContext` and pass it to `getRecurrenceDescription`.
-
----
-
-## Technical Details
-
-### `src/lib/recurrence.ts`
-
-**`getRecurrenceDescription` signature change:**
-```typescript
-export function getRecurrenceDescription(
-  goal: RecurrenceCheckable,
-  hijriDate?: HijriDate
-): string
-```
-
-**One-time case (line 215):**
-```typescript
-case 'one-time':
-  if (goal.due_date) {
-    const date = new Date(goal.due_date + 'T00:00:00');
-    const now = new Date();
-    const isToday = date.getFullYear() === now.getFullYear() &&
-      date.getMonth() === now.getMonth() &&
-      date.getDate() === now.getDate();
-    if (isToday) return 'Today';
-    const monthShort = date.toLocaleDateString('en-US', { month: 'short' });
-    return `${date.getDate()} ${monthShort}`;
-  }
-  return 'One-time';
-```
-
-**Monthly Hijri case in `getCustomDescription` (line 253-256):**
-```typescript
-case 'monthly':
-  if (!pattern.monthlyDay) return 'Monthly';
-  if ((pattern.calendarType || 'hijri') === 'hijri' && hijriDate) {
-    return `${pattern.monthlyDay} ${hijriDate.monthName}`;
-  }
-  return `${ordinal(pattern.monthlyDay)} monthly`;
-```
-
-### `src/components/goals/GoalCard.tsx`
-
-- Import `useCalendar` from `@/contexts/CalendarContext`
-- Get `dualDate` from `useCalendar()`
-- Pass `dualDate?.hijri` to `getRecurrenceDescription(goal, dualDate?.hijri)`
-
-### `src/components/goals/DynamicGoalDetailSheet.tsx`
-
-- Same pattern: import `useCalendar`, pass hijri date to `getRecurrenceDescription`
-
-### Files changed
-
-| File | Change |
-|------|--------|
-| `src/lib/recurrence.ts` | Update `getRecurrenceDescription` and `getCustomDescription` to accept optional hijri date; improve one-time and monthly labels |
-| `src/components/goals/GoalCard.tsx` | Pass current hijri date to `getRecurrenceDescription` |
-| `src/components/goals/DynamicGoalDetailSheet.tsx` | Pass current hijri date to `getRecurrenceDescription` |
-
+Both look and behave identically as tappable menu items.
