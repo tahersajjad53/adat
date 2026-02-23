@@ -7,6 +7,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { getRecurrenceDescription } from '@/lib/recurrence';
+import { useCalendar } from '@/contexts/CalendarContext';
 import type { GoalWithStatus } from '@/types/goals';
 
 interface DynamicGoalDetailSheetProps {
@@ -20,9 +21,11 @@ const DynamicGoalDetailSheet: React.FC<DynamicGoalDetailSheetProps> = ({
   open,
   onOpenChange,
 }) => {
+  const { currentDate } = useCalendar();
+
   if (!goal) return null;
 
-  const recurrenceLabel = getRecurrenceDescription(goal);
+  const recurrenceLabel = getRecurrenceDescription(goal, currentDate?.hijri);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
