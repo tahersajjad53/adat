@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import Namaz from "./pages/Namaz";
 import Goals from "./pages/Goals";
 import CompletedGoals from "./pages/CompletedGoals";
+import DynamicGoalsSettings from "./pages/DynamicGoalsSettings";
 import Elan from "./pages/Elan";
 import NotFound from "./pages/NotFound";
 
@@ -72,6 +73,16 @@ const App = () => (
                   <ProtectedRoute>
                     <AppLayout>
                       <CompletedGoals />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/goals/dynamic-goals"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <DynamicGoalsSettings />
                     </AppLayout>
                   </ProtectedRoute>
                 }
