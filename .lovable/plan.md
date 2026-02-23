@@ -1,67 +1,84 @@
 
-# Two Improvements: Toast Position + Completed Goals Page
 
-## 1. Move Toast to Bottom on Mobile
+# Improve Recurrence Labels in Goal Cards
 
-The Sonner toaster in `src/components/ui/sonner.tsx` currently uses default positioning (top). We'll pass `position="bottom-center"` on mobile and keep `"top-center"` on desktop. Since this component doesn't have access to React hooks easily (it's rendered at the App root), we'll use the Sonner `position` prop with a responsive approach.
+## Changes
 
-**File: `src/components/ui/sonner.tsx`**
-- Import `useIsMobile` from `@/hooks/use-mobile`
-- Set `position={isMobile ? "bottom-center" : "top-center"}`
-- Add `style={{ bottom: '5rem' }}` (or a className offset) so toasts sit above the mobile bottom nav (~80px/5rem tall)
+All changes are in **`src/lib/recurrence.ts`**, specifically in `getRecurrenceDescription` and `getCustomDescription`.
 
-## 2. Completed Goals History Page
+### 1. One-time label: "21 Feb" instead of "One-time (21/02/2026)"
 
-A new page showing all goal completions, accessible from the 3-dot menu on the Goals page.
+Update the `one-time` case (lines 207-217) to format the date as `d MMM` (e.g., "21 Feb") and drop the "One-time" prefix. Keep "Today" for same-day goals.
 
-### New file: `src/pages/CompletedGoals.tsx`
-- Fetches all `goal_completions` for the user (joined with goal title)
-- Groups by date (most recent first)
-- Shows each completion with goal title, completion date, and recurrence badge
-- Simple read-only list (no toggle/edit)
+### 2. Monthly Hijri label: "29 Shaban" instead of "29th of each month (Hijri)"
 
-### New hook: `src/hooks/useCompletedGoalsHistory.ts`
-- Queries `goal_completions` table for the current user, ordered by `completed_at DESC`
-- Joins with `goals` table to get title and recurrence info
-- Paginated or limited to last 30 days
+The function currently doesn't receive the current Hijri date, so it can't resolve the month name. The fix:
 
-### Route and navigation changes:
-- **`src/App.tsx`**: Add `/goals/completed` route inside `AppLayout` with `ProtectedRoute`
-- **`src/pages/Goals.tsx`**: Add "Completed Goals" menu item in the desktop 3-dot `DropdownMenu`
-- **`src/components/layout/AppLayout.tsx`**: Add "Completed Goals" menu item in the mobile 3-dot `DropdownMenu` for the goals page
+- Add an optional `hijriDate?: HijriDate` parameter to `getRecurrenceDescription`
+- For monthly Hijri goals, if `hijriDate` is provided, show `"{day} {hijriDate.monthName}"` (e.g., "29 Shaban")
+- Fallback to `"{ordinal(day)} monthly"` if no hijri date provided
+- For monthly Gregorian goals, show `"{ordinal(day)} monthly"` (compact, no "(Gregorian)" suffix)
+- Pass this through from `getCustomDescription`
+
+### 3. Update callers to pass Hijri date (GoalCard, DynamicGoalDetailSheet)
+
+Both callers need to obtain the current Hijri date from `CalendarContext` and pass it to `getRecurrenceDescription`.
 
 ---
 
 ## Technical Details
 
-### Toast positioning
-The Sonner `<Toaster>` component accepts a `position` prop. On mobile, we use `"bottom-center"` with a bottom offset to clear the bottom nav bar. The `useIsMobile` hook returns `undefined` initially, so we default to `"top-center"` until hydrated.
+### `src/lib/recurrence.ts`
 
-### Completed Goals query
-```sql
-SELECT gc.*, g.title, g.recurrence_type, g.description
-FROM goal_completions gc
-JOIN goals g ON gc.goal_id = g.id
-WHERE gc.user_id = :userId
-ORDER BY gc.completed_at DESC
-LIMIT 100
+**`getRecurrenceDescription` signature change:**
+```typescript
+export function getRecurrenceDescription(
+  goal: RecurrenceCheckable,
+  hijriDate?: HijriDate
+): string
 ```
-Since Supabase JS client supports foreign key joins, this becomes:
-```ts
-supabase
-  .from('goal_completions')
-  .select('*, goals(title, recurrence_type, description)')
-  .eq('user_id', user.id)
-  .order('completed_at', { ascending: false })
-  .limit(100)
+
+**One-time case (line 215):**
+```typescript
+case 'one-time':
+  if (goal.due_date) {
+    const date = new Date(goal.due_date + 'T00:00:00');
+    const now = new Date();
+    const isToday = date.getFullYear() === now.getFullYear() &&
+      date.getMonth() === now.getMonth() &&
+      date.getDate() === now.getDate();
+    if (isToday) return 'Today';
+    const monthShort = date.toLocaleDateString('en-US', { month: 'short' });
+    return `${date.getDate()} ${monthShort}`;
+  }
+  return 'One-time';
 ```
+
+**Monthly Hijri case in `getCustomDescription` (line 253-256):**
+```typescript
+case 'monthly':
+  if (!pattern.monthlyDay) return 'Monthly';
+  if ((pattern.calendarType || 'hijri') === 'hijri' && hijriDate) {
+    return `${pattern.monthlyDay} ${hijriDate.monthName}`;
+  }
+  return `${ordinal(pattern.monthlyDay)} monthly`;
+```
+
+### `src/components/goals/GoalCard.tsx`
+
+- Import `useCalendar` from `@/contexts/CalendarContext`
+- Get `dualDate` from `useCalendar()`
+- Pass `dualDate?.hijri` to `getRecurrenceDescription(goal, dualDate?.hijri)`
+
+### `src/components/goals/DynamicGoalDetailSheet.tsx`
+
+- Same pattern: import `useCalendar`, pass hijri date to `getRecurrenceDescription`
 
 ### Files changed
+
 | File | Change |
 |------|--------|
-| `src/components/ui/sonner.tsx` | Add mobile-aware `position` prop |
-| `src/hooks/useCompletedGoalsHistory.ts` | New hook for fetching completion history |
-| `src/pages/CompletedGoals.tsx` | New page listing completed goals grouped by date |
-| `src/App.tsx` | Add `/goals/completed` route |
-| `src/pages/Goals.tsx` | Add "Completed Goals" link in desktop 3-dot menu |
-| `src/components/layout/AppLayout.tsx` | Add "Completed Goals" link in mobile 3-dot menu |
+| `src/lib/recurrence.ts` | Update `getRecurrenceDescription` and `getCustomDescription` to accept optional hijri date; improve one-time and monthly labels |
+| `src/components/goals/GoalCard.tsx` | Pass current hijri date to `getRecurrenceDescription` |
+| `src/components/goals/DynamicGoalDetailSheet.tsx` | Pass current hijri date to `getRecurrenceDescription` |
+
