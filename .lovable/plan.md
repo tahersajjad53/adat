@@ -1,63 +1,96 @@
 
-# Goals Page Improvements
 
-## 1. Always Show 3-Dot Menu on Mobile Only
+# Update Elan Admin Goal CRUD to Match User Goal UX
 
-**File: `src/components/goals/GoalCard.tsx`**
+## Overview
 
-The GoalCard needs to know if it's on mobile. Import `useIsMobile` and conditionally apply the opacity classes:
+The admin goal form (`AdminGoalForm.tsx`) currently uses basic Select dropdowns for recurrence configuration, while the user goal form uses the polished `DateRecurrenceTimePopover` (with date presets, calendar picker, time selector, and recurrence presets). The admin card is also plain compared to the user's `GoalCard`. This plan brings the admin experience in line with the user experience.
 
-- On mobile: always show the 3-dot menu (remove `opacity-0 group-hover:opacity-100`)
-- On desktop: keep the current hover-to-reveal behavior
+## Changes
 
-Change line 158 from:
-```
-className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
-```
-To:
-```
-className={`h-7 w-7 shrink-0 ${isMobile ? '' : 'opacity-0 group-hover:opacity-100 focus:opacity-100'}`}
-```
+### 1. Modernize AdminGoalForm to use DateRecurrenceTimePopover
 
-## 2. Default New Goals to "One-time" with Today's Date Pre-filled
+**File: `src/components/elan/AdminGoalForm.tsx`**
 
-**File: `src/components/goals/GoalFormSheet.tsx`**
+Replace the manual recurrence Select dropdowns (Daily/Weekly/Custom/One-time/Annual) and their conditional sub-fields (day pickers, interval inputs, calendar type selects, etc.) with the same `DateRecurrenceTimePopover` component used in the user form.
 
-When creating a new goal (not editing), set the default so it behaves as a "today" preset:
+- Remove all recurrence-specific state: `customPatternType`, `interval`, `intervalUnit`, `monthlyDay`, `calendarType`, `annualMonth`, `annualDay`, `annualCalendar` -- replace with a single `recurrencePattern` state
+- Import and use `DateRecurrenceTimePopover` from `@/components/goals/DateRecurrenceTimePopover`
+- Keep admin-specific fields: Published toggle, Start date, End date toggle
+- Default new admin goals to one-time with today's date (matching user form)
+- Add the `preferred_time` field support (admin_goals table already has this column)
+- Wire up the mobile sheet to use `max-h-[85vh] flex flex-col` layout (matching the user form fix)
 
-- Keep `recurrenceType` as `'one-time'` (line 112)
-- Set `dueDate` to today's date instead of empty string (line 115): `setDueDate(new Date().toISOString().split('T')[0])`
+### 2. Improve AdminGoalCard display
 
-This means the form opens with "one-time" recurrence and today's date already filled in, matching a "Today" preset. The recurrence summary will show "Today" automatically.
+**File: `src/components/elan/AdminGoalCard.tsx`**
 
-## 3. Fix Mobile Sheet Height So Footer Is Always Visible
+- Use `getRecurrenceDescription` from `@/lib/recurrence` for the recurrence badge instead of raw `goal.recurrence_type` -- this will show labels like "Daily", "29 Shaban", "21 Feb" etc. matching user cards
+- Pass the current Hijri date via `useCalendar` to `getRecurrenceDescription`
+- Show `preferred_time` if set
 
-**File: `src/components/goals/GoalFormSheet.tsx`**
+### 3. Update AdminGoal type for preferred_time
 
-Change the mobile `SheetContent` (line 285) from:
-```
-<SheetContent side="bottom" className="h-[90vh] overflow-y-auto" ...>
-  <SheetHeader>...</SheetHeader>
-  <div className="py-4">{formContent}</div>
-  <SheetFooter>{footer}</SheetFooter>
-</SheetContent>
-```
-To a flex layout that pins the footer:
-```
-<SheetContent side="bottom" className="max-h-[85vh] flex flex-col" ...>
-  <SheetHeader>...</SheetHeader>
-  <div className="flex-1 overflow-y-auto py-4">{formContent}</div>
-  <SheetFooter>{footer}</SheetFooter>
-</SheetContent>
-```
+**File: `src/types/adminGoals.ts`**
 
-This ensures the Cancel/Save buttons are always visible at the bottom without scrolling.
+Add `preferred_time?: string | null` to the `AdminGoal` interface (column already exists in DB).
+Add `preferred_time?: string | null` to `AdminGoalInput`.
+
+### 4. Update useAdminGoals hook
+
+**File: `src/hooks/useAdminGoals.ts`**
+
+Pass `preferred_time` through in the create mutation.
 
 ---
 
-## Files Changed
+## Suggested Admin-Level Functionalities
+
+Here are some admin features that would be useful for creating dynamic goals:
+
+1. **Duplicate Goal** -- Add a "Duplicate" option in the AdminGoalCard dropdown to quickly clone an existing goal with a different date or title. Useful for seasonal goals that repeat annually with slight variations.
+
+2. **Bulk Publish/Unpublish** -- Add a "Select All" checkbox or multi-select mode to publish or unpublish multiple goals at once, useful during seasonal transitions (e.g., publishing all Ramadan goals at once).
+
+3. **Preview as User** -- A button that shows how the dynamic goal will appear to end users in their goal list, including the recurrence label and description rendering.
+
+4. **Schedule Publishing** -- Set a future publish date so goals auto-publish at the right time (e.g., schedule Ramadan goals to appear on 1st Ramadan).
+
+---
+
+## Technical Details
+
+### AdminGoalForm.tsx -- Key structural change
+
+The form content section will change from ~130 lines of manual recurrence selects to:
+
+```text
+Title input (unchanged)
+Description textarea (unchanged)
+DateRecurrenceTimePopover (replaces ~80 lines of recurrence selects)
+Published toggle (unchanged)
+Start date (handled by popover now)
+End date toggle (unchanged)
+```
+
+### AdminGoalCard.tsx -- Recurrence label change
+
+```typescript
+// Before:
+<Badge variant="secondary">{goal.recurrence_type}</Badge>
+
+// After:
+const { currentDate } = useCalendar();
+const label = getRecurrenceDescription(goal as any, currentDate?.hijri);
+<Badge variant="secondary">{label}</Badge>
+```
+
+### Files changed
 
 | File | Change |
 |------|--------|
-| `src/components/goals/GoalCard.tsx` | Import `useIsMobile`; conditionally show 3-dot menu always on mobile, hover-reveal on desktop |
-| `src/components/goals/GoalFormSheet.tsx` | Default `dueDate` to today for new goals; fix mobile sheet to flex layout with pinned footer |
+| `src/types/adminGoals.ts` | Add `preferred_time` to both interfaces |
+| `src/components/elan/AdminGoalForm.tsx` | Replace manual recurrence UI with `DateRecurrenceTimePopover`; fix mobile sheet layout |
+| `src/components/elan/AdminGoalCard.tsx` | Use `getRecurrenceDescription` for labels; show preferred time |
+| `src/hooks/useAdminGoals.ts` | Pass `preferred_time` in create mutation |
+
