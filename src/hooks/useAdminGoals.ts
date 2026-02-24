@@ -36,6 +36,7 @@ export function useAdminGoals() {
           start_date: input.start_date || new Date().toISOString().split('T')[0],
           end_date: input.end_date,
           due_date: input.due_date,
+          preferred_time: input.preferred_time ?? null,
           is_published: input.is_published ?? false,
           sort_order: maxOrder + 1,
         })

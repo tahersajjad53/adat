@@ -8,6 +8,7 @@ export interface AdminGoal {
   start_date: string;
   end_date?: string | null;
   due_date?: string | null;
+  preferred_time?: string | null;
   is_published: boolean;
   sort_order: number;
   created_at: string;
@@ -23,6 +24,7 @@ export interface AdminGoalInput {
   start_date?: string;
   end_date?: string | null;
   due_date?: string | null;
+  preferred_time?: string | null;
   is_published?: boolean;
   sort_order?: number;
 }

@@ -6,6 +6,8 @@ import { Switch } from '@/components/ui/switch';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useCalendar } from '@/contexts/CalendarContext';
+import { getRecurrenceDescription } from '@/lib/recurrence';
 import type { AdminGoal } from '@/types/adminGoals';
 
 interface AdminGoalCardProps {
@@ -18,6 +20,16 @@ interface AdminGoalCardProps {
 const AdminGoalCard: React.FC<AdminGoalCardProps> = ({
   goal, onEdit, onDelete, onTogglePublish,
 }) => {
+  const { currentDate } = useCalendar();
+  const recurrenceLabel = getRecurrenceDescription(goal as any, currentDate?.hijri);
+
+  const formatTime = (hhmm: string) => {
+    const [h, m] = hhmm.split(':').map(Number);
+    const period = h >= 12 ? 'PM' : 'AM';
+    const hour12 = h === 0 ? 12 : h > 12 ? h - 12 : h;
+    return `${hour12}:${m.toString().padStart(2, '0')} ${period}`;
+  };
+
   return (
     <div className="group flex items-start gap-4 rounded-xl border border-border bg-card p-4 transition-colors">
       <div className="flex-1 min-w-0">
@@ -29,8 +41,8 @@ const AdminGoalCard: React.FC<AdminGoalCardProps> = ({
           >
             {goal.is_published ? 'Published' : 'Draft'}
           </Badge>
-          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0 capitalize">
-            {goal.recurrence_type}
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
+            {recurrenceLabel}
           </Badge>
         </div>
         {goal.description && (
@@ -41,6 +53,7 @@ const AdminGoalCard: React.FC<AdminGoalCardProps> = ({
         <p className="text-xs text-muted-foreground mt-0.5">
           Start: {goal.start_date}
           {goal.end_date ? ` · End: ${goal.end_date}` : ''}
+          {goal.preferred_time ? ` · ${formatTime(goal.preferred_time)}` : ''}
         </p>
       </div>
 
