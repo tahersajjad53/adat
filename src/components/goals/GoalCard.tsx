@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { MoreHoriz, EditPencil, Trash } from 'iconoir-react';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
     transition,
   };
 
+  const isMobile = useIsMobile();
   const { currentDate } = useCalendar();
   const recurrenceLabel = getRecurrenceDescription(goal, currentDate?.hijri);
   const checkboxRef = useRef<HTMLButtonElement>(null);
@@ -155,7 +157,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
+              className={`h-7 w-7 shrink-0 ${isMobile ? '' : 'opacity-0 group-hover:opacity-100 focus:opacity-100'}`}
             >
               <MoreHoriz className="h-4 w-4" />
             </Button>

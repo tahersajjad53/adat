@@ -112,7 +112,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setRecurrenceType('one-time');
         setRecurrenceDays([]);
         setRecurrencePattern(null);
-        setDueDate('');
+        setDueDate(new Date().toISOString().split('T')[0]);
         setStartDate(new Date().toISOString().split('T')[0]);
         setIsActive(true);
         setPreferredTime(null);
@@ -282,12 +282,12 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[90vh] overflow-y-auto" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <SheetContent side="bottom" className="max-h-[85vh] flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
           <SheetHeader className="text-left">
             <SheetTitle>{formTitle}</SheetTitle>
             <SheetDescription>{formDescription}</SheetDescription>
           </SheetHeader>
-          <div className="py-4">{formContent}</div>
+          <div className="flex-1 overflow-y-auto py-4">{formContent}</div>
           <SheetFooter>{footer}</SheetFooter>
         </SheetContent>
       </Sheet>
