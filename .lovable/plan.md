@@ -1,34 +1,63 @@
 
+# Goals Page Improvements
 
-# Simplify Goals 3-Dot Menu
+## 1. Always Show 3-Dot Menu on Mobile Only
 
-## Problem
-The dropdown menu currently mixes a navigational item ("Completed Goals") with an inline settings panel (Dynamic Goals toggle + explanation). "Completed Goals" looks like a title, and the Dynamic Goals section feels bulky inside a dropdown.
+**File: `src/components/goals/GoalCard.tsx`**
 
-## Solution
-Make both items simple navigational menu items. Tapping "Dynamic Goals" navigates to a new dedicated settings page with the explanation and toggle.
+The GoalCard needs to know if it's on mobile. Import `useIsMobile` and conditionally apply the opacity classes:
 
-### Changes
+- On mobile: always show the 3-dot menu (remove `opacity-0 group-hover:opacity-100`)
+- On desktop: keep the current hover-to-reveal behavior
 
-**1. New page: `src/pages/DynamicGoalsSettings.tsx`**
-- Simple page with a back button, title, explanation text, and the on/off toggle
-- Reuses the existing `useUserPreferences` hook for the toggle state
-- Consistent styling with the rest of the app (same container/max-width pattern)
+Change line 158 from:
+```
+className="h-7 w-7 shrink-0 opacity-0 group-hover:opacity-100 focus:opacity-100"
+```
+To:
+```
+className={`h-7 w-7 shrink-0 ${isMobile ? '' : 'opacity-0 group-hover:opacity-100 focus:opacity-100'}`}
+```
 
-**2. New route in `src/App.tsx`**
-- Add `/goals/dynamic-goals` route pointing to the new page
+## 2. Default New Goals to "One-time" with Today's Date Pre-filled
 
-**3. Simplify menu in `src/pages/Goals.tsx` (desktop)**
-- Replace the inline Dynamic Goals panel with a simple `DropdownMenuItem` that navigates to `/goals/dynamic-goals`
-- Both items ("Completed Goals" and "Dynamic Goals") become identical-looking menu items
+**File: `src/components/goals/GoalFormSheet.tsx`**
 
-**4. Simplify menu in `src/components/layout/AppLayout.tsx` (mobile)**
-- Same change: replace the inline panel (lines 79-91) with a simple `DropdownMenuItem` navigating to `/goals/dynamic-goals`
-- Remove the `Switch` import and `dynamicGoalsEnabled`/`setDynamicGoalsEnabled` from this file since they move to the new page
+When creating a new goal (not editing), set the default so it behaves as a "today" preset:
 
-### Result
-The 3-dot menu becomes a clean, minimal list:
-- Completed Goals (navigates to `/goals/completed`)
-- Dynamic Goals (navigates to `/goals/dynamic-goals`)
+- Keep `recurrenceType` as `'one-time'` (line 112)
+- Set `dueDate` to today's date instead of empty string (line 115): `setDueDate(new Date().toISOString().split('T')[0])`
 
-Both look and behave identically as tappable menu items.
+This means the form opens with "one-time" recurrence and today's date already filled in, matching a "Today" preset. The recurrence summary will show "Today" automatically.
+
+## 3. Fix Mobile Sheet Height So Footer Is Always Visible
+
+**File: `src/components/goals/GoalFormSheet.tsx`**
+
+Change the mobile `SheetContent` (line 285) from:
+```
+<SheetContent side="bottom" className="h-[90vh] overflow-y-auto" ...>
+  <SheetHeader>...</SheetHeader>
+  <div className="py-4">{formContent}</div>
+  <SheetFooter>{footer}</SheetFooter>
+</SheetContent>
+```
+To a flex layout that pins the footer:
+```
+<SheetContent side="bottom" className="max-h-[85vh] flex flex-col" ...>
+  <SheetHeader>...</SheetHeader>
+  <div className="flex-1 overflow-y-auto py-4">{formContent}</div>
+  <SheetFooter>{footer}</SheetFooter>
+</SheetContent>
+```
+
+This ensures the Cancel/Save buttons are always visible at the bottom without scrolling.
+
+---
+
+## Files Changed
+
+| File | Change |
+|------|--------|
+| `src/components/goals/GoalCard.tsx` | Import `useIsMobile`; conditionally show 3-dot menu always on mobile, hover-reveal on desktop |
+| `src/components/goals/GoalFormSheet.tsx` | Default `dueDate` to today for new goals; fix mobile sheet to flex layout with pinned footer |
