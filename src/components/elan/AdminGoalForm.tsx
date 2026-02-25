@@ -188,7 +188,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="max-h-[85vh] flex flex-col">
+        <SheetContent side="bottom" className="max-h-[85dvh] flex flex-col">
           <SheetHeader className="text-left">
             <SheetTitle>{formTitle}</SheetTitle>
             <SheetDescription>Manage community goal</SheetDescription>
