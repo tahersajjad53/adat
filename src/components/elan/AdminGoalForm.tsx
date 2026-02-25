@@ -108,8 +108,13 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
           placeholder="e.g., Moti Salwat before Iftar"
           disabled={isLoading}
           required
-          autoFocus
           className="flex-1 min-w-0 h-9"
+          onFocus={(e) => {
+            const target = e.target;
+            setTimeout(() => {
+              target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+            }, 300);
+          }}
         />
       </div>
 
