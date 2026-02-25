@@ -186,6 +186,12 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
             disabled={isLoading}
             required
             className="flex-1 min-w-0 h-9"
+            onFocus={(e) => {
+              const target = e.target;
+              setTimeout(() => {
+                target.scrollIntoView({ block: 'center', behavior: 'smooth' });
+              }, 300);
+            }}
           />
         </div>
         <p className="text-sm text-muted-foreground pl-8">{recurrenceSummary}</p>
@@ -282,7 +288,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="max-h-[85vh] flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <SheetContent side="bottom" className="max-h-[85dvh] flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
           <SheetHeader className="text-left">
             <SheetTitle>{formTitle}</SheetTitle>
             <SheetDescription>{formDescription}</SheetDescription>
