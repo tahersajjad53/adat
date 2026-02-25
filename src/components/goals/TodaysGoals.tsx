@@ -78,9 +78,10 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   };
 
   const hasOverdue = overdueGoals.length > 0;
+  const dynamicCompletedCount = dynamicGoals.filter((g) => isDynamicCompleted?.(g.id)).length;
   const totalDisplay = goalsTotal + overdueGoals.length + dynamicGoals.length;
-  const completedDisplay = goalsCompleted;
-  const totalForCounter = goalsTotal;
+  const completedDisplay = goalsCompleted + dynamicCompletedCount;
+  const totalForCounter = goalsTotal + dynamicGoals.length;
 
   return (
     <div>
