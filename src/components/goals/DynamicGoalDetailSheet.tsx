@@ -4,8 +4,8 @@ import {
   Sheet,
   SheetContent,
   SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+  SheetTitle } from
+'@/components/ui/sheet';
 import { getRecurrenceDescription } from '@/lib/recurrence';
 import { useCalendar } from '@/contexts/CalendarContext';
 import type { GoalWithStatus } from '@/types/goals';
@@ -19,7 +19,7 @@ interface DynamicGoalDetailSheetProps {
 const DynamicGoalDetailSheet: React.FC<DynamicGoalDetailSheetProps> = ({
   goal,
   open,
-  onOpenChange,
+  onOpenChange
 }) => {
   const { currentDate } = useCalendar();
 
@@ -45,22 +45,22 @@ const DynamicGoalDetailSheet: React.FC<DynamicGoalDetailSheetProps> = ({
           </Badge>
         </div>
 
-        {goal.description && (
-          <div className="prose prose-sm max-w-none">
-            <p className="text-base text-foreground leading-relaxed whitespace-pre-wrap">
+        {goal.description &&
+        <div className="prose prose-sm max-w-none">
+            <p className="text-foreground leading-relaxed whitespace-pre-wrap text-2xl">
               {goal.description}
             </p>
           </div>
-        )}
+        }
 
-        {!goal.description && (
-          <p className="text-sm text-muted-foreground italic">
+        {!goal.description &&
+        <p className="text-sm text-muted-foreground italic">
             No additional details for this goal.
           </p>
-        )}
+        }
       </SheetContent>
-    </Sheet>
-  );
+    </Sheet>);
+
 };
 
 export default DynamicGoalDetailSheet;
