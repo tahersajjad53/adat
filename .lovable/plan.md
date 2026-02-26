@@ -1,56 +1,73 @@
 
 
-# Fix: iOS Keyboard Obscuring Goal Form Input
+# Analysis: Al-Kanz Font for Arabic / Lisan ud Dawat Text
 
-## Problem
+## Current Arabic Text Locations
 
-On iOS PWA, when the keyboard opens after tapping the title input in the "Add Goal" bottom sheet, the `max-h-[85vh]` constraint is based on the full viewport height — but iOS doesn't resize the viewport when the keyboard appears (especially in standalone PWA mode). The sheet stays at 85% of the full screen, and the keyboard covers the bottom half, hiding the input field and the form content.
+| File | Text | Context |
+|------|------|---------|
+| `src/pages/Auth.tsx` | السَّلَامُ عَلَيْكُمْ | Login greeting |
+| `src/components/auth/AuthLayout.tsx` | عبادة ني پابندي ما ساتهي | Splash tagline |
+| `src/pages/Onboarding.tsx` | اُمّید | Step heading |
+| `src/lib/hijri.ts` | محرم, صفر, etc. | Hijri month names (available but not currently displayed) |
+| User-generated | Duas, prayers in goals | Typed or pasted by users |
 
-## Solution
+## Feasibility: High
 
-Use the CSS `dvh` (dynamic viewport height) unit instead of `vh`. On iOS, `100dvh` shrinks to account for the on-screen keyboard, so `max-h-[85dvh]` will automatically reduce the sheet height when the keyboard is visible, keeping the input in view.
+The TTF format is universally supported. The cleanest integration approach uses CSS `unicode-range` on the `@font-face` declaration, targeting the Arabic Unicode block (`U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFF`). This means:
 
-Additionally, add a scroll-into-view behavior so the focused input scrolls into the visible area when the keyboard opens.
+- **No code changes needed per-component** — the browser automatically applies Al-Kanz to any Arabic characters wherever they appear, regardless of which `font-family` the element uses (sans, display, etc.).
+- Works for hardcoded Arabic strings **and** user-pasted Arabic content in goal titles/descriptions.
+- Latin text remains unaffected (Inter / Bricolage Grotesque).
 
-## Changes
+## Stability Considerations
 
-**File: `src/components/goals/GoalFormSheet.tsx`**
+| Concern | Risk | Mitigation |
+|---------|------|------------|
+| Missing glyphs (diacritics like tashkeel: َ ُ ِ ّ) | Medium | The السَّلَامُ text uses heavy tashkeel — needs testing. If Al-Kanz lacks these, diacritics fall back to system Arabic fonts. |
+| Lisan ud Dawat specific characters (e.g., پ, ٹ, ڈ) | Medium | These are in the extended Arabic block. Al-Kanz must support U+067x range for Urdu/Gujarati-script characters. |
+| Mixed LTR/RTL in a single line | Low | CSS handles this natively via Unicode Bidi algorithm — font choice doesn't affect it. |
+| File size / performance | Low | A single TTF is typically 50-200KB, loaded once and cached. |
+| Font rendering on iOS PWA | Low | TTF/WOFF works reliably in Safari WebKit. |
 
-1. Change `max-h-[85vh]` to `max-h-[85dvh]` on the mobile `SheetContent` (line 285). The `dvh` unit is supported on iOS 15.4+ and all modern browsers — it dynamically accounts for the keyboard.
+## Recommended Implementation
 
-2. Add an `onFocus` handler to the title `Input` that calls `scrollIntoView({ block: 'center' })` after a short delay (to wait for the keyboard animation). This ensures the focused field scrolls into view even if the layout shift is slow.
+### 1. Copy font to `src/assets/fonts/Al-Kanz.ttf`
 
-**File: `src/components/elan/AdminGoalForm.tsx`**
+### 2. Add `@font-face` with `unicode-range` in `src/index.css`
 
-Apply the same `max-h-[85dvh]` fix to the admin form's mobile sheet for consistency.
-
-## Technical Details
-
+```css
+@font-face {
+  font-family: 'Al-Kanz';
+  src: url('@/assets/fonts/Al-Kanz.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+0870-089F,
+                 U+FB50-FDFF, U+FE70-FEFF;
+}
 ```
-// Line 285 of GoalFormSheet.tsx
-// Before:
-<SheetContent side="bottom" className="max-h-[85vh] flex flex-col" ...>
 
-// After:
-<SheetContent side="bottom" className="max-h-[85dvh] flex flex-col" ...>
+### 3. Prepend Al-Kanz to all font stacks in `tailwind.config.ts`
+
+```ts
+fontFamily: {
+  sans: ['"Al-Kanz"', 'Inter', 'system-ui', 'sans-serif'],
+  display: ['"Al-Kanz"', '"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
+},
 ```
 
-```
-// Title Input — add onFocus scroll
-<Input
-  ...
-  onFocus={(e) => {
-    setTimeout(() => {
-      e.target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    }, 300);
-  }}
-/>
-```
+Because of `unicode-range`, the browser will **only** use Al-Kanz for Arabic-range characters and fall through to Inter/Bricolage for Latin text. Zero per-component changes required.
 
-### Files changed
+### Files Changed
 
 | File | Change |
 |------|--------|
-| `src/components/goals/GoalFormSheet.tsx` | `max-h-[85dvh]` + `scrollIntoView` on title input focus |
-| `src/components/elan/AdminGoalForm.tsx` | `max-h-[85dvh]` on mobile sheet |
+| `src/assets/fonts/Al-Kanz.ttf` | New file (copy from upload) |
+| `src/index.css` | Add `@font-face` declaration |
+| `tailwind.config.ts` | Prepend `Al-Kanz` to font stacks |
+
+### Key Risk to Test
+
+The main unknown is whether **Al-Kanz includes tashkeel/diacritics** (the marks on السَّلَامُ عَلَيْكُمْ) and **Lisan ud Dawat extended characters** (پ, ٹ, ڈ, ے). If any glyphs are missing, the browser gracefully falls back to the next font in the stack — so there is no breakage, just inconsistent styling for those specific characters.
 
