@@ -17,8 +17,8 @@ export default {
       },
     },
     fontFamily: {
-      sans: ['Inter', 'system-ui', 'sans-serif'],
-      display: ['"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
+      sans: ['"Al-Kanz"', 'Inter', 'system-ui', 'sans-serif'],
+      display: ['"Al-Kanz"', '"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
     },
     extend: {
       colors: {
