@@ -1,73 +1,34 @@
 
 
-# Analysis: Al-Kanz Font for Arabic / Lisan ud Dawat Text
+## Current State
 
-## Current Arabic Text Locations
+Goal descriptions appear in three places with inconsistent and small sizing:
 
-| File | Text | Context |
-|------|------|---------|
-| `src/pages/Auth.tsx` | السَّلَامُ عَلَيْكُمْ | Login greeting |
-| `src/components/auth/AuthLayout.tsx` | عبادة ني پابندي ما ساتهي | Splash tagline |
-| `src/pages/Onboarding.tsx` | اُمّید | Step heading |
-| `src/lib/hijri.ts` | محرم, صفر, etc. | Hijri month names (available but not currently displayed) |
-| User-generated | Duas, prayers in goals | Typed or pasted by users |
+| Location | Current size | Line clamp |
+|----------|-------------|------------|
+| `TodaysGoals.tsx` (today's + dynamic goals) | `text-sm` (14px) | `line-clamp-1` |
+| `GoalCard.tsx` (goals page) | `text-xs` (12px) for regular, `text-sm` for dynamic | `line-clamp-1` |
+| `DynamicGoalDetailSheet.tsx` (detail view) | `text-base` (16px) | None |
 
-## Feasibility: High
+For Arabic text with diacritics (tashkeel), `text-sm` and especially `text-xs` are too small — the delicate marks above/below characters become illegible, particularly for elderly users.
 
-The TTF format is universally supported. The cleanest integration approach uses CSS `unicode-range` on the `@font-face` declaration, targeting the Arabic Unicode block (`U+0600-06FF, U+0750-077F, U+FB50-FDFF, U+FE70-FEFF`). This means:
+## Proposed Changes
 
-- **No code changes needed per-component** — the browser automatically applies Al-Kanz to any Arabic characters wherever they appear, regardless of which `font-family` the element uses (sans, display, etc.).
-- Works for hardcoded Arabic strings **and** user-pasted Arabic content in goal titles/descriptions.
-- Latin text remains unaffected (Inter / Bricolage Grotesque).
+### Size recommendations
 
-## Stability Considerations
+- **Goal titles** (currently `text-base` / 16px): Keep as-is — already legible.
+- **Goal descriptions on Today page** (`TodaysGoals.tsx`): Bump from `text-sm` (14px) → `text-base` (16px). Remove `line-clamp-1` and use `line-clamp-2` to show more of the description without unbounded expansion.
+- **Goal descriptions on Goals page** (`GoalCard.tsx`): Bump from `text-xs`/`text-sm` → `text-sm` (14px) uniformly. Change `line-clamp-1` → `line-clamp-2`.
+- **Detail sheet** (`DynamicGoalDetailSheet.tsx`): Already `text-base` — no change needed.
 
-| Concern | Risk | Mitigation |
-|---------|------|------------|
-| Missing glyphs (diacritics like tashkeel: َ ُ ِ ّ) | Medium | The السَّلَامُ text uses heavy tashkeel — needs testing. If Al-Kanz lacks these, diacritics fall back to system Arabic fonts. |
-| Lisan ud Dawat specific characters (e.g., پ, ٹ, ڈ) | Medium | These are in the extended Arabic block. Al-Kanz must support U+067x range for Urdu/Gujarati-script characters. |
-| Mixed LTR/RTL in a single line | Low | CSS handles this natively via Unicode Bidi algorithm — font choice doesn't affect it. |
-| File size / performance | Low | A single TTF is typically 50-200KB, loaded once and cached. |
-| Font rendering on iOS PWA | Low | TTF/WOFF works reliably in Safari WebKit. |
+### Spacing improvement
 
-## Recommended Implementation
+Add slightly more vertical gap between title and description (`mt-1` instead of `mt-0.5`) for better visual separation, especially when Arabic text has ascenders/descenders from diacritics.
 
-### 1. Copy font to `src/assets/fonts/Al-Kanz.ttf`
-
-### 2. Add `@font-face` with `unicode-range` in `src/index.css`
-
-```css
-@font-face {
-  font-family: 'Al-Kanz';
-  src: url('@/assets/fonts/Al-Kanz.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-  unicode-range: U+0600-06FF, U+0750-077F, U+0870-089F,
-                 U+FB50-FDFF, U+FE70-FEFF;
-}
-```
-
-### 3. Prepend Al-Kanz to all font stacks in `tailwind.config.ts`
-
-```ts
-fontFamily: {
-  sans: ['"Al-Kanz"', 'Inter', 'system-ui', 'sans-serif'],
-  display: ['"Al-Kanz"', '"Bricolage Grotesque"', 'system-ui', 'sans-serif'],
-},
-```
-
-Because of `unicode-range`, the browser will **only** use Al-Kanz for Arabic-range characters and fall through to Inter/Bricolage for Latin text. Zero per-component changes required.
-
-### Files Changed
+### Files changed
 
 | File | Change |
 |------|--------|
-| `src/assets/fonts/Al-Kanz.ttf` | New file (copy from upload) |
-| `src/index.css` | Add `@font-face` declaration |
-| `tailwind.config.ts` | Prepend `Al-Kanz` to font stacks |
-
-### Key Risk to Test
-
-The main unknown is whether **Al-Kanz includes tashkeel/diacritics** (the marks on السَّلَامُ عَلَيْكُمْ) and **Lisan ud Dawat extended characters** (پ, ٹ, ڈ, ے). If any glyphs are missing, the browser gracefully falls back to the next font in the stack — so there is no breakage, just inconsistent styling for those specific characters.
+| `src/components/goals/TodaysGoals.tsx` | Lines 208, 288: `text-sm` → `text-base`, `line-clamp-1` → `line-clamp-2`, `mt-0.5` → `mt-1` |
+| `src/components/goals/GoalCard.tsx` | Line 142: unify to `text-sm`, `line-clamp-1` → `line-clamp-2`, `mt-0.5` → `mt-1` |
 
