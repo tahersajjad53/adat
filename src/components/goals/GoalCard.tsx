@@ -139,7 +139,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
           )}
         </div>
         {goal.description && (
-          <p className={`mt-0.5 line-clamp-1 text-muted-foreground ${goal.isDynamic ? 'text-sm' : 'text-xs'}`}>
+          <p className={`mt-1 line-clamp-2 text-sm text-muted-foreground`}>
             {goal.description}
           </p>
         )}
