@@ -11,7 +11,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
-import DynamicGoalDetailSheet from '@/components/goals/DynamicGoalDetailSheet';
+import GoalDetailSheet from '@/components/goals/GoalDetailSheet';
 import type { Goal, GoalWithStatus, OverdueGoal } from '@/types/goals';
 import type { AdminGoal } from '@/types/adminGoals';
 
@@ -56,7 +56,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   const navigate = useNavigate();
   const { triggerConfetti, ConfettiPortal } = useConfetti();
   const checkboxRefs = useRef<Map<string, HTMLButtonElement>>(new Map());
-  const [viewingDynamic, setViewingDynamic] = useState<GoalWithStatus | null>(null);
+  const [viewingGoal, setViewingGoal] = useState<GoalWithStatus | null>(null);
 
   const handleToggle = (goalId: string) => {
     if (!isCompleted(goalId)) {
@@ -147,10 +147,24 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                 />
                 <div
                   className="flex-1 min-w-0 cursor-pointer"
-                  onClick={() => navigate('/goals')}
+                  onClick={() => {
+                    const goalWithStatus: GoalWithStatus = {
+                      ...overdue.goal,
+                      isCompleted: false,
+                    };
+                    setViewingGoal(goalWithStatus);
+                  }}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => { if (e.key === 'Enter') navigate('/goals'); }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const goalWithStatus: GoalWithStatus = {
+                        ...overdue.goal,
+                        isCompleted: false,
+                      };
+                      setViewingGoal(goalWithStatus);
+                    }
+                  }}
                 >
                   <span className="text-base font-medium">{overdue.goal.title}</span>
                   <p className="text-xs font-medium text-destructive mt-0.5">
@@ -196,10 +210,24 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                 />
                 <div
                   className="flex-1 min-w-0 cursor-pointer"
-                  onClick={() => navigate('/goals')}
+                  onClick={() => {
+                    const goalWithStatus: GoalWithStatus = {
+                      ...goal,
+                      isCompleted: completed,
+                    };
+                    setViewingGoal(goalWithStatus);
+                  }}
                   role="button"
                   tabIndex={0}
-                  onKeyDown={(e) => { if (e.key === 'Enter') navigate('/goals'); }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const goalWithStatus: GoalWithStatus = {
+                        ...goal,
+                        isCompleted: completed,
+                      };
+                      setViewingGoal(goalWithStatus);
+                    }
+                  }}
                 >
                   <span className={`text-base font-medium ${completed ? 'line-through text-muted-foreground' : ''}`}>
                     {goal.title}
@@ -251,7 +279,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                 />
                 <div
                   className="flex-1 min-w-0 cursor-pointer"
-                  onClick={() => setViewingDynamic({
+                  onClick={() => setViewingGoal({
                     ...goal,
                     user_id: '',
                     recurrence_type: goal.recurrence_type as GoalWithStatus['recurrence_type'],
@@ -264,7 +292,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter') setViewingDynamic({
+                    if (e.key === 'Enter') setViewingGoal({
                       ...goal,
                       user_id: '',
                       recurrence_type: goal.recurrence_type as GoalWithStatus['recurrence_type'],
@@ -298,10 +326,10 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
       )}
       <ConfettiPortal />
 
-      <DynamicGoalDetailSheet
-        goal={viewingDynamic}
-        open={!!viewingDynamic}
-        onOpenChange={(open) => { if (!open) setViewingDynamic(null); }}
+      <GoalDetailSheet
+        goal={viewingGoal}
+        open={!!viewingGoal}
+        onOpenChange={(open) => { if (!open) setViewingGoal(null); }}
       />
     </div>
   );
