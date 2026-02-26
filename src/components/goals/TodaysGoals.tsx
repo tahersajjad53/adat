@@ -205,7 +205,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                     {goal.title}
                   </span>
                   {goal.description && (
-                    <p className={`text-sm text-muted-foreground font-normal line-clamp-1 mt-0.5 ${completed ? 'line-through' : ''}`}>
+                    <p className={`text-base text-muted-foreground font-normal line-clamp-2 mt-1 ${completed ? 'line-through' : ''}`}>
                       {goal.description}
                     </p>
                   )}
@@ -285,7 +285,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                     </Badge>
                   </div>
                   {goal.description && (
-                    <p className={`text-sm text-muted-foreground font-normal line-clamp-1 mt-0.5 ${completed ? 'line-through' : ''}`}>
+                    <p className={`text-base text-muted-foreground font-normal line-clamp-2 mt-1 ${completed ? 'line-through' : ''}`}>
                       {goal.description}
                     </p>
                   )}
