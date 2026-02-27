@@ -22,6 +22,7 @@ import { getRecurrenceDescription } from '@/lib/recurrence';
 import { useConfetti } from '@/components/ui/confetti';
 import { useCalendar } from '@/contexts/CalendarContext';
 import type { GoalWithStatus } from '@/types/goals';
+import { hasArabic } from '@/lib/textUtils';
 
 interface GoalCardProps {
   goal: GoalWithStatus;
@@ -139,7 +140,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
           )}
         </div>
         {goal.description && (
-          <p className={`mt-1 line-clamp-2 text-sm text-muted-foreground`}>
+          <p className={`mt-1 line-clamp-2 ${hasArabic(goal.description || '') ? 'text-base' : 'text-sm'} text-muted-foreground`}>
             {goal.description}
           </p>
         )}

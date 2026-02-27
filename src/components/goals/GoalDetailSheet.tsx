@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/sheet';
 import { getRecurrenceDescription } from '@/lib/recurrence';
 import { useCalendar } from '@/contexts/CalendarContext';
+import { hasArabic } from '@/lib/textUtils';
 import type { GoalWithStatus } from '@/types/goals';
 
 interface GoalDetailSheetProps {
@@ -49,7 +50,7 @@ const GoalDetailSheet: React.FC<GoalDetailSheetProps> = ({
 
         {goal.description ? (
           <div className="prose prose-sm max-w-none">
-            <p className="text-foreground leading-relaxed whitespace-pre-wrap text-2xl">
+            <p className={`text-foreground leading-relaxed whitespace-pre-wrap ${hasArabic(goal.description || '') ? 'text-2xl' : 'text-base'}`}>
               {goal.description}
             </p>
           </div>
