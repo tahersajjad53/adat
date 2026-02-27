@@ -14,6 +14,7 @@ import {
 import GoalDetailSheet from '@/components/goals/GoalDetailSheet';
 import type { Goal, GoalWithStatus, OverdueGoal } from '@/types/goals';
 import type { AdminGoal } from '@/types/adminGoals';
+import { hasArabic } from '@/lib/textUtils';
 
 interface TodaysGoalsProps {
   goalsDueToday: Goal[];
@@ -233,7 +234,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                     {goal.title}
                   </span>
                   {goal.description && (
-                    <p className={`text-base text-muted-foreground font-normal line-clamp-2 mt-1 ${completed ? 'line-through' : ''}`}>
+                    <p className={`${hasArabic(goal.description || '') ? 'text-base' : 'text-sm'} text-muted-foreground font-normal line-clamp-2 mt-1 ${completed ? 'line-through' : ''}`}>
                       {goal.description}
                     </p>
                   )}
@@ -313,7 +314,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                     </Badge>
                   </div>
                   {goal.description && (
-                    <p className={`text-base text-muted-foreground font-normal line-clamp-2 mt-1 ${completed ? 'line-through' : ''}`}>
+                    <p className={`${hasArabic(goal.description || '') ? 'text-base' : 'text-sm'} text-muted-foreground font-normal line-clamp-2 mt-1 ${completed ? 'line-through' : ''}`}>
                       {goal.description}
                     </p>
                   )}
