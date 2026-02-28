@@ -97,9 +97,6 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
               {overdueGoals.length} overdue
             </span>
           )}
-          <span className="label-caps">
-            {completedDisplay}/{totalForCounter}
-          </span>
         </div>
       </div>
 
