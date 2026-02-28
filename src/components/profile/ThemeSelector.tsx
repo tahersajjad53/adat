@@ -31,7 +31,7 @@ const THEMES: ThemeOption[] = [
     name: 'bhukur',
     label: 'Bhukur',
     colors: {
-      bg: 'hsl(0 0% 9%)',
+      bg: 'hsl(207 11% 15%)',
       primary: 'hsl(24 85% 55%)',
       accent: 'hsl(30 90% 50%)',
     },
@@ -56,7 +56,7 @@ const ThemeSelector: React.FC = () => {
             }`}
           >
             {/* Color swatch */}
-            <div className="rounded-lg overflow-hidden h-16 flex flex-col">
+            <div className="rounded-lg overflow-hidden h-16 flex flex-col border border-border/40">
               <div className="flex-1" style={{ backgroundColor: t.colors.bg }} />
               <div className="h-3" style={{ backgroundColor: t.colors.primary }} />
               <div className="h-2" style={{ backgroundColor: t.colors.accent }} />
