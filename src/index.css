@@ -101,41 +101,41 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
   }
 
   .theme-bhukur {
-    --background: 0 0% 9%;
+    --background: 207 11% 15%;
     --foreground: 0 0% 92%;
 
-    --card: 0 0% 13%;
+    --card: 212 14% 21%;
     --card-foreground: 0 0% 92%;
 
-    --popover: 0 0% 13%;
+    --popover: 212 14% 21%;
     --popover-foreground: 0 0% 92%;
 
     --primary: 24 85% 55%;
     --primary-foreground: 0 0% 5%;
 
-    --secondary: 0 0% 18%;
+    --secondary: 210 12% 25%;
     --secondary-foreground: 0 0% 80%;
 
-    --muted: 0 0% 16%;
+    --muted: 210 10% 23%;
     --muted-foreground: 0 0% 55%;
 
     --accent: 30 90% 50%;
     --accent-foreground: 0 0% 5%;
 
-    --destructive: 0 75% 55%;
+    --destructive: 4 89% 62%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
+    --border: 210 10% 26%;
+    --input: 210 10% 26%;
     --ring: 24 85% 55%;
 
-    --sidebar-background: 0 0% 14%;
+    --sidebar-background: 210 12% 18%;
     --sidebar-foreground: 0 0% 90%;
     --sidebar-primary: 24 85% 55%;
     --sidebar-primary-foreground: 0 0% 5%;
-    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent: 210 10% 26%;
     --sidebar-accent-foreground: 0 0% 90%;
-    --sidebar-border: 0 0% 20%;
+    --sidebar-border: 210 10% 26%;
     --sidebar-ring: 24 85% 55%;
   }
 }
