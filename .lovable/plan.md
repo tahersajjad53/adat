@@ -1,21 +1,45 @@
 
 
-## Conditional Text Size: Arabic = Large, English = Small
+## Plan: Hide Completed Goals + Improve Completed Goals Page
 
-### Approach
-Create a utility function `hasArabic(text: string)` that checks if a string contains Arabic Unicode characters. Use it to conditionally apply `text-base` (Arabic) or `text-sm` (English) on description text.
+### 1. Hide completed goals on the Goals page
 
-### Files
+**File: `src/pages/Goals.tsx`**
+- Filter `mergedGoals` to exclude goals where `isCompleted === true` before rendering in `GoalList`.
+- This applies to both user goals and dynamic goals.
 
-**New: `src/lib/textUtils.ts`**
-- Export `hasArabic(text: string): boolean` — tests against regex `/[\u0600-\u06FF\u0750-\u077F\u0870-\u089F\uFB50-\uFDFF\uFE70-\uFEFF]/`
+### 2. Show Hijri date alongside Gregorian date on Completed Goals page
 
-**Edit: `src/components/goals/TodaysGoals.tsx`**
-- Lines 236, 316: Change `text-base` to `${hasArabic(goal.description) ? 'text-base' : 'text-sm'}`
+**File: `src/hooks/useCompletedGoalsHistory.ts`**
+- The `completion_date` field already stores the Hijri date (as YYYY-MM-DD). Include it in the mapped output (already present as `completion_date`).
 
-**Edit: `src/components/goals/GoalCard.tsx`**
-- Line 142: Change `text-sm` to `${hasArabic(goal.description) ? 'text-base' : 'text-sm'}`
+**File: `src/pages/CompletedGoals.tsx`**
+- In the date header, append the Hijri date from `completion_date` using the `HIJRI_MONTHS` data from `src/lib/hijri.ts` to format it as "Day MonthName Year AH" (e.g. "3 Moharram 1447 AH").
+- Format: `"Wednesday, 2 July 2025 · 3 Moharram 1447 AH"`
 
-**Edit: `src/components/goals/GoalDetailSheet.tsx`**
-- Description text: Apply same conditional sizing (`text-2xl` for Arabic, `text-base` for English) if applicable
+### 3. Add delete button per completed task
+
+**File: `src/hooks/useCompletedGoalsHistory.ts`**
+- Add a `deleteCompletion(id: string)` mutation that deletes from `goal_completions` by id, then invalidates the query.
+
+**File: `src/pages/CompletedGoals.tsx`**
+- Add a trash icon button on each completion entry row.
+- Wire it to `deleteCompletion`.
+
+### 4. Add "Clear All" button with confirmation
+
+**File: `src/hooks/useCompletedGoalsHistory.ts`**
+- Add a `clearAllCompletions()` mutation that deletes all `goal_completions` for the current user.
+
+**File: `src/pages/CompletedGoals.tsx`**
+- Add a "Clear All" button in the header row opposite the "Completed" title.
+- Wrap in an `AlertDialog` for confirmation before executing.
+
+### Files changed
+
+| File | Change |
+|------|--------|
+| `src/pages/Goals.tsx` | Filter out completed goals from `mergedGoals` |
+| `src/hooks/useCompletedGoalsHistory.ts` | Add `deleteCompletion` and `clearAllCompletions` mutations |
+| `src/pages/CompletedGoals.tsx` | Add Hijri date display, per-item delete, "Clear All" with confirmation dialog |
 
