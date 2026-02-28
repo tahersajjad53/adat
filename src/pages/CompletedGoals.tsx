@@ -1,14 +1,31 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { NavArrowLeft } from 'iconoir-react';
+import { NavArrowLeft, Trash } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { useCompletedGoalsHistory, CompletedGoalEntry } from '@/hooks/useCompletedGoalsHistory';
 import { format, parseISO } from 'date-fns';
+import { getHijriMonthName } from '@/lib/hijri';
+
+function formatHijriFromKey(hijriDateStr: string): string {
+  // completion_date is stored as YYYY-MM-DD hijri
+  const parts = hijriDateStr.split('-');
+  if (parts.length !== 3) return hijriDateStr;
+  const day = parseInt(parts[2], 10);
+  const month = parseInt(parts[1], 10);
+  const year = parseInt(parts[0], 10);
+  const monthName = getHijriMonthName(month);
+  return `${day} ${monthName} ${year} AH`;
+}
 
 const CompletedGoals: React.FC = () => {
   const navigate = useNavigate();
-  const { completions, isLoading } = useCompletedGoalsHistory();
+  const { completions, isLoading, deleteCompletion, clearAllCompletions, isDeleting, isClearing } = useCompletedGoalsHistory();
 
   // Group by gregorian_date
   const grouped = useMemo(() => {
@@ -24,16 +41,42 @@ const CompletedGoals: React.FC = () => {
   return (
     <div className="container py-8">
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={() => navigate('/goals')}>
-            <NavArrowLeft className="h-5 w-5" />
-          </Button>
-          <div>
-            <h1 className="md:text-4xl tracking-tight font-display text-4xl font-normal">Completed</h1>
-            <p className="text-base text-muted-foreground mt-1 font-normal">
-              Your goal completion history.
-            </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" onClick={() => navigate('/goals')}>
+              <NavArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="md:text-4xl tracking-tight font-display text-4xl font-normal">Completed</h1>
+              <p className="text-base text-muted-foreground mt-1 font-normal">
+                Your goal completion history.
+              </p>
+            </div>
           </div>
+
+          {completions.length > 0 && (
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="outline" size="sm" disabled={isClearing}>
+                  Clear All
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Clear all completed goals?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This will permanently delete all {completions.length} completion records. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => clearAllCompletions()}>
+                    Clear All
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          )}
         </div>
 
         {isLoading ? (
@@ -46,38 +89,51 @@ const CompletedGoals: React.FC = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {grouped.map(([date, entries]) => (
-              <div key={date} className="space-y-2">
-                <h2 className="text-sm font-medium text-muted-foreground sticky top-14 bg-background py-1 z-10">
-                  {format(parseISO(date), 'EEEE, d MMMM yyyy')}
-                </h2>
-                <div className="space-y-2">
-                  {entries.map((entry) => (
-                    <div
-                      key={entry.id}
-                      className="flex items-center gap-3 rounded-xl border border-border bg-card p-4"
-                    >
-                      <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-                        <svg className="h-3 w-3 text-primary" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M2 6l3 3 5-5" />
-                        </svg>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-base font-medium leading-tight">{entry.goal_title}</span>
-                          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
-                            {entry.goal_recurrence_type}
-                          </Badge>
+            {grouped.map(([date, entries]) => {
+              const hijriStr = entries[0]?.completion_date ? formatHijriFromKey(entries[0].completion_date) : '';
+              return (
+                <div key={date} className="space-y-2">
+                  <h2 className="text-sm font-medium text-muted-foreground sticky top-14 bg-background py-1 z-10">
+                    {format(parseISO(date), 'EEEE, d MMMM yyyy')}
+                    {hijriStr && <span className="ml-1">· {hijriStr}</span>}
+                  </h2>
+                  <div className="space-y-2">
+                    {entries.map((entry) => (
+                      <div
+                        key={entry.id}
+                        className="flex items-center gap-3 rounded-xl border border-border bg-card p-4"
+                      >
+                        <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+                          <svg className="h-3 w-3 text-primary" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="M2 6l3 3 5-5" />
+                          </svg>
                         </div>
-                        {entry.goal_description && (
-                          <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">{entry.goal_description}</p>
-                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-base font-medium leading-tight">{entry.goal_title}</span>
+                            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
+                              {entry.goal_recurrence_type}
+                            </Badge>
+                          </div>
+                          {entry.goal_description && (
+                            <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">{entry.goal_description}</p>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 shrink-0 text-muted-foreground hover:text-destructive"
+                          disabled={isDeleting}
+                          onClick={() => deleteCompletion(entry.id)}
+                        >
+                          <Trash className="h-4 w-4" />
+                        </Button>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

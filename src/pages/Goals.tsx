@@ -96,9 +96,9 @@ const Goals: React.FC = () => {
     [dynamicGoals, isDynamicCompleted]
   );
 
-  // Merge and sort using persisted order
+  // Merge, sort, and filter out completed goals
   const mergedGoals: GoalWithStatus[] = useMemo(() => {
-    const allGoals = [...userGoalsWithStatus, ...dynamicGoalsWithStatus];
+    const allGoals = [...userGoalsWithStatus, ...dynamicGoalsWithStatus].filter(g => !g.isCompleted);
     if (goalSortOrder.length === 0) return allGoals;
 
     const orderMap = new Map(goalSortOrder.map((id, i) => [id, i]));
