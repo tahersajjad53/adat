@@ -1,26 +1,25 @@
 
 
-## Fix: iOS PWA Status Bar Color
+## Fix: iOS PWA Status Bar Color Across All Themes
 
-### Problem
-The `THEME_COLORS` map in `ThemeContext.tsx` still has the old Bhukur background color (`#171717`) instead of the updated one (`#22272B`). When iOS reads the `theme-color` meta tag, it gets the wrong value, causing a mismatch in the dynamic island / status bar area.
+### Root cause
 
-Additionally, iOS PWAs are known to poorly handle dynamic `theme-color` updates via JavaScript. A more robust approach is to also declare multiple `<meta name="theme-color">` tags in `index.html` keyed by `media` attribute, so iOS picks up the right color on initial load based on system preference.
+The `applyThemeClass` function in `ThemeContext.tsx` uses `document.querySelector('meta[name="theme-color"]')` which only selects the **first** `<meta name="theme-color">` tag. There are now three such tags in `index.html`. iOS PWA reads the media-query variants, which never get updated by JavaScript — so the status bar color stays stale after theme switching.
 
 ### Changes
 
-**`src/contexts/ThemeContext.tsx`** (line 17)
-- Update `bhukur` color from `#171717` to `#22272B`
+**`src/contexts/ThemeContext.tsx`** — `applyThemeClass` function
 
-**`index.html`** (line 10)
-- Replace the single `<meta name="theme-color">` with two tags:
-  - `<meta name="theme-color" content="#ece4d4" media="(prefers-color-scheme: light)">`
-  - `<meta name="theme-color" content="#22272B" media="(prefers-color-scheme: dark)">`
-- Keep the non-media fallback tag as well for browsers that don't support the media attribute
+Update the meta tag logic to set **all three** `theme-color` meta tags to the active theme's color. This overrides the media-query variants so iOS always picks up the correct value regardless of system appearance:
 
-**`src/index.css`** — Bhukur theme
-- Confirm the header uses `bg-background` so the status bar bleed-through matches the theme-color. No change expected here, just validation.
+```ts
+const metas = document.querySelectorAll('meta[name="theme-color"]');
+metas.forEach(meta => meta.setAttribute('content', THEME_COLORS[theme]));
+```
 
-### Why this fixes it
-iOS Safari (and iOS PWA) reads `theme-color` meta tags at page load and respects `media` queries on them. The JS-based update in `applyThemeClass` handles runtime switches. Together, both initial load and dynamic switching are covered.
+This is a single-line change (line 26-27) replacing the existing `querySelector` + `setAttribute`.
+
+### Why this works
+
+iOS Safari respects `media` attributes on `theme-color` meta tags. When we only updated the first (no-media) tag, iOS continued reading the `prefers-color-scheme: light` or `dark` variant with the old color. By updating all three tags to the active theme's color, iOS always sees the correct value regardless of which meta tag it prioritizes.
 
