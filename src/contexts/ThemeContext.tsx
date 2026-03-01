@@ -14,7 +14,7 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const THEME_COLORS: Record<ThemeName, string> = {
   oudh: '#ece4d4',
   khalaf: '#ffffff',
-  bhukur: '#171717',
+  bhukur: '#22272B',
 };
 
 function applyThemeClass(theme: ThemeName) {
