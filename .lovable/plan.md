@@ -1,25 +1,26 @@
 
 
-## Fix: iOS PWA Status Bar Color Across All Themes
+## Plan: Apply user sort order to Today's Goals
 
-### Root cause
+### Problem
+The Goals page respects `goalSortOrder` from `useUserPreferences` to display a unified, user-ordered list. The Dashboard's `TodaysGoals` component ignores this entirely — it renders overdue goals first, then `goalsDueToday` in DB order, then dynamic goals at the bottom.
 
-The `applyThemeClass` function in `ThemeContext.tsx` uses `document.querySelector('meta[name="theme-color"]')` which only selects the **first** `<meta name="theme-color">` tag. There are now three such tags in `index.html`. iOS PWA reads the media-query variants, which never get updated by JavaScript — so the status bar color stays stale after theme switching.
+### Approach
+Update `Dashboard.tsx` to sort `goalsDueToday` and `dynamicGoals` using the same `goalSortOrder` preference, then pass a single sorted list to `TodaysGoals`. This requires refactoring `TodaysGoals` to accept a unified ordered list instead of separate `goalsDueToday` + `dynamicGoals` arrays.
 
 ### Changes
 
-**`src/contexts/ThemeContext.tsx`** — `applyThemeClass` function
+**`src/pages/Dashboard.tsx`**
+- Import `useUserPreferences` and read `goalSortOrder`
+- After getting `goalsDueToday` and `dynamicGoals`, merge them into a single sorted array using the same logic as `Goals.tsx` (sort by `goalSortOrder`, with unordered user goals first, dynamic goals after)
+- Pass the sorted list to `TodaysGoals` via a new prop pattern
 
-Update the meta tag logic to set **all three** `theme-color` meta tags to the active theme's color. This overrides the media-query variants so iOS always picks up the correct value regardless of system appearance:
+**`src/components/goals/TodaysGoals.tsx`**
+- Add a new optional `sortedGoals` prop that accepts a pre-sorted array of `GoalWithStatus` items (containing both user and dynamic goals with `isDynamic` flag)
+- When `sortedGoals` is provided, render from that single list instead of separate `goalsDueToday` / `dynamicGoals` arrays
+- Each item checks `isDynamic` to determine which toggle handler and badge to use
+- Overdue goals remain rendered first (before the sorted list), unchanged
 
-```ts
-const metas = document.querySelectorAll('meta[name="theme-color"]');
-metas.forEach(meta => meta.setAttribute('content', THEME_COLORS[theme]));
-```
-
-This is a single-line change (line 26-27) replacing the existing `querySelector` + `setAttribute`.
-
-### Why this works
-
-iOS Safari respects `media` attributes on `theme-color` meta tags. When we only updated the first (no-media) tag, iOS continued reading the `prefers-color-scheme: light` or `dark` variant with the old color. By updating all three tags to the active theme's color, iOS always sees the correct value regardless of which meta tag it prioritizes.
+### Result
+Goals on the Today page will mirror the order set on the Goals page. Dynamic goals without a custom position will appear after user goals by default.
 
