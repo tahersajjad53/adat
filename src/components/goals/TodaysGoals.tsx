@@ -16,6 +16,8 @@ import type { Goal, GoalWithStatus, OverdueGoal } from '@/types/goals';
 import type { AdminGoal } from '@/types/adminGoals';
 import { hasArabic } from '@/lib/textUtils';
 
+const DYNAMIC_PREFIX = 'dynamic:';
+
 interface TodaysGoalsProps {
   goalsDueToday: Goal[];
   goalsCompleted: number;
@@ -34,6 +36,8 @@ interface TodaysGoalsProps {
   isDynamicCompleted?: (goalId: string) => boolean;
   onDynamicToggle?: (goalId: string) => void;
   isDynamicToggling?: boolean;
+  // Sorted unified list
+  sortedGoals?: GoalWithStatus[];
 }
 
 const TodaysGoals: React.FC<TodaysGoalsProps> = ({
@@ -53,6 +57,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   isDynamicCompleted,
   onDynamicToggle,
   isDynamicToggling = false,
+  sortedGoals,
 }) => {
   const navigate = useNavigate();
   const { triggerConfetti, ConfettiPortal } = useConfetti();
@@ -60,22 +65,23 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   const [viewingGoal, setViewingGoal] = useState<GoalWithStatus | null>(null);
 
   const handleToggle = (goalId: string) => {
-    if (!isCompleted(goalId)) {
-      triggerConfetti(checkboxRefs.current.get(goalId));
+    if (goalId.startsWith(DYNAMIC_PREFIX)) {
+      const realId = goalId.slice(DYNAMIC_PREFIX.length);
+      if (isDynamicCompleted && !isDynamicCompleted(realId)) {
+        triggerConfetti(checkboxRefs.current.get(goalId));
+      }
+      onDynamicToggle?.(realId);
+    } else {
+      if (!isCompleted(goalId)) {
+        triggerConfetti(checkboxRefs.current.get(goalId));
+      }
+      onToggle(goalId);
     }
-    onToggle(goalId);
   };
 
   const handleOverdueToggle = (goalId: string) => {
     triggerConfetti(checkboxRefs.current.get(`overdue-${goalId}`));
     onCompleteOverdue?.(goalId);
-  };
-
-  const handleDynamicToggle = (goalId: string) => {
-    if (isDynamicCompleted && !isDynamicCompleted(goalId)) {
-      triggerConfetti(checkboxRefs.current.get(`dynamic-${goalId}`));
-    }
-    onDynamicToggle?.(goalId);
   };
 
   const hasOverdue = overdueGoals.length > 0;
@@ -188,127 +194,59 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
             );
           })}
 
-          {/* Today's goals */}
-          {goalsDueToday.map((goal) => {
-            const completed = isCompleted(goal.id);
+          {/* Sorted goals (user + dynamic unified) */}
+          {(sortedGoals ?? goalsDueToday.map(g => ({ ...g, isCompleted: isCompleted(g.id) }))).map((goal) => {
+            const isDynamic = !!(goal as GoalWithStatus).isDynamic;
+            const completed = goal.isCompleted;
+            const displayId = goal.id;
+            const realId = isDynamic ? goal.id.slice(DYNAMIC_PREFIX.length) : goal.id;
+            const isDisabled = isDynamic ? isDynamicToggling : isToggling;
+
             const row = (
               <div
-                key={goal.id}
+                key={displayId}
                 className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
               >
                 <Checkbox
                   ref={(el) => {
-                    if (el) checkboxRefs.current.set(goal.id, el);
-                    else checkboxRefs.current.delete(goal.id);
+                    if (el) checkboxRefs.current.set(displayId, el);
+                    else checkboxRefs.current.delete(displayId);
                   }}
                   checked={completed}
-                  onCheckedChange={() => handleToggle(goal.id)}
-                  disabled={isToggling}
+                  onCheckedChange={() => handleToggle(displayId)}
+                  disabled={isDisabled}
                   className="h-5 w-5"
                 />
                 <div
                   className="flex-1 min-w-0 cursor-pointer"
                   onClick={() => {
-                    const goalWithStatus: GoalWithStatus = {
-                      ...goal,
-                      isCompleted: completed,
-                    };
-                    setViewingGoal(goalWithStatus);
+                    if (isDynamic) {
+                      setViewingGoal({ ...goal, isDynamic: true });
+                    } else {
+                      setViewingGoal({ ...goal, isCompleted: completed });
+                    }
                   }}
                   role="button"
                   tabIndex={0}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') {
-                      const goalWithStatus: GoalWithStatus = {
-                        ...goal,
-                        isCompleted: completed,
-                      };
-                      setViewingGoal(goalWithStatus);
+                      if (isDynamic) {
+                        setViewingGoal({ ...goal, isDynamic: true });
+                      } else {
+                        setViewingGoal({ ...goal, isCompleted: completed });
+                      }
                     }
-                  }}
-                >
-                  <span className={`text-base font-medium ${completed ? 'line-through text-muted-foreground' : ''}`}>
-                    {goal.title}
-                  </span>
-                  {goal.description && (
-                    <p className={`${hasArabic(goal.description || '') ? 'text-base' : 'text-sm'} text-muted-foreground font-normal line-clamp-2 mt-1 ${completed ? 'line-through' : ''}`}>
-                      {goal.description}
-                    </p>
-                  )}
-                </div>
-                {completed && <Check className="h-4 w-4 text-primary shrink-0" />}
-              </div>
-            );
-
-            return (
-              <ContextMenu key={`ctx-${goal.id}`}>
-                <ContextMenuTrigger asChild>{row}</ContextMenuTrigger>
-                <ContextMenuContent className="bg-popover">
-                  <ContextMenuItem
-                    onClick={() => onDeleteGoal?.(goal.id)}
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <Trash className="h-4 w-4 mr-2" />
-                    Delete
-                  </ContextMenuItem>
-                </ContextMenuContent>
-              </ContextMenu>
-            );
-          })}
-
-          {/* Dynamic goals inline */}
-          {dynamicGoals.map((goal) => {
-            const completed = isDynamicCompleted?.(goal.id) ?? false;
-            return (
-              <div
-                key={`dynamic-${goal.id}`}
-                className="flex items-center gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
-              >
-                <Checkbox
-                  ref={(el) => {
-                    const key = `dynamic-${goal.id}`;
-                    if (el) checkboxRefs.current.set(key, el);
-                    else checkboxRefs.current.delete(key);
-                  }}
-                  checked={completed}
-                  onCheckedChange={() => handleDynamicToggle(goal.id)}
-                  disabled={isDynamicToggling}
-                  className="h-5 w-5"
-                />
-                <div
-                  className="flex-1 min-w-0 cursor-pointer"
-                  onClick={() => setViewingGoal({
-                    ...goal,
-                    user_id: '',
-                    recurrence_type: goal.recurrence_type as GoalWithStatus['recurrence_type'],
-                    recurrence_days: goal.recurrence_days ?? null,
-                    recurrence_pattern: goal.recurrence_pattern as any,
-                    is_active: true,
-                    isCompleted: completed,
-                    isDynamic: true,
-                  })}
-                  role="button"
-                  tabIndex={0}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') setViewingGoal({
-                      ...goal,
-                      user_id: '',
-                      recurrence_type: goal.recurrence_type as GoalWithStatus['recurrence_type'],
-                      recurrence_days: goal.recurrence_days ?? null,
-                      recurrence_pattern: goal.recurrence_pattern as any,
-                      is_active: true,
-                      isCompleted: completed,
-                      isDynamic: true,
-                    });
                   }}
                 >
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={`text-base font-medium ${completed ? 'line-through text-muted-foreground' : ''}`}>
                       {goal.title}
                     </span>
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 text-primary border-primary/30">
-                      Dynamic
-                    </Badge>
+                    {isDynamic && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 text-primary border-primary/30">
+                        Dynamic
+                      </Badge>
+                    )}
                   </div>
                   {goal.description && (
                     <p className={`${hasArabic(goal.description || '') ? 'text-base' : 'text-sm'} text-muted-foreground font-normal line-clamp-2 mt-1 ${completed ? 'line-through' : ''}`}>
@@ -318,6 +256,23 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
                 </div>
                 {completed && <Check className="h-4 w-4 text-primary shrink-0" />}
               </div>
+            );
+
+            if (isDynamic) return row;
+
+            return (
+              <ContextMenu key={`ctx-${displayId}`}>
+                <ContextMenuTrigger asChild>{row}</ContextMenuTrigger>
+                <ContextMenuContent className="bg-popover">
+                  <ContextMenuItem
+                    onClick={() => onDeleteGoal?.(realId)}
+                    className="text-destructive focus:text-destructive"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             );
           })}
         </div>

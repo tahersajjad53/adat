@@ -20,6 +20,8 @@ import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import { useOverdueGoals } from '@/hooks/useOverdueGoals';
 import { useDynamicGoals } from '@/hooks/useDynamicGoals';
 import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
+import { useUserPreferences } from '@/hooks/useUserPreferences';
+import type { GoalWithStatus } from '@/types/goals';
 
 const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
   fajr: SunLight,
@@ -50,10 +52,44 @@ const Dashboard: React.FC = () => {
     toggleCompletion: toggleDynamic,
     isToggling: isDynamicToggling,
   } = useAdminGoalCompletions();
+  const { goalSortOrder } = useUserPreferences();
 
   const {
     prayerCompleted, prayerTotal, goalsCompleted, goalsTotal, goalsDueToday, overallPercentage,
   } = useTodayProgress(prayers, prayersLoading, overdueGoalIds, dynamicGoals, isDynamicCompleted);
+
+  const DYNAMIC_PREFIX = 'dynamic:';
+
+  // Build sorted goals list matching Goals page order
+  const sortedGoals: GoalWithStatus[] = useMemo(() => {
+    const userGoals: GoalWithStatus[] = goalsDueToday.map((g) => ({
+      ...g,
+      isCompleted: isCompleted(g.id),
+    }));
+    const dynGoals: GoalWithStatus[] = dynamicGoals.map((g) => ({
+      ...g,
+      user_id: '',
+      recurrence_type: g.recurrence_type as GoalWithStatus['recurrence_type'],
+      recurrence_days: g.recurrence_days ?? null,
+      recurrence_pattern: g.recurrence_pattern as any,
+      is_active: true,
+      id: `${DYNAMIC_PREFIX}${g.id}`,
+      isCompleted: isDynamicCompleted(g.id),
+      isDynamic: true,
+    }));
+    const allGoals = [...userGoals, ...dynGoals];
+    if (goalSortOrder.length === 0) return allGoals;
+
+    const orderMap = new Map(goalSortOrder.map((id, i) => [id, i]));
+    const sorted: GoalWithStatus[] = [];
+    const unsorted: GoalWithStatus[] = [];
+    for (const g of allGoals) {
+      if (orderMap.has(g.id)) sorted.push(g);
+      else unsorted.push(g);
+    }
+    sorted.sort((a, b) => (orderMap.get(a.id) ?? 0) - (orderMap.get(b.id) ?? 0));
+    return [...sorted, ...unsorted];
+  }, [goalsDueToday, dynamicGoals, isCompleted, isDynamicCompleted, goalSortOrder]);
 
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayerName = currentPrayerWindow?.current || null;
@@ -193,6 +229,7 @@ const Dashboard: React.FC = () => {
           onDynamicToggle={toggleDynamic}
           isDynamicToggling={isDynamicToggling}
           onCreateGoal={() => setGoalFormOpen(true)}
+          sortedGoals={sortedGoals}
         />
 
         <GoalFormSheet
