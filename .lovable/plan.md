@@ -1,45 +1,26 @@
 
 
-## Plan: Hide Completed Goals + Improve Completed Goals Page
+## Fix: iOS PWA Status Bar Color
 
-### 1. Hide completed goals on the Goals page
+### Problem
+The `THEME_COLORS` map in `ThemeContext.tsx` still has the old Bhukur background color (`#171717`) instead of the updated one (`#22272B`). When iOS reads the `theme-color` meta tag, it gets the wrong value, causing a mismatch in the dynamic island / status bar area.
 
-**File: `src/pages/Goals.tsx`**
-- Filter `mergedGoals` to exclude goals where `isCompleted === true` before rendering in `GoalList`.
-- This applies to both user goals and dynamic goals.
+Additionally, iOS PWAs are known to poorly handle dynamic `theme-color` updates via JavaScript. A more robust approach is to also declare multiple `<meta name="theme-color">` tags in `index.html` keyed by `media` attribute, so iOS picks up the right color on initial load based on system preference.
 
-### 2. Show Hijri date alongside Gregorian date on Completed Goals page
+### Changes
 
-**File: `src/hooks/useCompletedGoalsHistory.ts`**
-- The `completion_date` field already stores the Hijri date (as YYYY-MM-DD). Include it in the mapped output (already present as `completion_date`).
+**`src/contexts/ThemeContext.tsx`** (line 17)
+- Update `bhukur` color from `#171717` to `#22272B`
 
-**File: `src/pages/CompletedGoals.tsx`**
-- In the date header, append the Hijri date from `completion_date` using the `HIJRI_MONTHS` data from `src/lib/hijri.ts` to format it as "Day MonthName Year AH" (e.g. "3 Moharram 1447 AH").
-- Format: `"Wednesday, 2 July 2025 · 3 Moharram 1447 AH"`
+**`index.html`** (line 10)
+- Replace the single `<meta name="theme-color">` with two tags:
+  - `<meta name="theme-color" content="#ece4d4" media="(prefers-color-scheme: light)">`
+  - `<meta name="theme-color" content="#22272B" media="(prefers-color-scheme: dark)">`
+- Keep the non-media fallback tag as well for browsers that don't support the media attribute
 
-### 3. Add delete button per completed task
+**`src/index.css`** — Bhukur theme
+- Confirm the header uses `bg-background` so the status bar bleed-through matches the theme-color. No change expected here, just validation.
 
-**File: `src/hooks/useCompletedGoalsHistory.ts`**
-- Add a `deleteCompletion(id: string)` mutation that deletes from `goal_completions` by id, then invalidates the query.
-
-**File: `src/pages/CompletedGoals.tsx`**
-- Add a trash icon button on each completion entry row.
-- Wire it to `deleteCompletion`.
-
-### 4. Add "Clear All" button with confirmation
-
-**File: `src/hooks/useCompletedGoalsHistory.ts`**
-- Add a `clearAllCompletions()` mutation that deletes all `goal_completions` for the current user.
-
-**File: `src/pages/CompletedGoals.tsx`**
-- Add a "Clear All" button in the header row opposite the "Completed" title.
-- Wrap in an `AlertDialog` for confirmation before executing.
-
-### Files changed
-
-| File | Change |
-|------|--------|
-| `src/pages/Goals.tsx` | Filter out completed goals from `mergedGoals` |
-| `src/hooks/useCompletedGoalsHistory.ts` | Add `deleteCompletion` and `clearAllCompletions` mutations |
-| `src/pages/CompletedGoals.tsx` | Add Hijri date display, per-item delete, "Clear All" with confirmation dialog |
+### Why this fixes it
+iOS Safari (and iOS PWA) reads `theme-color` meta tags at page load and respects `media` queries on them. The JS-based update in `applyThemeClass` handles runtime switches. Together, both initial load and dynamic switching are covered.
 
