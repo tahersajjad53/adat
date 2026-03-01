@@ -23,8 +23,8 @@ function applyThemeClass(theme: ThemeName) {
   if (theme === 'khalaf') html.classList.add('theme-khalaf');
   if (theme === 'bhukur') html.classList.add('theme-bhukur');
 
-  const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', THEME_COLORS[theme]);
+  const metas = document.querySelectorAll('meta[name="theme-color"]');
+  metas.forEach(meta => meta.setAttribute('content', THEME_COLORS[theme]));
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
