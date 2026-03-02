@@ -162,9 +162,6 @@ const Goals: React.FC = () => {
               Rooted in Niyat, completed with Ikhlas.
             </p>
           </div>
-          {isMobile && (
-            <span className="text-sm text-muted-foreground">{completedCount}/{totalCount}</span>
-          )}
           <div className="flex items-center gap-2">
             {!isMobile && (
               <Button onClick={handleAdd}>
