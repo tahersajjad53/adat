@@ -54,14 +54,16 @@ export function DateDisplay({
           {currentDate.isAfterMaghrib ? <HalfMoon className={cn("h-6 w-6", isLight ? "text-white" : "text-primary")} /> : <SunLight className={cn("h-6 w-6", isLight ? "text-white" : "text-accent-foreground")} />}
           <span className={cn("font-display text-xl sm:text-2xl font-semibold whitespace-nowrap", isLight && "text-white")}>{hijriFormatted}</span>
         </div>
-        <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-white/80" : "text-muted-foreground")}>
-          {gregorianFormatted}
-        </span>
-        {location?.city && (
-          <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal flex items-center gap-1", isLight ? "text-white/80" : "text-muted-foreground")}>
-            <MapPin className="h-3 w-3" />{location.city}
+        <div className="flex flex-col gap-1 ml-8">
+          <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-white/80" : "text-muted-foreground")}>
+            {gregorianFormatted}
           </span>
-        )}
+          {location?.city && (
+            <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal flex items-center gap-1", isLight ? "text-white/80" : "text-muted-foreground")}>
+              <MapPin className="h-3 w-3" />{location.city}
+            </span>
+          )}
+        </div>
       </div>;
   }
   return <div className={cn('flex flex-col items-center space-y-1', className)}>
