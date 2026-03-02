@@ -96,6 +96,10 @@ const Goals: React.FC = () => {
     [dynamicGoals, isDynamicCompleted]
   );
 
+  // Completion counter (mobile only)
+  const completedCount = useMemo(() => [...userGoalsWithStatus, ...dynamicGoalsWithStatus].filter(g => g.isCompleted).length, [userGoalsWithStatus, dynamicGoalsWithStatus]);
+  const totalCount = useMemo(() => userGoalsWithStatus.length + dynamicGoalsWithStatus.length, [userGoalsWithStatus, dynamicGoalsWithStatus]);
+
   // Merge, sort, and filter out completed goals
   const mergedGoals: GoalWithStatus[] = useMemo(() => {
     const allGoals = [...userGoalsWithStatus, ...dynamicGoalsWithStatus].filter(g => !g.isCompleted);
@@ -158,6 +162,9 @@ const Goals: React.FC = () => {
               Rooted in Niyat, completed with Ikhlas.
             </p>
           </div>
+          {isMobile && (
+            <span className="text-sm text-muted-foreground">{completedCount}/{totalCount}</span>
+          )}
           <div className="flex items-center gap-2">
             {!isMobile && (
               <Button onClick={handleAdd}>
