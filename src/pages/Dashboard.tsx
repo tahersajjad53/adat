@@ -143,6 +143,7 @@ const Dashboard: React.FC = () => {
     <div className="container py-8">
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Unified Time-Aware Card */}
+        <div onClick={() => navigate('/namaz')} className="cursor-pointer">
         <TimeOfDayCard currentPrayer={currentPrayerName}>
           <div className="flex items-start justify-between">
             <DateDisplay showLocation compact variant="light" />
@@ -192,7 +193,7 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                 {prayerToShow.isCompleted && (
                   <div className="flex items-center gap-1 text-white/80 text-sm">
                     <Check className="h-4 w-4" />
@@ -210,6 +211,7 @@ const Dashboard: React.FC = () => {
             <p className="text-white/80 text-sm font-medium">Reflect, rest, renew.</p>
           )}
         </TimeOfDayCard>
+        </div>
 
         {/* Today's Goals */}
         <TodaysGoals
