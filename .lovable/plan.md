@@ -1,10 +1,16 @@
 
 
-## Remove decorative SVG illustrations from TimeOfDayCard
+## Plan: Make TimeOfDayCard tappable to navigate to Namaz page
 
-**File: `src/components/namaz/TimeOfDayCard.tsx`**
+**File: `src/pages/Dashboard.tsx`**
 
-Remove the `GeometricShape` component entirely (lines 25-117) and remove its usage in the render (the `<GeometricShape variant={currentPrayer} />` line). Keep the gradient class logic and the rest of the card intact.
+Wrap the `TimeOfDayCard` content in a click handler that navigates to `/namaz`, but stop propagation on the Checkbox so it continues to toggle the prayer without navigating.
 
-This affects both the Dashboard and Namaz page headers since they both use `TimeOfDayCard`.
+1. Import `useNavigate` from `react-router-dom` (likely already imported)
+2. Add `onClick={() => navigate('/namaz')}` and `cursor-pointer` to the `TimeOfDayCard` wrapper
+3. Add `e.stopPropagation()` on the Checkbox's `onCheckedChange` and its parent container to prevent navigation when tapping the checkbox
+
+Specifically:
+- Wrap `TimeOfDayCard` in a `<div onClick={() => navigate('/namaz')} className="cursor-pointer">`
+- On the checkbox container div (line 195), add `onClick={(e) => e.stopPropagation()}` so checkbox taps don't trigger navigation
 
