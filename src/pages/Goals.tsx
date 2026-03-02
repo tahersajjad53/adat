@@ -176,11 +176,11 @@ const Goals: React.FC = () => {
                     <MoreHoriz className="h-5 w-5" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover">
-                  <DropdownMenuItem onClick={() => navigate('/goals/completed')}>
+                <DropdownMenuContent align="end" className="bg-popover min-w-[200px] p-2">
+                  <DropdownMenuItem onClick={() => navigate('/goals/completed')} className="py-3 px-4 text-base">
                     Completed Goals
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate('/goals/dynamic-goals')}>
+                  <DropdownMenuItem onClick={() => navigate('/goals/dynamic-goals')} className="py-3 px-4 text-base">
                     Dynamic Goals
                   </DropdownMenuItem>
                 </DropdownMenuContent>
