@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { format, addDays, nextSaturday, nextMonday } from 'date-fns';
+import { gregorianToBohra, formatHijriDate } from '@/lib/hijri';
 import {
   Calendar as CalendarIcon,
   SunLight,
@@ -179,6 +180,7 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
   const dayOfWeek = date ? new Date(date + 'T12:00:00').getDay() : 0;
   const dayOfMonth = date ? new Date(date + 'T12:00:00').getDate() : 1;
   const monthOfYear = date ? new Date(date + 'T12:00:00').getMonth() + 1 : 1;
+  const hijriDate = date ? gregorianToBohra(new Date(date + 'T12:00:00'), timezone) : null;
 
   const recurrencePresets = [
     { label: 'Off', onClick: () => handleRecurrencePreset('one-time') },
@@ -210,6 +212,27 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
           calendarType: 'gregorian',
         }),
     },
+    ...(hijriDate ? [
+      {
+        label: `Every month on ${hijriDate.day} ${hijriDate.monthName} (Hijri)`,
+        onClick: () =>
+          handleRecurrencePreset('custom', undefined, {
+            type: 'monthly',
+            monthlyDay: hijriDate.day,
+            calendarType: 'hijri',
+          }),
+      },
+      {
+        label: `Every year on ${hijriDate.day} ${hijriDate.monthName} (Hijri)`,
+        onClick: () =>
+          handleRecurrencePreset('annual', undefined, {
+            type: 'annual',
+            annualMonth: hijriDate.month,
+            monthlyDay: hijriDate.day,
+            calendarType: 'hijri',
+          }),
+      },
+    ] : []),
   ];
 
   const formatTimeDisplay = (hhmm: string | null) => {
@@ -364,6 +387,9 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
         <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
           <SheetHeader className="text-left">
             <SheetTitle>{date ? formatDateShort(date) : 'Pick a date'}</SheetTitle>
+            {hijriDate && (
+              <p className="text-sm text-muted-foreground">{formatHijriDate(hijriDate, 'long')} H</p>
+            )}
           </SheetHeader>
           <div className="py-4">{modalContent}</div>
         </SheetContent>
@@ -377,6 +403,9 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
       <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader className="text-left">
           <DialogTitle>{date ? formatDateShort(date) : 'Pick a date'}</DialogTitle>
+          {hijriDate && (
+            <p className="text-sm text-muted-foreground">{formatHijriDate(hijriDate, 'long')} H</p>
+          )}
         </DialogHeader>
         {modalContent}
       </DialogContent>
