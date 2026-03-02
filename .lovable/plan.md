@@ -1,26 +1,23 @@
 
 
-## Plan: Apply user sort order to Today's Goals
+## Plan: Add completed/total counter to Goals page (mobile only)
 
-### Problem
-The Goals page respects `goalSortOrder` from `useUserPreferences` to display a unified, user-ordered list. The Dashboard's `TodaysGoals` component ignores this entirely — it renders overdue goals first, then `goalsDueToday` in DB order, then dynamic goals at the bottom.
+### Change
 
-### Approach
-Update `Dashboard.tsx` to sort `goalsDueToday` and `dynamicGoals` using the same `goalSortOrder` preference, then pass a single sorted list to `TodaysGoals`. This requires refactoring `TodaysGoals` to accept a unified ordered list instead of separate `goalsDueToday` + `dynamicGoals` arrays.
+**`src/pages/Goals.tsx`** (around lines 154-163)
 
-### Changes
+Add a completion counter (e.g., "3/7") to the right of the title, visible only on mobile via `md:hidden` class. Desktop header stays unchanged.
 
-**`src/pages/Dashboard.tsx`**
-- Import `useUserPreferences` and read `goalSortOrder`
-- After getting `goalsDueToday` and `dynamicGoals`, merge them into a single sorted array using the same logic as `Goals.tsx` (sort by `goalSortOrder`, with unordered user goals first, dynamic goals after)
-- Pass the sorted list to `TodaysGoals` via a new prop pattern
+Compute values from existing arrays:
+- `completedCount` = `[...userGoalsWithStatus, ...dynamicGoalsWithStatus].filter(g => g.isCompleted).length`
+- `totalCount` = `userGoalsWithStatus.length + dynamicGoalsWithStatus.length`
 
-**`src/components/goals/TodaysGoals.tsx`**
-- Add a new optional `sortedGoals` prop that accepts a pre-sorted array of `GoalWithStatus` items (containing both user and dynamic goals with `isDynamic` flag)
-- When `sortedGoals` is provided, render from that single list instead of separate `goalsDueToday` / `dynamicGoals` arrays
-- Each item checks `isDynamic` to determine which toggle handler and badge to use
-- Overdue goals remain rendered first (before the sorted list), unchanged
+Insert between the title div and the buttons div:
+```tsx
+{isMobile && (
+  <span className="text-sm text-muted-foreground">{completedCount}/{totalCount}</span>
+)}
+```
 
-### Result
-Goals on the Today page will mirror the order set on the Goals page. Dynamic goals without a custom position will appear after user goals by default.
+The `isMobile` hook is already imported and available. Single file, minimal edit.
 
