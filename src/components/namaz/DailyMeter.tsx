@@ -41,7 +41,6 @@ export const DailyMeter: React.FC<DailyMeterProps> = ({
         <span className={cn("text-3xl sm:text-4xl font-bold font-display", isLight ? "text-white" : "text-foreground")}>
           {percentage}%
         </span>
-        <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-white/80" : "text-muted-foreground")}>Ada</span>
       </div>;
   }
   return <div className={cn('space-y-3', className)}>
