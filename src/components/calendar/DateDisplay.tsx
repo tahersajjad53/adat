@@ -59,8 +59,8 @@ export function DateDisplay({
             {gregorianFormatted}
           </span>
           {location?.city && (
-            <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal inline-flex items-center gap-1", isLight ? "text-white/80" : "text-muted-foreground")}>
-              <MapPin className="h-3 w-3 shrink-0" /><span>{location.city}</span>
+            <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-white/80" : "text-muted-foreground")}>
+              {location.city}
             </span>
           )}
         </div>
