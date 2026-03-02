@@ -1,16 +1,16 @@
 
 
-## Plan: Make TimeOfDayCard tappable to navigate to Namaz page
+## Improve Dashboard card information layout
 
-**File: `src/pages/Dashboard.tsx`**
+### Changes
 
-Wrap the `TimeOfDayCard` content in a click handler that navigates to `/namaz`, but stop propagation on the Checkbox so it continues to toggle the prayer without navigating.
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-1. Import `useNavigate` from `react-router-dom` (likely already imported)
-2. Add `onClick={() => navigate('/namaz')}` and `cursor-pointer` to the `TimeOfDayCard` wrapper
-3. Add `e.stopPropagation()` on the Checkbox's `onCheckedChange` and its parent container to prevent navigation when tapping the checkbox
-
-Specifically:
-- Wrap `TimeOfDayCard` in a `<div onClick={() => navigate('/namaz')} className="cursor-pointer">`
-- On the checkbox container div (line 195), add `onClick={(e) => e.stopPropagation()}` so checkbox taps don't trigger navigation
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
