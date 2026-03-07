@@ -53,7 +53,8 @@ const Dashboard: React.FC = () => {
     toggleCompletion: toggleDynamic,
     isToggling: isDynamicToggling,
   } = useAdminGoalCompletions();
-  const { goalSortOrder } = useUserPreferences();
+  const { goalSortOrder, tagSortOrder } = useUserPreferences();
+  const { tags } = useTags();
 
   const {
     prayerCompleted, prayerTotal, goalsCompleted, goalsTotal, goalsDueToday, overallPercentage,
