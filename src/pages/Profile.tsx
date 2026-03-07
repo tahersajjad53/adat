@@ -11,11 +11,12 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 
 import { CITIES, type City } from '@/data/cities';
-import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignPencil, Bell } from 'iconoir-react';
+import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignPencil, Bell, Archery } from 'iconoir-react';
 import ThemeSelector from '@/components/profile/ThemeSelector';
+import TagOrderPreferences from '@/components/profile/TagOrderPreferences';
 import { initPushNotifications } from '@/utils/pushNotifications';
 
-type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications';
+type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications' | 'today-view';
 
 const Profile: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -384,6 +385,30 @@ const Profile: React.FC = () => {
   }
 
 
+  // Sub-section: Today View
+  if (activeSection === 'today-view') {
+    return (
+      <div className="container py-8">
+        <div className="max-w-xl mx-auto space-y-6">
+          <button
+            onClick={() => setActiveSection('menu')}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <NavArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+
+          <div>
+            <h1 className="text-4xl font-normal tracking-tight font-display">Today View</h1>
+            <p className="text-base text-muted-foreground mt-1 font-normal">Customise how your goals are displayed.</p>
+          </div>
+
+          <TagOrderPreferences />
+        </div>
+      </div>
+    );
+  }
+
   // Main menu
   return (
     <div className="container py-8">
@@ -419,6 +444,21 @@ const Profile: React.FC = () => {
               <div className="text-left">
                 <span className="text-base font-medium">Notifications</span>
                 <p className="text-sm text-muted-foreground">Manage your alerts and reminders</p>
+              </div>
+            </div>
+            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
+          </button>
+
+          {/* Today View */}
+          <button
+            onClick={() => setActiveSection('today-view')}
+            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center gap-3">
+              <Archery className="h-5 w-5 text-primary" />
+              <div className="text-left">
+                <span className="text-base font-medium">Today View</span>
+                <p className="text-sm text-muted-foreground">Reorder goal categories</p>
               </div>
             </div>
             <NavArrowRight className="h-5 w-5 text-muted-foreground" />

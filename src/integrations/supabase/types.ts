@@ -522,6 +522,7 @@ export type Database = {
           dynamic_goals_enabled: boolean
           goal_sort_order: Json | null
           id: string
+          tag_sort_order: Json | null
           updated_at: string
           user_id: string
         }
@@ -529,6 +530,7 @@ export type Database = {
           dynamic_goals_enabled?: boolean
           goal_sort_order?: Json | null
           id?: string
+          tag_sort_order?: Json | null
           updated_at?: string
           user_id: string
         }
@@ -536,6 +538,7 @@ export type Database = {
           dynamic_goals_enabled?: boolean
           goal_sort_order?: Json | null
           id?: string
+          tag_sort_order?: Json | null
           updated_at?: string
           user_id?: string
         }

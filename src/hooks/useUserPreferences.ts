@@ -5,6 +5,7 @@ import { useAuth } from '@/contexts/AuthContext';
 interface UserPreferencesData {
   dynamic_goals_enabled: boolean;
   goal_sort_order: string[] | null;
+  tag_sort_order: string[] | null;
 }
 
 export function useUserPreferences() {
@@ -28,6 +29,7 @@ export function useUserPreferences() {
 
   const dynamicGoalsEnabled = data?.dynamic_goals_enabled ?? false;
   const goalSortOrder: string[] = (data?.goal_sort_order as string[] | null) ?? [];
+  const tagSortOrder: string[] = (data?.tag_sort_order as string[] | null) ?? [];
 
   const toggleMutation = useMutation({
     mutationFn: async (enabled: boolean) => {
@@ -62,12 +64,30 @@ export function useUserPreferences() {
     },
   });
 
+  const tagSortOrderMutation = useMutation({
+    mutationFn: async (order: string[]) => {
+      if (!user) throw new Error('Not authenticated');
+      const { error } = await (supabase as any)
+        .from('user_preferences')
+        .upsert(
+          { user_id: user.id, tag_sort_order: order },
+          { onConflict: 'user_id' }
+        );
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user-preferences'] });
+    },
+  });
+
   return {
     dynamicGoalsEnabled,
     goalSortOrder,
+    tagSortOrder,
     isLoading,
     setDynamicGoalsEnabled: toggleMutation.mutateAsync,
     setGoalSortOrder: sortOrderMutation.mutateAsync,
+    setTagSortOrder: tagSortOrderMutation.mutateAsync,
     isToggling: toggleMutation.isPending,
   };
 }

@@ -14,6 +14,7 @@ import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/u
 import { useTodayProgress } from '@/hooks/useTodayProgress';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
 import { useGoals } from '@/hooks/useGoals';
+import { useTags } from '@/hooks/useTags';
 
 import TodaysGoals from '@/components/goals/TodaysGoals';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
@@ -52,7 +53,8 @@ const Dashboard: React.FC = () => {
     toggleCompletion: toggleDynamic,
     isToggling: isDynamicToggling,
   } = useAdminGoalCompletions();
-  const { goalSortOrder } = useUserPreferences();
+  const { goalSortOrder, tagSortOrder } = useUserPreferences();
+  const { tags } = useTags();
 
   const {
     prayerCompleted, prayerTotal, goalsCompleted, goalsTotal, goalsDueToday, overallPercentage,
@@ -232,6 +234,8 @@ const Dashboard: React.FC = () => {
           isDynamicToggling={isDynamicToggling}
           onCreateGoal={() => setGoalFormOpen(true)}
           sortedGoals={sortedGoals}
+          tags={tags}
+          tagSortOrder={tagSortOrder}
         />
 
         <GoalFormSheet
