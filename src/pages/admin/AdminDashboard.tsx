@@ -32,6 +32,15 @@ const AdminDashboard: React.FC = () => {
               Manage goal categories visible to all users.
             </p>
           </a>
+          <a
+            href="/admin/users"
+            className="rounded-xl border bg-card p-5 hover:bg-accent/50 transition-colors"
+          >
+            <p className="font-medium">Users</p>
+            <p className="text-sm text-muted-foreground mt-1">
+              View registered users and activity.
+            </p>
+          </a>
         </div>
       </div>
     </div>

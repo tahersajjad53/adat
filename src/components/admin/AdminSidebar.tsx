@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Megaphone, Label, ArrowLeft } from 'iconoir-react';
+import { Home, Megaphone, Label, Group, ArrowLeft } from 'iconoir-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Sidebar,
@@ -22,6 +22,7 @@ const adminNavItems = [
   { title: 'Dashboard', url: '/admin', icon: Home },
   { title: 'Elans', url: '/admin/elans', icon: Megaphone },
   { title: 'Tags', url: '/admin/tags', icon: Label },
+  { title: 'Users', url: '/admin/users', icon: Group },
 ];
 
 export function AdminSidebar() {
