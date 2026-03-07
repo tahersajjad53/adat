@@ -21,7 +21,11 @@ interface HijriCalendarGridProps {
   timezone?: string;
 }
 
-const WEEKDAY_HEADERS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const WEEKDAY_HEADERS_AR = ['أح', 'اث', 'ثل', 'أر', 'خم', 'جم', 'سب'];
+
+function toArabicNumerals(n: number): string {
+  return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[parseInt(d)]);
+}
 
 export default function HijriCalendarGrid({
   selected,
