@@ -14,6 +14,7 @@ import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/u
 import { useTodayProgress } from '@/hooks/useTodayProgress';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
 import { useGoals } from '@/hooks/useGoals';
+import { useTags } from '@/hooks/useTags';
 
 import TodaysGoals from '@/components/goals/TodaysGoals';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
