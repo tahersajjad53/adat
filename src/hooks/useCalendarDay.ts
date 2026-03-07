@@ -28,7 +28,7 @@ export interface CalendarDayPrayer {
   isQazaFulfilled: boolean;
 }
 
-const POST_MAGHRIB_PRAYERS: AllPrayerName[] = ['maghrib', 'isha', 'nisfulLayl'];
+const POST_MAGHRIB_PRAYERS: AllPrayerName[] = ['maghrib', 'isha'];
 
 function formatDateKey(d: Date): string {
   const y = d.getFullYear();

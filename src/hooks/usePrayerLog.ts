@@ -32,7 +32,7 @@ interface UsePrayerLogReturn {
  * Prayers that belong to the post-Maghrib Hijri date.
  * All others belong to the pre-Maghrib Hijri date.
  */
-const POST_MAGHRIB_PRAYERS: AllPrayerName[] = ['maghrib', 'isha', 'nisfulLayl'];
+const POST_MAGHRIB_PRAYERS: AllPrayerName[] = ['maghrib', 'isha'];
 
 /**
  * Get the correct Hijri date for a specific prayer.
