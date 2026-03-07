@@ -23,6 +23,7 @@ type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications' | 'today-vi
 const Profile: React.FC = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const { percentage, totalTracked, loading: statsLoading } = useOnTimePrayerStats();
   const [activeSection, setActiveSection] = useState<ProfileSection>('menu');
   
   const [fullName, setFullName] = useState('');
