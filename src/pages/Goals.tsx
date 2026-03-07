@@ -121,6 +121,13 @@ const Goals: React.FC = () => {
     return [...sorted, ...unsorted];
   }, [userGoalsWithStatus, dynamicGoalsWithStatus, goalSortOrder]);
 
+  // Apply tag filter
+  const filteredGoals: GoalWithStatus[] = useMemo(() => {
+    if (!activeFilter) return mergedGoals;
+    if (activeFilter === '__untagged__') return mergedGoals.filter(g => !g.tag);
+    return mergedGoals.filter(g => g.tag === activeFilter);
+  }, [mergedGoals, activeFilter]);
+
   const handleAdd = () => { setEditingGoal(null); setFormOpen(true); };
   const handleEdit = (goal: GoalWithStatus) => { if (!goal.isDynamic) { setEditingGoal(goal); setFormOpen(true); } };
   const handleSubmit = async (data: GoalInput) => {
