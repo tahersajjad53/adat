@@ -127,9 +127,6 @@ const OnTimeMeter: React.FC<OnTimeMeterProps> = ({ percentage, totalTracked }) =
           points={`${needleTipX},${needleTipY} ${leftX},${leftY} ${rightX},${rightY}`}
           className="fill-primary"
         />
-        {/* Needle center dot */}
-        <circle cx={cx} cy={cy} r={4} className="fill-primary" />
-        <circle cx={cx} cy={cy} r={2} className="fill-primary-foreground" />
 
         {/* Center percentage */}
         <text x={cx} y={cy - 6} textAnchor="middle" className="fill-foreground font-display text-3xl font-semibold" dominantBaseline="central">
