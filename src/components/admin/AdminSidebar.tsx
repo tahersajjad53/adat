@@ -21,7 +21,7 @@ import { NavLink } from '@/components/NavLink';
 const adminNavItems = [
   { title: 'Dashboard', url: '/admin', icon: Home },
   { title: 'Elans', url: '/admin/elans', icon: Megaphone },
-  { title: 'Tags', url: '/admin/tags', icon: Tag },
+  { title: 'Tags', url: '/admin/tags', icon: Label },
 ];
 
 export function AdminSidebar() {

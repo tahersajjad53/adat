@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, EditPencil, Trash, Check, Cancel } from 'iconoir-react';
+import { Plus, EditPencil, Trash, Check, Xmark } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
