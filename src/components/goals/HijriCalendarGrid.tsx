@@ -99,7 +99,7 @@ export default function HijriCalendarGrid({
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
   return (
-    <div className="p-3 pointer-events-auto">
+    <div className="p-3 pointer-events-auto" dir="rtl">
       {/* Header */}
       <div className="flex justify-center pt-1 relative items-center mb-4">
         <button
