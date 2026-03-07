@@ -109,7 +109,7 @@ const Calendar: React.FC = () => {
 
       {/* Selected date header */}
       <div className="px-1 flex justify-between items-baseline">
-        <h2 className="text-lg font-bold font-display">
+        <h2 className="font-display tracking-tight font-normal text-xl">
           {showingToday ? 'Today' : selectedDateLabel}
         </h2>
         <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
