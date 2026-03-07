@@ -93,7 +93,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
       <button
         {...attributes}
         {...listeners}
-        className="mt-0.5 cursor-grab touch-none text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing"
+        className="mt-1 cursor-grab touch-none text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing"
         aria-label="Drag to reorder"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
