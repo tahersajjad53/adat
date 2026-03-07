@@ -15,6 +15,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useDynamicGoals } from '@/hooks/useDynamicGoals';
 import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useTags } from '@/hooks/useTags';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import GoalList from '@/components/goals/GoalList';
 import DynamicGoalDetailSheet from '@/components/goals/DynamicGoalDetailSheet';
@@ -33,8 +34,10 @@ const Goals: React.FC = () => {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [educationPopupOpen, setEducationPopupOpen] = useState(false);
   const [viewingDynamicGoal, setViewingDynamicGoal] = useState<GoalWithStatus | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { tags } = useTags();
 
   // Auto-open form when arriving from onboarding with ?new=1
   useEffect(() => {
@@ -118,6 +121,13 @@ const Goals: React.FC = () => {
     return [...sorted, ...unsorted];
   }, [userGoalsWithStatus, dynamicGoalsWithStatus, goalSortOrder]);
 
+  // Apply tag filter
+  const filteredGoals: GoalWithStatus[] = useMemo(() => {
+    if (!activeFilter) return mergedGoals;
+    if (activeFilter === '__untagged__') return mergedGoals.filter(g => !g.tag);
+    return mergedGoals.filter(g => g.tag === activeFilter);
+  }, [mergedGoals, activeFilter]);
+
   const handleAdd = () => { setEditingGoal(null); setFormOpen(true); };
   const handleEdit = (goal: GoalWithStatus) => { if (!goal.isDynamic) { setEditingGoal(goal); setFormOpen(true); } };
   const handleSubmit = async (data: GoalInput) => {
@@ -189,6 +199,45 @@ const Goals: React.FC = () => {
           </div>
         </div>
 
+        {/* Tag filter pills */}
+        {!isLoading && mergedGoals.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <button
+              onClick={() => setActiveFilter(null)}
+              className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                activeFilter === null
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              }`}
+            >
+              All
+            </button>
+            {tags.map((tag) => (
+              <button
+                key={tag.value}
+                onClick={() => setActiveFilter(activeFilter === tag.value ? null : tag.value)}
+                className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                  activeFilter === tag.value
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                {tag.label}
+              </button>
+            ))}
+            <button
+              onClick={() => setActiveFilter(activeFilter === '__untagged__' ? null : '__untagged__')}
+              className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                activeFilter === '__untagged__'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              }`}
+            >
+              Unlisted
+            </button>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <p className="text-sm text-muted-foreground">Loading goals...</p>
@@ -203,9 +252,15 @@ const Goals: React.FC = () => {
               Create your first goal
             </Button>
           </div>
+        ) : filteredGoals.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              No goals in this category yet.
+            </p>
+          </div>
         ) : (
           <GoalList
-            goals={mergedGoals}
+            goals={filteredGoals}
             onToggle={handleToggle}
             onEdit={handleEdit}
             onDelete={handleDelete}
