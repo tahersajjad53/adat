@@ -357,6 +357,8 @@ export type Database = {
           id: string
           prayer: string
           prayer_date: string
+          prayer_window_end: string | null
+          prayer_window_start: string | null
           qaza_completed_at: string | null
           user_id: string
         }
@@ -367,6 +369,8 @@ export type Database = {
           id?: string
           prayer: string
           prayer_date: string
+          prayer_window_end?: string | null
+          prayer_window_start?: string | null
           qaza_completed_at?: string | null
           user_id: string
         }
@@ -377,6 +381,8 @@ export type Database = {
           id?: string
           prayer?: string
           prayer_date?: string
+          prayer_window_end?: string | null
+          prayer_window_start?: string | null
           qaza_completed_at?: string | null
           user_id?: string
         }
