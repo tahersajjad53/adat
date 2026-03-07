@@ -385,6 +385,30 @@ const Profile: React.FC = () => {
   }
 
 
+  // Sub-section: Today View
+  if (activeSection === 'today-view') {
+    return (
+      <div className="container py-8">
+        <div className="max-w-xl mx-auto space-y-6">
+          <button
+            onClick={() => setActiveSection('menu')}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <NavArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+
+          <div>
+            <h1 className="text-4xl font-normal tracking-tight font-display">Today View</h1>
+            <p className="text-base text-muted-foreground mt-1 font-normal">Customise how your goals are displayed.</p>
+          </div>
+
+          <TagOrderPreferences />
+        </div>
+      </div>
+    );
+  }
+
   // Main menu
   return (
     <div className="container py-8">
