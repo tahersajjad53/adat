@@ -21,7 +21,11 @@ interface HijriCalendarGridProps {
   timezone?: string;
 }
 
-const WEEKDAY_HEADERS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
+const WEEKDAY_HEADERS_AR = ['أح', 'اث', 'ثل', 'أر', 'خم', 'جم', 'سب'];
+
+function toArabicNumerals(n: number): string {
+  return String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[parseInt(d)]);
+}
 
 export default function HijriCalendarGrid({
   selected,
@@ -95,7 +99,7 @@ export default function HijriCalendarGrid({
   for (let d = 1; d <= daysInMonth; d++) cells.push(d);
 
   return (
-    <div className="p-3 pointer-events-auto">
+    <div className="p-3 pointer-events-auto" dir="rtl">
       {/* Header */}
       <div className="flex justify-center pt-1 relative items-center mb-4">
         <button
@@ -109,7 +113,7 @@ export default function HijriCalendarGrid({
           <ChevronLeft className="h-4 w-4" />
         </button>
         <span className="text-sm font-medium">
-          {getHijriMonthName(viewMonth)} {viewYear}
+          {getHijriMonthName(viewMonth, true)} {toArabicNumerals(viewYear)}
         </span>
         <button
           type="button"
@@ -125,7 +129,7 @@ export default function HijriCalendarGrid({
 
       {/* Weekday headers */}
       <div className="flex">
-        {WEEKDAY_HEADERS.map((d) => (
+        {WEEKDAY_HEADERS_AR.map((d) => (
           <div
             key={d}
             className="text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] text-center"
@@ -151,7 +155,7 @@ export default function HijriCalendarGrid({
                   isToday(day) && !isSelected(day) && 'bg-accent text-accent-foreground'
                 )}
               >
-                {day}
+                {toArabicNumerals(day)}
               </button>
             ) : null}
           </div>
