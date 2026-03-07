@@ -234,6 +234,8 @@ const Dashboard: React.FC = () => {
           isDynamicToggling={isDynamicToggling}
           onCreateGoal={() => setGoalFormOpen(true)}
           sortedGoals={sortedGoals}
+          tags={tags}
+          tagSortOrder={tagSortOrder}
         />
 
         <GoalFormSheet

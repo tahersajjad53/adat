@@ -449,6 +449,21 @@ const Profile: React.FC = () => {
             <NavArrowRight className="h-5 w-5 text-muted-foreground" />
           </button>
 
+          {/* Today View */}
+          <button
+            onClick={() => setActiveSection('today-view')}
+            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center gap-3">
+              <Archery className="h-5 w-5 text-primary" />
+              <div className="text-left">
+                <span className="text-base font-medium">Today View</span>
+                <p className="text-sm text-muted-foreground">Reorder goal categories</p>
+              </div>
+            </div>
+            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
+          </button>
+
           {/* Theme */}
           <button
             onClick={() => setActiveSection('theme')}
