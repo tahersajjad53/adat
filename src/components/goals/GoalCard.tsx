@@ -140,7 +140,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
             </Badge>
           )}
           {goal.isDynamic && (
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 text-primary border-primary/30">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 shrink-0 text-primary border-primary/30">
               Dynamic
             </Badge>
           )}
