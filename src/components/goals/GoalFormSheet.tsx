@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Circle, CheckCircle, Page, Calendar, Bell } from 'iconoir-react';
+import { Circle, CheckCircle, Page, Calendar, Bell, Trash } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
