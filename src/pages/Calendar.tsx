@@ -138,7 +138,7 @@ const Calendar: React.FC = () => {
         goal={editingGoal || undefined}
         onSubmit={async (data) => {
           if (editingGoal) {
-            await updateGoal({ id: editingGoal.id, input: data });
+            await updateGoal(editingGoal.id, data);
             setEditingGoal(null);
           }
         }}
