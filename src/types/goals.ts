@@ -74,6 +74,7 @@ export interface GoalInput {
   end_date?: string | null;
   preferred_time?: string | null;    // HH:mm e.g. "09:45"
   reminder_offset?: ReminderOffset | null;
+  tag?: GoalTag | null;
   sort_order?: number;
   is_active?: boolean;
 }
