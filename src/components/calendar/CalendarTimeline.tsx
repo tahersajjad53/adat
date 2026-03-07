@@ -3,8 +3,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
 import { cn } from '@/lib/utils';
-import { Undo, Clock, Check, WarningCircle } from 'iconoir-react';
+import { Undo, Clock, Check, WarningCircle, Trash } from 'iconoir-react';
 import { CalendarDayPrayer } from '@/hooks/useCalendarDay';
 import { AllPrayerName } from '@/hooks/usePrayerTimes';
 import type { GoalWithStatus } from '@/types/goals';
