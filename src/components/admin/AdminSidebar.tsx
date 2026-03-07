@@ -22,6 +22,7 @@ const adminNavItems = [
   { title: 'Dashboard', url: '/admin', icon: Home },
   { title: 'Elans', url: '/admin/elans', icon: Megaphone },
   { title: 'Tags', url: '/admin/tags', icon: Label },
+  { title: 'Users', url: '/admin/users', icon: Group },
 ];
 
 export function AdminSidebar() {

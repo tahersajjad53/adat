@@ -123,6 +123,7 @@ const App = () => (
                 <Route index element={<AdminDashboard />} />
                 <Route path="elans" element={<AdminElans />} />
                 <Route path="tags" element={<AdminTags />} />
+                <Route path="users" element={<AdminUsers />} />
               </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
