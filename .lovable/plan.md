@@ -1,24 +1,16 @@
 
 
-## Add Swipe Animation to WeekRow
+## Improve Dashboard card information layout
 
-### Approach
-Use `useState` to track a slide direction, and apply a CSS transition (translateX) when the week changes. On swipe trigger, set a slide-out class in the swipe direction, then after a short delay update the week data and apply a slide-in from the opposite side.
+### Changes
 
-### Changes — `src/components/calendar/WeekRow.tsx`
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-1. Add `useState<'left' | 'right' | null>` for `slideDirection`
-2. Wrap the day buttons in an inner `div` with `transition-transform duration-200` and conditional `translate-x-full` / `-translate-x-full` / `translate-x-0`
-3. On swipe detection, instead of immediately calling `onShiftWeek`:
-   - Set `slideDirection` to animate the current week out
-   - After ~200ms (`setTimeout`), call `onShiftWeek` and set the opposite entry direction
-   - After another frame, reset to `null` (centered) to animate in
-4. Use `overflow-hidden` on the outer container to clip the sliding content
-
-### Animation flow
-- Swipe left → current row slides out to the left (`-translate-x-full opacity-0`) → new week enters from right (`translate-x-full` → `translate-x-0`)
-- Swipe right → mirror
-
-### Files
-- `src/components/calendar/WeekRow.tsx` — only file changed
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
