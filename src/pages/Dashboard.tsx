@@ -245,6 +245,8 @@ const Dashboard: React.FC = () => {
           onSubmit={async (data) => { await createGoal(data); }}
           isLoading={isCreating}
         />
+
+        <WhatsNewPopup />
       </div>
     </div>
   );
