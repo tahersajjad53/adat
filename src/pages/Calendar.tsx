@@ -63,7 +63,7 @@ const Calendar: React.FC = () => {
   }, [preMaghribHijri]);
 
   const { toggleCompletion, isToggling } = useGoalCompletions({ forDate: hijriDateStr });
-  const { updateGoal } = useGoals();
+  const { updateGoal, deleteGoal } = useGoals();
 
   // Goal editing
   const [editingGoal, setEditingGoal] = useState<GoalWithStatus | null>(null);
@@ -128,6 +128,7 @@ const Calendar: React.FC = () => {
         onFulfillQaza={fulfillQaza}
         onToggleGoal={toggleCompletion}
         onEditGoal={setEditingGoal}
+        onDeleteGoal={deleteGoal}
         isGoalToggling={isToggling}
       />
 
@@ -141,6 +142,10 @@ const Calendar: React.FC = () => {
             await updateGoal(editingGoal.id, data);
             setEditingGoal(null);
           }
+        }}
+        onDelete={async (id) => {
+          await deleteGoal(id);
+          setEditingGoal(null);
         }}
         isLoading={false}
       />

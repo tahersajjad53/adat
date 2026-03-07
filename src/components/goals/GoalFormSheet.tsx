@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Circle, CheckCircle, Page, Calendar, Bell } from 'iconoir-react';
+import { Circle, CheckCircle, Page, Calendar, Bell, Trash } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -71,6 +71,7 @@ interface GoalFormSheetProps {
   onOpenChange: (open: boolean) => void;
   goal?: Goal | null;
   onSubmit: (data: GoalInput) => Promise<void>;
+  onDelete?: (goalId: string) => Promise<void>;
   isLoading?: boolean;
 }
 
@@ -79,6 +80,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   onOpenChange,
   goal,
   onSubmit,
+  onDelete,
   isLoading = false,
 }) => {
   const isMobile = useIsMobile();
@@ -290,22 +292,38 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   );
 
   const footer = (
-    <div className="flex gap-3">
-      <Button
-        variant="outline"
-        onClick={() => onOpenChange(false)}
-        disabled={isLoading}
-        className="flex-1"
-      >
-        Cancel
-      </Button>
-      <Button
-        onClick={() => handleSubmit()}
-        disabled={isLoading || !title.trim()}
-        className="flex-1"
-      >
-        {isLoading ? 'Saving...' : isEditing ? 'Update' : 'Add Goal'}
-      </Button>
+    <div className="space-y-3">
+      <div className="flex gap-3">
+        <Button
+          variant="outline"
+          onClick={() => onOpenChange(false)}
+          disabled={isLoading}
+          className="flex-1"
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={() => handleSubmit()}
+          disabled={isLoading || !title.trim()}
+          className="flex-1"
+        >
+          {isLoading ? 'Saving...' : isEditing ? 'Update' : 'Add Goal'}
+        </Button>
+      </div>
+      {isEditing && onDelete && goal && (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            onDelete(goal.id);
+            onOpenChange(false);
+          }}
+          disabled={isLoading}
+          className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
+        >
+          <Trash className="size-4" />
+          Delete Goal
+        </Button>
+      )}
     </div>
   );
 

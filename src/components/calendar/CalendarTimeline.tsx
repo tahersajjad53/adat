@@ -3,8 +3,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger,
+} from '@/components/ui/context-menu';
 import { cn } from '@/lib/utils';
-import { Undo, Clock, Check, WarningCircle } from 'iconoir-react';
+import { Undo, Clock, Check, WarningCircle, Trash } from 'iconoir-react';
 import { CalendarDayPrayer } from '@/hooks/useCalendarDay';
 import { AllPrayerName } from '@/hooks/usePrayerTimes';
 import type { GoalWithStatus } from '@/types/goals';
@@ -32,6 +38,7 @@ interface CalendarTimelineProps {
   onFulfillQaza: (prayer: AllPrayerName) => void;
   onToggleGoal: (goalId: string) => void;
   onEditGoal: (goal: GoalWithStatus) => void;
+  onDeleteGoal?: (goalId: string) => void;
   isGoalToggling?: boolean;
 }
 
@@ -64,6 +71,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
   onFulfillQaza,
   onToggleGoal,
   onEditGoal,
+  onDeleteGoal,
   isGoalToggling,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -121,6 +129,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
                 isFuture={isFuture}
                 onToggle={() => onToggleGoal(goal.id)}
                 onEdit={() => onEditGoal(goal)}
+                onDelete={onDeleteGoal ? () => onDeleteGoal(goal.id) : undefined}
                 isToggling={isGoalToggling}
               />
             ))}
@@ -232,6 +241,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
                     isFuture={isFuture}
                     onToggle={() => onToggleGoal(goal.id)}
                     onEdit={() => onEditGoal(goal)}
+                    onDelete={onDeleteGoal ? () => onDeleteGoal(goal.id) : undefined}
                     showTime
                     isToggling={isGoalToggling}
                   />
@@ -359,6 +369,7 @@ function GoalTimelineCard({
   isFuture,
   onToggle,
   onEdit,
+  onDelete,
   showTime = false,
   isToggling,
 }: {
@@ -366,10 +377,11 @@ function GoalTimelineCard({
   isFuture: boolean;
   onToggle: () => void;
   onEdit: () => void;
+  onDelete?: () => void;
   showTime?: boolean;
   isToggling?: boolean;
 }) {
-  return (
+  const cardContent = (
     <div
       className={cn(
         'flex items-center gap-3 rounded-lg border p-2.5 transition-all cursor-pointer',
@@ -410,5 +422,24 @@ function GoalTimelineCard({
         </div>
       )}
     </div>
+  );
+
+  if (!onDelete) return cardContent;
+
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        {cardContent}
+      </ContextMenuTrigger>
+      <ContextMenuContent className="bg-popover">
+        <ContextMenuItem
+          onClick={onDelete}
+          className="text-destructive focus:text-destructive gap-2"
+        >
+          <Trash className="size-4" />
+          Delete
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
