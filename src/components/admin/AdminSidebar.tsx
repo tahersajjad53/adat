@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Megaphone, Tag, ArrowLeft } from 'iconoir-react';
+import { Home, Megaphone, Label, ArrowLeft } from 'iconoir-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Sidebar,
