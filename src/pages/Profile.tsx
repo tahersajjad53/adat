@@ -15,6 +15,8 @@ import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignP
 import ThemeSelector from '@/components/profile/ThemeSelector';
 import TagOrderPreferences from '@/components/profile/TagOrderPreferences';
 import { initPushNotifications } from '@/utils/pushNotifications';
+import OnTimeMeter from '@/components/profile/OnTimeMeter';
+import { useOnTimePrayerStats } from '@/hooks/useOnTimePrayerStats';
 
 type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications' | 'today-view';
 
