@@ -71,6 +71,7 @@ interface GoalFormSheetProps {
   onOpenChange: (open: boolean) => void;
   goal?: Goal | null;
   onSubmit: (data: GoalInput) => Promise<void>;
+  onDelete?: (goalId: string) => Promise<void>;
   isLoading?: boolean;
 }
 
