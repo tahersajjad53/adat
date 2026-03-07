@@ -133,6 +133,11 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
         </div>
       )}
 
+      {/* Divider between all-day and timeline */}
+      {allDayGoals.length > 0 && items.length > 0 && (
+        <div className="border-t border-dashed border-border" />
+      )}
+
       {/* Chronological card list */}
       <div className="space-y-3">
         {items.map((item, idx) => {
