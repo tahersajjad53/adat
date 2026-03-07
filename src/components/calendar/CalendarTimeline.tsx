@@ -71,6 +71,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
   onFulfillQaza,
   onToggleGoal,
   onEditGoal,
+  onDeleteGoal,
   isGoalToggling,
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
