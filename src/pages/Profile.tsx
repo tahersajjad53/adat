@@ -418,7 +418,7 @@ const Profile: React.FC = () => {
       <div className="max-w-xl mx-auto space-y-6">
         <div>
           <h1 className="text-4xl font-normal tracking-tight font-display">Profile</h1>
-          <p className="text-base text-muted-foreground mt-1 font-normal">Manage your account settings.</p>
+          <p className="text-base text-muted-foreground mt-1 font-normal">Your stats, preferences, and account settings.</p>
         </div>
 
         {/* On-Time Prayer Meter */}
