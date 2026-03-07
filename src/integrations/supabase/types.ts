@@ -248,6 +248,7 @@ export type Database = {
           reminder_offset: string | null
           sort_order: number
           start_date: string
+          tag: string | null
           title: string
           updated_at: string
           user_id: string
@@ -266,6 +267,7 @@ export type Database = {
           reminder_offset?: string | null
           sort_order?: number
           start_date?: string
+          tag?: string | null
           title: string
           updated_at?: string
           user_id: string
@@ -284,6 +286,7 @@ export type Database = {
           reminder_offset?: string | null
           sort_order?: number
           start_date?: string
+          tag?: string | null
           title?: string
           updated_at?: string
           user_id?: string
