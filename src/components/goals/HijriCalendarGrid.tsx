@@ -129,7 +129,7 @@ export default function HijriCalendarGrid({
 
       {/* Weekday headers */}
       <div className="flex">
-        {WEEKDAY_HEADERS.map((d) => (
+        {WEEKDAY_HEADERS_AR.map((d) => (
           <div
             key={d}
             className="text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] text-center"
