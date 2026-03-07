@@ -113,7 +113,7 @@ export default function HijriCalendarGrid({
           <ChevronLeft className="h-4 w-4" />
         </button>
         <span className="text-sm font-medium">
-          {getHijriMonthName(viewMonth)} {viewYear}
+          {getHijriMonthName(viewMonth, true)} {toArabicNumerals(viewYear)}
         </span>
         <button
           type="button"
