@@ -120,6 +120,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setIsActive(true);
         setPreferredTime(null);
         setReminderOffset(null);
+        setTag(null);
       }
     }
   }, [open, goal]);
