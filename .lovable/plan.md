@@ -1,18 +1,16 @@
 
 
-## Update What's New Popup Content
+## Improve Dashboard card information layout
 
-### Changes — `src/components/WhatsNewPopup.tsx`
+### Changes
 
-1. Bump `WHATS_NEW_KEY` from `'whats-new-v1'` to `'whats-new-v2'` so all users see the popup again.
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-2. Replace the `UPDATES` array with new entries:
-   - `🎨` — Softer pastel prayer gradients across the app
-   - `📅` — Swipe between weeks on the Calendar page
-   - `🏷️` — Goals are now grouped by tags on your Today page
-   - `🔀` — Reorder your tag groups from Profile settings
-   - `🔍` — Filter goals by tag on the Goals page
-
-### Files
-- `src/components/WhatsNewPopup.tsx` — only file changed
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
