@@ -143,6 +143,10 @@ const Calendar: React.FC = () => {
             setEditingGoal(null);
           }
         }}
+        onDelete={async (id) => {
+          await deleteGoal(id);
+          setEditingGoal(null);
+        }}
         isLoading={false}
       />
     </div>
