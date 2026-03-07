@@ -23,6 +23,7 @@ import { useDynamicGoals } from '@/hooks/useDynamicGoals';
 import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
 import type { GoalWithStatus } from '@/types/goals';
+import WhatsNewPopup from '@/components/WhatsNewPopup';
 
 const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
   fajr: SunLight,
@@ -244,6 +245,8 @@ const Dashboard: React.FC = () => {
           onSubmit={async (data) => { await createGoal(data); }}
           isLoading={isCreating}
         />
+
+        <WhatsNewPopup />
       </div>
     </div>
   );
