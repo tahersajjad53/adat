@@ -24,8 +24,8 @@ import {
 import DateRecurrenceTimePopover from './DateRecurrenceTimePopover';
 import ReminderSelector from './ReminderSelector';
 import CondensedAttributeRow from './CondensedAttributeRow';
+import { useTags } from '@/hooks/useTags';
 import type { Goal, GoalInput, GoalTag, RecurrenceType, RecurrencePattern, ReminderOffset } from '@/types/goals';
-import { GOAL_TAGS } from '@/types/goals';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = [
@@ -82,6 +82,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   isLoading = false,
 }) => {
   const isMobile = useIsMobile();
+  const { tags: dbTags } = useTags();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -93,7 +94,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   const [isActive, setIsActive] = useState(true);
   const [preferredTime, setPreferredTime] = useState<string | null>(null);
   const [reminderOffset, setReminderOffset] = useState<ReminderOffset | null>(null);
-  const [tag, setTag] = useState<GoalTag | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -157,7 +158,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       end_date: null,
       preferred_time: preferredTime,
       reminder_offset: reminderOffset,
-      tag: tag,
+      tag: tag as GoalTag | null,
       is_active: isActive,
     };
 
@@ -203,7 +204,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
 
         {/* Tag selector */}
         <div className="flex flex-wrap gap-2 pl-8 pt-1">
-          {GOAL_TAGS.map((t) => (
+          {dbTags.map((t) => (
             <button
               key={t.value}
               type="button"
