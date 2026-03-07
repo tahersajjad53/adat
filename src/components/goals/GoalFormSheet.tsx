@@ -203,7 +203,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
 
         {/* Tag selector */}
         <div className="flex flex-wrap gap-2 pl-8 pt-1">
-          {GOAL_TAGS.map((t) => (
+          {dbTags.map((t) => (
             <button
               key={t.value}
               type="button"
