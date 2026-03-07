@@ -110,14 +110,19 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route path="/elan" element={<Navigate to="/admin/elans" replace />} />
               <Route
-                path="/elan"
+                path="/admin"
                 element={
                   <ProtectedRoute>
-                    <Elan />
+                    <AdminLayout />
                   </ProtectedRoute>
                 }
-              />
+              >
+                <Route index element={<AdminDashboard />} />
+                <Route path="elans" element={<AdminElans />} />
+                <Route path="tags" element={<AdminTags />} />
+              </Route>
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
