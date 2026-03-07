@@ -18,6 +18,7 @@ import Profile from "./pages/Profile";
 import Namaz from "./pages/Namaz";
 import Goals from "./pages/Goals";
 import CompletedGoals from "./pages/CompletedGoals";
+import Calendar from "./pages/Calendar";
 import DynamicGoalsSettings from "./pages/DynamicGoalsSettings";
 import NotFound from "./pages/NotFound";
 import AdminLayout from "./components/admin/AdminLayout";
