@@ -93,7 +93,7 @@ const GoalCard: React.FC<GoalCardProps> = ({
       <button
         {...attributes}
         {...listeners}
-        className="mt-0.5 cursor-grab touch-none text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing"
+        className="mt-1 cursor-grab touch-none text-muted-foreground/40 hover:text-muted-foreground active:cursor-grabbing"
         aria-label="Drag to reorder"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
@@ -131,16 +131,16 @@ const GoalCard: React.FC<GoalCardProps> = ({
           >
             {goal.title}
           </span>
-          <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
+          <Badge variant="secondary" className="text-[10px] px-1.5 py-0.5 shrink-0">
             {recurrenceLabel}
           </Badge>
           {goal.tag && (
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 text-primary border-primary/30">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 shrink-0 text-primary border-primary/30">
               {GOAL_TAGS.find(t => t.value === goal.tag)?.label ?? goal.tag}
             </Badge>
           )}
           {goal.isDynamic && (
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 text-primary border-primary/30">
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0.5 shrink-0 text-primary border-primary/30">
               Dynamic
             </Badge>
           )}

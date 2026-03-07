@@ -1,19 +1,16 @@
 
 
-## Fix: Vertical text alignment in pill badges and tag buttons
+## Improve Dashboard card information layout
 
-Two issues visible in the screenshot:
+### Changes
 
-### 1. GoalCard badges (recurrence + tag) — `py-0` removes vertical padding, causing text to sit top-heavy
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-**File:** `src/components/goals/GoalCard.tsx`
-- Lines 134, 138, 143: Change `py-0` to `py-0.5` on all Badge components to give text proper vertical centering within the pill shape.
-
-### 2. GoalFormSheet tag pills — text appears top-heavy in the pill buttons
-
-**File:** `src/components/goals/GoalFormSheet.tsx`  
-- Line ~199: The tag buttons use `px-3 py-1` — change to `px-3 py-1.5` for better vertical centering, and add `leading-none` to tighten line-height so text sits centered.
-
-### 3. GoalCard items-start alignment
-The card uses `items-start` (line 86), which pushes the drag handle and checkbox to use `mt-0.5` for manual alignment. This is fine for multi-line content but the `mt-0.5` on the drag handle (line 96) may need adjusting to `mt-1` to better center with the title text baseline.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
