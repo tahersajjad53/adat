@@ -123,7 +123,7 @@ const AdminTags: React.FC = () => {
                       <Check className="h-4 w-4" />
                     </Button>
                     <Button size="icon" variant="ghost" onClick={cancelEdit}>
-                      <Cancel className="h-4 w-4" />
+                      <Xmark className="h-4 w-4" />
                     </Button>
                   </>
                 ) : (
