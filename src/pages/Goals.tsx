@@ -34,7 +34,10 @@ const Goals: React.FC = () => {
   const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
   const [educationPopupOpen, setEducationPopupOpen] = useState(false);
   const [viewingDynamicGoal, setViewingDynamicGoal] = useState<GoalWithStatus | null>(null);
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const { tags } = useTags();
   const navigate = useNavigate();
 
   // Auto-open form when arriving from onboarding with ?new=1
