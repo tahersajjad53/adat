@@ -19,8 +19,11 @@ import Namaz from "./pages/Namaz";
 import Goals from "./pages/Goals";
 import CompletedGoals from "./pages/CompletedGoals";
 import DynamicGoalsSettings from "./pages/DynamicGoalsSettings";
-import Elan from "./pages/Elan";
 import NotFound from "./pages/NotFound";
+import AdminLayout from "./components/admin/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminElans from "./pages/admin/AdminElans";
+import AdminTags from "./pages/admin/AdminTags";
 
 const queryClient = new QueryClient();
 
