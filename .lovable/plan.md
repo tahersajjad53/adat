@@ -1,16 +1,13 @@
 
 
-## Improve Dashboard card information layout
+## Match Calendar Date Header to Today's Goals Header Style
 
-### Changes
+### Change
 
-**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
-- Increase icon size from `h-4 w-4` to `h-6 w-6`
-- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
-- Split the Gregorian date and location onto separate lines instead of combining them with `·`
-- Location shown on its own line below the Gregorian date
+**`src/pages/Calendar.tsx`** (line 112) — Update the `h2` class to match the TodaysGoals header styling:
 
-**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
-- Remove the "Ada" label span entirely
-- Keep just the percentage number
+- Change from: `text-lg font-bold font-display`
+- Change to: `font-display tracking-tight font-normal text-xl`
+
+This aligns the Calendar date title with the same typographic treatment used for "Today's Goals" on the Dashboard — display font, normal weight, tight tracking, text-xl size.
 
