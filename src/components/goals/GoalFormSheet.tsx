@@ -292,22 +292,38 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   );
 
   const footer = (
-    <div className="flex gap-3">
-      <Button
-        variant="outline"
-        onClick={() => onOpenChange(false)}
-        disabled={isLoading}
-        className="flex-1"
-      >
-        Cancel
-      </Button>
-      <Button
-        onClick={() => handleSubmit()}
-        disabled={isLoading || !title.trim()}
-        className="flex-1"
-      >
-        {isLoading ? 'Saving...' : isEditing ? 'Update' : 'Add Goal'}
-      </Button>
+    <div className="space-y-3">
+      <div className="flex gap-3">
+        <Button
+          variant="outline"
+          onClick={() => onOpenChange(false)}
+          disabled={isLoading}
+          className="flex-1"
+        >
+          Cancel
+        </Button>
+        <Button
+          onClick={() => handleSubmit()}
+          disabled={isLoading || !title.trim()}
+          className="flex-1"
+        >
+          {isLoading ? 'Saving...' : isEditing ? 'Update' : 'Add Goal'}
+        </Button>
+      </div>
+      {isEditing && onDelete && goal && (
+        <Button
+          variant="ghost"
+          onClick={() => {
+            onDelete(goal.id);
+            onOpenChange(false);
+          }}
+          disabled={isLoading}
+          className="w-full text-destructive hover:text-destructive hover:bg-destructive/10 gap-2"
+        >
+          <Trash className="size-4" />
+          Delete Goal
+        </Button>
+      )}
     </div>
   );
 
