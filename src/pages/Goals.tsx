@@ -199,6 +199,45 @@ const Goals: React.FC = () => {
           </div>
         </div>
 
+        {/* Tag filter pills */}
+        {!isLoading && mergedGoals.length > 0 && (
+          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+            <button
+              onClick={() => setActiveFilter(null)}
+              className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                activeFilter === null
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              }`}
+            >
+              All
+            </button>
+            {tags.map((tag) => (
+              <button
+                key={tag.value}
+                onClick={() => setActiveFilter(activeFilter === tag.value ? null : tag.value)}
+                className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                  activeFilter === tag.value
+                    ? 'bg-primary text-primary-foreground'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                {tag.label}
+              </button>
+            ))}
+            <button
+              onClick={() => setActiveFilter(activeFilter === '__untagged__' ? null : '__untagged__')}
+              className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                activeFilter === '__untagged__'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              }`}
+            >
+              Unlisted
+            </button>
+          </div>
+        )}
+
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <p className="text-sm text-muted-foreground">Loading goals...</p>
@@ -213,9 +252,15 @@ const Goals: React.FC = () => {
               Create your first goal
             </Button>
           </div>
+        ) : filteredGoals.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-8 text-center">
+            <p className="text-sm text-muted-foreground">
+              No goals in this category yet.
+            </p>
+          </div>
         ) : (
           <GoalList
-            goals={mergedGoals}
+            goals={filteredGoals}
             onToggle={handleToggle}
             onEdit={handleEdit}
             onDelete={handleDelete}
