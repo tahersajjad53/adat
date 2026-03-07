@@ -38,7 +38,7 @@ export const DailyMeter: React.FC<DailyMeterProps> = ({
   const isLight = variant === 'light';
   if (compact) {
     return <div className={cn('flex flex-col items-end', className)}>
-        <span className={cn("text-3xl sm:text-4xl font-bold font-display", isLight ? "text-white" : "text-foreground")}>
+        <span className={cn("text-3xl sm:text-4xl font-bold font-display", isLight ? "text-foreground" : "text-foreground")}>
           {percentage}%
         </span>
       </div>;

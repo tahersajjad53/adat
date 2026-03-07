@@ -41,7 +41,7 @@ export function DateDisplay({
   }
   const isLight = variant === 'light';
   if (isLoading || !currentDate) {
-    return <div className={cn('flex items-center gap-2', isLight ? 'text-white/70' : 'text-muted-foreground', className)}>
+    return <div className={cn('flex items-center gap-2', isLight ? 'text-foreground/60' : 'text-muted-foreground', className)}>
         <Refresh className="h-4 w-4 animate-spin" />
         <span className="text-sm">Loading calendar...</span>
       </div>;
@@ -51,15 +51,15 @@ export function DateDisplay({
   if (compact) {
     return <div className={cn('flex flex-col items-start', className)}>
         <div className="flex items-center gap-2">
-          {currentDate.isAfterMaghrib ? <HalfMoon className={cn("h-6 w-6", isLight ? "text-white" : "text-primary")} /> : <SunLight className={cn("h-6 w-6", isLight ? "text-white" : "text-accent-foreground")} />}
-          <span className={cn("font-display text-xl sm:text-2xl font-semibold whitespace-nowrap", isLight && "text-white")}>{hijriFormatted}</span>
+          {currentDate.isAfterMaghrib ? <HalfMoon className={cn("h-6 w-6", isLight ? "text-foreground" : "text-primary")} /> : <SunLight className={cn("h-6 w-6", isLight ? "text-foreground" : "text-accent-foreground")} />}
+          <span className={cn("font-display text-xl sm:text-2xl font-semibold whitespace-nowrap", isLight && "text-foreground")}>{hijriFormatted}</span>
         </div>
         <div className="flex flex-col gap-1 ml-8">
-          <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-white/80" : "text-muted-foreground")}>
+          <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-foreground/70" : "text-muted-foreground")}>
             {gregorianFormatted}
           </span>
           {location?.city && (
-            <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-white/80" : "text-muted-foreground")}>
+            <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-foreground/70" : "text-muted-foreground")}>
               {location.city}
             </span>
           )}

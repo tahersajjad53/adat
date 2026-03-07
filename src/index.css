@@ -182,16 +182,22 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
 
   /* Progress meter theming */
   .meter-track {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.08);
   }
   .meter-fill {
-    background-color: hsl(var(--accent));
+    background-color: hsl(var(--foreground) / 0.6);
   }
   .theme-khalaf .meter-track {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(0, 0, 0, 0.1);
   }
   .theme-khalaf .meter-fill {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .theme-bhukur .meter-track {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .theme-bhukur .meter-fill {
+    background-color: rgba(255, 255, 255, 0.6);
   }
 
   .theme-bhukur .logo-themed {

@@ -257,27 +257,27 @@ function PrayerSlotCard({
           if (isToday) onToggle();
         }}
         disabled={!isToday && !isPast}
-        className="h-5 w-5 shrink-0 border-white/50 data-[state=checked]:bg-white/30 data-[state=checked]:border-white/60"
+        className="h-5 w-5 shrink-0 border-foreground/30 data-[state=checked]:bg-foreground/20 data-[state=checked]:border-foreground/40"
       />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
           <span className={cn(
-            'font-semibold text-white text-base',
+            'font-semibold text-foreground text-base',
             p.isCompleted && 'line-through opacity-70'
           )}>
             {p.displayName}
           </span>
           {p.isOptional && (
-            <Badge variant="outline" className="text-[10px] border-white/30 text-white/80">
+            <Badge variant="outline" className="text-[10px] border-foreground/20 text-foreground/70">
               Optional
             </Badge>
           )}
         </div>
-        <span className="text-xs text-white/70">
+        <span className="text-xs text-foreground/60">
           {p.hijriDate.day} {p.hijriDate.monthName}
         </span>
       </div>
-      <span className="text-sm text-white/80 font-medium shrink-0">{p.time}</span>
+      <span className="text-sm text-foreground/70 font-medium shrink-0">{p.time}</span>
     </div>
   );
 }
