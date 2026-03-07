@@ -94,7 +94,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   const [isActive, setIsActive] = useState(true);
   const [preferredTime, setPreferredTime] = useState<string | null>(null);
   const [reminderOffset, setReminderOffset] = useState<ReminderOffset | null>(null);
-  const [tag, setTag] = useState<GoalTag | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
 
   useEffect(() => {
     if (open) {
