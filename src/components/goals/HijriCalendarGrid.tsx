@@ -155,7 +155,7 @@ export default function HijriCalendarGrid({
                   isToday(day) && !isSelected(day) && 'bg-accent text-accent-foreground'
                 )}
               >
-                {day}
+                {toArabicNumerals(day)}
               </button>
             ) : null}
           </div>
