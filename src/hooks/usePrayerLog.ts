@@ -175,8 +175,9 @@ export function usePrayerLog(): UsePrayerLogReturn {
           return next;
         });
       } else {
-        // Mark as completed with per-prayer Hijri date
+        // Mark as completed with per-prayer Hijri date and time window
         const now = new Date();
+        const window = allPrayerTimes ? getPrayerWindow(prayer, allPrayerTimes) : null;
         await supabase
           .from('prayer_logs')
           .upsert({
@@ -185,6 +186,10 @@ export function usePrayerLog(): UsePrayerLogReturn {
             prayer,
             completed_at: now.toISOString(),
             gregorian_date: gregorianDate,
+            ...(window && {
+              prayer_window_start: window.start,
+              prayer_window_end: window.end,
+            }),
           }, {
             onConflict: 'user_id,prayer_date,prayer',
           });
