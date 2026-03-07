@@ -2,6 +2,16 @@
 
 export type RecurrenceType = 'daily' | 'weekly' | 'custom' | 'one-time' | 'annual';
 
+export type GoalTag = 'quran' | 'dua' | 'tasbeeh' | 'sadakah' | 'nazrul_maqam';
+
+export const GOAL_TAGS: { value: GoalTag; label: string }[] = [
+  { value: 'quran', label: 'Quran' },
+  { value: 'dua', label: 'Dua' },
+  { value: 'tasbeeh', label: 'Tasbeeh' },
+  { value: 'sadakah', label: 'Sadakah' },
+  { value: 'nazrul_maqam', label: 'Nazrul Maqam' },
+];
+
 export type ReminderOffset =
   | 'none'
   | 'at_time'
