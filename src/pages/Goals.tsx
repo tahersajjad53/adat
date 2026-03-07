@@ -38,7 +38,6 @@ const Goals: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { tags } = useTags();
-  const navigate = useNavigate();
 
   // Auto-open form when arriving from onboarding with ?new=1
   useEffect(() => {
