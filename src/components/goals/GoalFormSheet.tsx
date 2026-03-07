@@ -24,7 +24,8 @@ import {
 import DateRecurrenceTimePopover from './DateRecurrenceTimePopover';
 import ReminderSelector from './ReminderSelector';
 import CondensedAttributeRow from './CondensedAttributeRow';
-import type { Goal, GoalInput, RecurrenceType, RecurrencePattern, ReminderOffset } from '@/types/goals';
+import type { Goal, GoalInput, GoalTag, RecurrenceType, RecurrencePattern, ReminderOffset } from '@/types/goals';
+import { GOAL_TAGS } from '@/types/goals';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = [
