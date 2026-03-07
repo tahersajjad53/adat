@@ -1,22 +1,16 @@
 
 
-## Move Hijri Date to Same Row as Gregorian Date
+## Improve Dashboard card information layout
 
-### Change
+### Changes
 
-**`src/pages/Calendar.tsx`** (lines 111-116) — Update the selected date header layout:
-- Make the container a `flex` row with `justify-between items-baseline`
-- Keep the Gregorian date / "Today" label as `h2` on the left
-- Move the Hijri date `p` to the right side of the same row
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-```tsx
-<div className="px-1 flex justify-between items-baseline">
-  <h2 className="text-lg font-bold font-display">
-    {showingToday ? 'Today' : selectedDateLabel}
-  </h2>
-  <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
-</div>
-```
-
-Single file, 1 line structural change.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
