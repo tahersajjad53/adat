@@ -190,27 +190,55 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
             );
           })}
 
-          {/* Timed goal cards */}
-          {timedGoals.map((goal) => {
-            const mins = goal.preferred_time ? parseTimeToMinutes(goal.preferred_time) : 0;
-            const top = minutesToTop(mins, startHour);
-            return (
-              <div
-                key={`goal-${goal.id}`}
-                className="absolute left-12 right-0 z-20"
-                style={{ top: top + 2 }}
-              >
-                <GoalTimelineCard
-                  goal={goal}
-                  isFuture={isFuture}
-                  onToggle={() => onToggleGoal(goal.id)}
-                  onEdit={() => onEditGoal(goal)}
-                  showTime
-                  isToggling={isGoalToggling}
-                />
-              </div>
-            );
-          })}
+          {/* Timed goal cards — nudged below overlapping prayers */}
+          {(() => {
+            // Build prayer occupied ranges
+            const prayerRanges = prayers.map((p, idx) => {
+              const pTop = minutesToTop(p.timeMinutes, startHour);
+              const nextPrayer = prayers[idx + 1];
+              const durationMins = nextPrayer
+                ? Math.max(nextPrayer.timeMinutes - p.timeMinutes, 30)
+                : 60;
+              const pHeight = Math.min(Math.max((durationMins / 60) * HOUR_HEIGHT, 70), 100);
+              return { topPx: pTop, bottomPx: pTop + pHeight };
+            });
+
+            // Track occupied bottoms for stacking multiple goals
+            const occupiedBottoms = new Map<number, number>(); // prayerIndex -> next available bottom
+
+            return timedGoals.map((goal) => {
+              const mins = goal.preferred_time ? parseTimeToMinutes(goal.preferred_time) : 0;
+              let goalTop = minutesToTop(mins, startHour) + 2;
+
+              // Check overlap with any prayer range
+              for (let i = 0; i < prayerRanges.length; i++) {
+                const range = prayerRanges[i];
+                if (goalTop >= range.topPx && goalTop < range.bottomPx) {
+                  const currentBottom = occupiedBottoms.get(i) ?? range.bottomPx;
+                  goalTop = currentBottom + 4;
+                  occupiedBottoms.set(i, goalTop + 36); // ~36px goal card height
+                  break;
+                }
+              }
+
+              return (
+                <div
+                  key={`goal-${goal.id}`}
+                  className="absolute left-12 right-0 z-20"
+                  style={{ top: goalTop }}
+                >
+                  <GoalTimelineCard
+                    goal={goal}
+                    isFuture={isFuture}
+                    onToggle={() => onToggleGoal(goal.id)}
+                    onEdit={() => onEditGoal(goal)}
+                    showTime
+                    isToggling={isGoalToggling}
+                  />
+                </div>
+              );
+            });
+          })()}
         </div>
       </div>
     </div>
