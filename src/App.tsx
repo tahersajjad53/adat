@@ -24,6 +24,7 @@ import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminElans from "./pages/admin/AdminElans";
 import AdminTags from "./pages/admin/AdminTags";
+import AdminUsers from "./pages/admin/AdminUsers";
 
 const queryClient = new QueryClient();
 
