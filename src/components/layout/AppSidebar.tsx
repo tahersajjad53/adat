@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Home, Clock, User, LogOut, Archery, Plus } from 'iconoir-react';
+import { Home, Clock, User, LogOut, Archery, Plus, Calendar as CalendarIcon } from 'iconoir-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +23,7 @@ import ibadatLogo from '@/assets/ibadat-logo.svg';
 
 const navItems = [
   { title: 'Today', url: '/today', icon: Home },
+  { title: 'Calendar', url: '/calendar', icon: CalendarIcon },
   { title: 'Namaz', url: '/namaz', icon: Clock },
   { title: 'Goals', url: '/goals', icon: Archery },
 ];
