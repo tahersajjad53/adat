@@ -1,11 +1,11 @@
 import React from 'react';
-import { Home, Clock, User, Archery, Plus } from 'iconoir-react';
+import { Home, Clock, User, Archery, Plus, Calendar as CalendarIcon } from 'iconoir-react';
 import { NavLink } from '@/components/NavLink';
 import { cn } from '@/lib/utils';
 import { InstallBanner } from '@/components/pwa/InstallBanner';
 const leftItems = [
   { title: 'Today', url: '/today', icon: Home },
-  { title: 'Namaz', url: '/namaz', icon: Clock },
+  { title: 'Calendar', url: '/calendar', icon: CalendarIcon },
 ];
 
 const rightItems = [

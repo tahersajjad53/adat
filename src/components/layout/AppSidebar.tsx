@@ -23,6 +23,7 @@ import ibadatLogo from '@/assets/ibadat-logo.svg';
 
 const navItems = [
   { title: 'Today', url: '/today', icon: Home },
+  { title: 'Calendar', url: '/calendar', icon: CalendarIcon },
   { title: 'Namaz', url: '/namaz', icon: Clock },
   { title: 'Goals', url: '/goals', icon: Archery },
 ];
