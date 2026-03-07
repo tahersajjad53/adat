@@ -3,7 +3,18 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { supabase } from '@/integrations/supabase/client';
 import { HijriDate, formatHijriDateKey } from '@/lib/hijri';
-import { usePrayerTimes, PrayerName, AllPrayerName, ALL_PRAYER_ORDER, OPTIONAL_PRAYERS, getPrayerStatus, PRAYER_DISPLAY_NAMES } from './usePrayerTimes';
+import { usePrayerTimes, PrayerName, AllPrayerName, ALL_PRAYER_ORDER, PRAYER_ORDER, OPTIONAL_PRAYERS, getPrayerStatus, PRAYER_DISPLAY_NAMES } from './usePrayerTimes';
+
+/**
+ * Get the prayer time window (start/end) for a given prayer.
+ */
+function getPrayerWindow(prayer: AllPrayerName, times: Record<AllPrayerName, string>): { start: string; end: string } {
+  if (prayer === 'nisfulLayl') return { start: times.nisfulLayl, end: times.fajr };
+  const idx = PRAYER_ORDER.indexOf(prayer as PrayerName);
+  const start = times[prayer];
+  const end = idx < PRAYER_ORDER.length - 1 ? times[PRAYER_ORDER[idx + 1]] : '23:59';
+  return { start, end };
+}
 
 export interface PrayerStatus {
   name: AllPrayerName;
