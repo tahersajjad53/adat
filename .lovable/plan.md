@@ -1,21 +1,16 @@
 
 
-## Hide Scrollbar on Tag Filter Pills
+## Improve Dashboard card information layout
 
-The `scrollbar-none` utility class is already applied to the filter row in `Goals.tsx` but it's never defined in the CSS. I'll add the utility to `src/index.css` so it hides the scrollbar cross-browser.
+### Changes
 
-### Change
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-**`src/index.css`** — Add a utility class:
-```css
-.scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
-}
-```
-
-No other files need changes — `Goals.tsx` already uses the class.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
