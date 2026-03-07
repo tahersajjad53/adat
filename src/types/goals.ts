@@ -2,6 +2,16 @@
 
 export type RecurrenceType = 'daily' | 'weekly' | 'custom' | 'one-time' | 'annual';
 
+export type GoalTag = 'quran' | 'dua' | 'tasbeeh' | 'sadakah' | 'nazrul_maqam';
+
+export const GOAL_TAGS: { value: GoalTag; label: string }[] = [
+  { value: 'quran', label: 'Quran' },
+  { value: 'dua', label: 'Dua' },
+  { value: 'tasbeeh', label: 'Tasbeeh' },
+  { value: 'sadakah', label: 'Sadakah' },
+  { value: 'nazrul_maqam', label: 'Nazrul Maqam' },
+];
+
 export type ReminderOffset =
   | 'none'
   | 'at_time'
@@ -36,6 +46,7 @@ export interface Goal {
   end_date?: string | null;
   preferred_time?: string | null;    // HH:mm e.g. "09:45"
   reminder_offset?: ReminderOffset | null;
+  tag?: GoalTag | null;
   sort_order: number;
   is_active: boolean;
   created_at: string;
@@ -63,6 +74,7 @@ export interface GoalInput {
   end_date?: string | null;
   preferred_time?: string | null;    // HH:mm e.g. "09:45"
   reminder_offset?: ReminderOffset | null;
+  tag?: GoalTag | null;
   sort_order?: number;
   is_active?: boolean;
 }

@@ -73,6 +73,7 @@ export function useGoals() {
           end_date: input.end_date,
           preferred_time: input.preferred_time ?? null,
           reminder_offset: input.reminder_offset ?? null,
+          tag: input.tag ?? null,
           sort_order: maxOrder + 1,
           is_active: input.is_active ?? true,
         })

@@ -24,7 +24,8 @@ import {
 import DateRecurrenceTimePopover from './DateRecurrenceTimePopover';
 import ReminderSelector from './ReminderSelector';
 import CondensedAttributeRow from './CondensedAttributeRow';
-import type { Goal, GoalInput, RecurrenceType, RecurrencePattern, ReminderOffset } from '@/types/goals';
+import type { Goal, GoalInput, GoalTag, RecurrenceType, RecurrencePattern, ReminderOffset } from '@/types/goals';
+import { GOAL_TAGS } from '@/types/goals';
 
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const MONTH_NAMES = [
@@ -92,6 +93,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   const [isActive, setIsActive] = useState(true);
   const [preferredTime, setPreferredTime] = useState<string | null>(null);
   const [reminderOffset, setReminderOffset] = useState<ReminderOffset | null>(null);
+  const [tag, setTag] = useState<GoalTag | null>(null);
 
   useEffect(() => {
     if (open) {
@@ -106,6 +108,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setIsActive(goal.is_active);
         setPreferredTime(goal.preferred_time ?? null);
         setReminderOffset(goal.reminder_offset ?? null);
+        setTag(goal.tag ?? null);
       } else {
         setTitle('');
         setDescription('');
@@ -117,6 +120,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setIsActive(true);
         setPreferredTime(null);
         setReminderOffset(null);
+        setTag(null);
       }
     }
   }, [open, goal]);
@@ -153,6 +157,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       end_date: null,
       preferred_time: preferredTime,
       reminder_offset: reminderOffset,
+      tag: tag,
       is_active: isActive,
     };
 
@@ -195,6 +200,24 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
           />
         </div>
         <p className="text-sm text-muted-foreground pl-8">{recurrenceSummary}</p>
+
+        {/* Tag selector */}
+        <div className="flex flex-wrap gap-2 pl-8 pt-1">
+          {GOAL_TAGS.map((t) => (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => setTag(tag === t.value ? null : t.value)}
+              className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
+                tag === t.value
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-secondary text-secondary-foreground border-border hover:bg-accent'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Description: Add placeholder when empty */}
