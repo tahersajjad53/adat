@@ -96,7 +96,7 @@ const AdminTags: React.FC = () => {
                   variant="ghost"
                   onClick={() => { setShowNew(false); setNewLabel(''); setNewSlug(''); }}
                 >
-                  <Cancel className="h-4 w-4" />
+                  <Xmark className="h-4 w-4" />
                 </Button>
               </div>
             )}
