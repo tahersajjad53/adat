@@ -369,6 +369,7 @@ function GoalTimelineCard({
   isFuture,
   onToggle,
   onEdit,
+  onDelete,
   showTime = false,
   isToggling,
 }: {
@@ -376,10 +377,11 @@ function GoalTimelineCard({
   isFuture: boolean;
   onToggle: () => void;
   onEdit: () => void;
+  onDelete?: () => void;
   showTime?: boolean;
   isToggling?: boolean;
 }) {
-  return (
+  const cardContent = (
     <div
       className={cn(
         'flex items-center gap-3 rounded-lg border p-2.5 transition-all cursor-pointer',
@@ -420,5 +422,24 @@ function GoalTimelineCard({
         </div>
       )}
     </div>
+  );
+
+  if (!onDelete) return cardContent;
+
+  return (
+    <ContextMenu>
+      <ContextMenuTrigger asChild>
+        {cardContent}
+      </ContextMenuTrigger>
+      <ContextMenuContent className="bg-popover">
+        <ContextMenuItem
+          onClick={onDelete}
+          className="text-destructive focus:text-destructive gap-2"
+        >
+          <Trash className="size-4" />
+          Delete
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
