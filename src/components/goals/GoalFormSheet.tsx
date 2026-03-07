@@ -82,6 +82,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   isLoading = false,
 }) => {
   const isMobile = useIsMobile();
+  const { tags: dbTags } = useTags();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
