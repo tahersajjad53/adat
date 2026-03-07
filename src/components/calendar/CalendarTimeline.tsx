@@ -129,6 +129,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
                 isFuture={isFuture}
                 onToggle={() => onToggleGoal(goal.id)}
                 onEdit={() => onEditGoal(goal)}
+                onDelete={onDeleteGoal ? () => onDeleteGoal(goal.id) : undefined}
                 isToggling={isGoalToggling}
               />
             ))}
