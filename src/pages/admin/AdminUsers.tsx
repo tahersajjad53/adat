@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { Input } from '@/components/ui/input';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Search } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -21,6 +25,17 @@ interface AdminUser {
   last_sign_in_at: string | null;
 }
 
+const TEST_EMAIL_PATTERNS = [
+  '@example.com',
+  '@example.invalid',
+  '@test.com',
+];
+
+function isTestAccount(email: string): boolean {
+  const lower = email.toLowerCase();
+  return TEST_EMAIL_PATTERNS.some((p) => lower.endsWith(p));
+}
+
 function getInitials(name: string | null, email: string): string {
   if (name) {
     return name
@@ -34,6 +49,9 @@ function getInitials(name: string | null, email: string): string {
 }
 
 const AdminUsers: React.FC = () => {
+  const [search, setSearch] = useState('');
+  const [hideTest, setHideTest] = useState(true);
+
   const { data: users = [], isLoading } = useQuery<AdminUser[]>({
     queryKey: ['admin-users'],
     queryFn: async () => {
@@ -43,6 +61,23 @@ const AdminUsers: React.FC = () => {
     },
   });
 
+  const filtered = useMemo(() => {
+    let list = users;
+    if (hideTest) {
+      list = list.filter((u) => !isTestAccount(u.email));
+    }
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      list = list.filter(
+        (u) =>
+          u.email.toLowerCase().includes(q) ||
+          (u.full_name?.toLowerCase().includes(q) ?? false) ||
+          (u.city?.toLowerCase().includes(q) ?? false)
+      );
+    }
+    return list;
+  }, [users, hideTest, search]);
+
   return (
     <div className="container py-8">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -51,15 +86,39 @@ const AdminUsers: React.FC = () => {
             Users
           </h1>
           <p className="text-base text-muted-foreground mt-1">
-            {isLoading ? 'Loading...' : `${users.length} registered user${users.length !== 1 ? 's' : ''}`}
+            {isLoading
+              ? 'Loading...'
+              : `${filtered.length} of ${users.length} user${users.length !== 1 ? 's' : ''}`}
           </p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search by name, email, or city…"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="hide-test"
+              checked={hideTest}
+              onCheckedChange={setHideTest}
+            />
+            <Label htmlFor="hide-test" className="text-sm whitespace-nowrap cursor-pointer">
+              Hide test accounts
+            </Label>
+          </div>
         </div>
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
             <p className="text-sm text-muted-foreground">Loading users...</p>
           </div>
-        ) : users.length === 0 ? (
+        ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <p className="text-muted-foreground">No users found.</p>
           </div>
@@ -75,7 +134,7 @@ const AdminUsers: React.FC = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((user) => (
+                {filtered.map((user) => (
                   <TableRow key={user.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
