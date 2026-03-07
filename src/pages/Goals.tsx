@@ -15,6 +15,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useDynamicGoals } from '@/hooks/useDynamicGoals';
 import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useTags } from '@/hooks/useTags';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import GoalList from '@/components/goals/GoalList';
 import DynamicGoalDetailSheet from '@/components/goals/DynamicGoalDetailSheet';
