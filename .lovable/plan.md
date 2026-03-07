@@ -1,16 +1,37 @@
 
 
-## Improve Dashboard card information layout
+## Handling Overlapping Goals and Namaz
 
-### Changes
+Currently, timed goals and prayer cards are both absolutely positioned at their time slot with `left-12 right-0`, meaning if a goal is scheduled at the same time as a prayer (e.g., a Quran goal at Fajr time), they stack on top of each other with only z-index differentiating them.
 
-**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
-- Increase icon size from `h-4 w-4` to `h-6 w-6`
-- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
-- Split the Gregorian date and location onto separate lines instead of combining them with `·`
-- Location shown on its own line below the Gregorian date
+### Recommended Approach: Offset timed goals that fall within a prayer's time range
 
-**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
-- Remove the "Ada" label span entirely
-- Keep just the percentage number
+**Logic:**
+- For each timed goal, check if its `preferred_time` falls within any prayer's time window (prayer start → next prayer start).
+- If it overlaps, nudge the goal card down to sit just below the prayer card (prayer top + prayer height + small gap).
+- If multiple goals overlap the same prayer, stack them sequentially below.
+
+**Visual result:**
+```text
+│5 AM│ ┌── FAJR ───────────┐
+│    │ │ gradient-fajr      │
+│    │ └────────────────────┘
+│    │  ┌─ Quran goal ─────┐   ← nudged below
+│    │  └──────────────────-┘
+│6 AM│
+```
+
+### Implementation
+
+**`CalendarTimeline.tsx`** — adjust the timed goals rendering section:
+
+1. Build a list of prayer time ranges: `{ start: timeMinutes, end: start + cardHeight }` for each prayer.
+2. For each timed goal, if its minute position falls within a prayer range, set its top to `prayerTop + prayerHeight + 4px` gap. If multiple goals collide, stack them with additional offsets.
+3. This keeps prayers visually dominant while goals tuck neatly beneath overlapping prayers.
+
+### Alternative considered but not recommended
+- **Side-by-side columns** (prayer left half, goal right half): Adds complexity and makes both elements narrower on mobile. Not ideal for the current single-column layout.
+
+### Scope
+Single file change to `CalendarTimeline.tsx` — ~20 lines of collision-detection logic in the timed goals map.
 
