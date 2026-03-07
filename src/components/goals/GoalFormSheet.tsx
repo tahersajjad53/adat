@@ -158,7 +158,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       end_date: null,
       preferred_time: preferredTime,
       reminder_offset: reminderOffset,
-      tag: tag,
+      tag: tag as GoalTag | null,
       is_active: isActive,
     };
 
