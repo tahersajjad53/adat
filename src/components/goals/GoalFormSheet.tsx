@@ -200,6 +200,24 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
           />
         </div>
         <p className="text-sm text-muted-foreground pl-8">{recurrenceSummary}</p>
+
+        {/* Tag selector */}
+        <div className="flex flex-wrap gap-2 pl-8 pt-1">
+          {GOAL_TAGS.map((t) => (
+            <button
+              key={t.value}
+              type="button"
+              onClick={() => setTag(tag === t.value ? null : t.value)}
+              className={`rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
+                tag === t.value
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-secondary text-secondary-foreground border-border hover:bg-accent'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Description: Add placeholder when empty */}

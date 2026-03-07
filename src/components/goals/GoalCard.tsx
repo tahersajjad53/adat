@@ -134,6 +134,11 @@ const GoalCard: React.FC<GoalCardProps> = ({
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
             {recurrenceLabel}
           </Badge>
+          {goal.tag && (
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 text-primary border-primary/30">
+              {GOAL_TAGS.find(t => t.value === goal.tag)?.label ?? goal.tag}
+            </Badge>
+          )}
           {goal.isDynamic && (
             <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0 text-primary border-primary/30">
               Dynamic
