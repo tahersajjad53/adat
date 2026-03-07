@@ -108,6 +108,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setIsActive(goal.is_active);
         setPreferredTime(goal.preferred_time ?? null);
         setReminderOffset(goal.reminder_offset ?? null);
+        setTag(goal.tag ?? null);
       } else {
         setTitle('');
         setDescription('');
