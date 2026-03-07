@@ -128,6 +128,7 @@ const Calendar: React.FC = () => {
         onFulfillQaza={fulfillQaza}
         onToggleGoal={toggleCompletion}
         onEditGoal={setEditingGoal}
+        onDeleteGoal={deleteGoal}
         isGoalToggling={isToggling}
       />
 
