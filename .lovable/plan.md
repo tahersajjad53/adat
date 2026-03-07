@@ -1,16 +1,28 @@
 
 
-## Improve Dashboard card information layout
+## Fix Nisful Layl Hijri Date Assignment
 
-### Changes
+### The Problem
+Nisful Layl occurs around midnight (e.g., 00:22), at the **start** of a Gregorian day. It belongs to the **previous evening's** Islamic night. On March 6 (18 Ramadan), the pre-Maghrib Hijri = 18 Ramadan, post-Maghrib = 19 Ramadan. Currently Nisful Layl is in `POST_MAGHRIB_PRAYERS`, so it incorrectly gets 19 Ramadan. It should get 18 Ramadan (same as Fajr), since both occur before the next Maghrib.
 
-**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
-- Increase icon size from `h-4 w-4` to `h-6 w-6`
-- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
-- Split the Gregorian date and location onto separate lines instead of combining them with `·`
-- Location shown on its own line below the Gregorian date
+### The Fix
+Remove `'nisfulLayl'` from `POST_MAGHRIB_PRAYERS` in two files:
 
-**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
-- Remove the "Ada" label span entirely
-- Keep just the percentage number
+**`src/hooks/useCalendarDay.ts` (line 31)**
+```typescript
+// Before
+const POST_MAGHRIB_PRAYERS: AllPrayerName[] = ['maghrib', 'isha', 'nisfulLayl'];
+// After
+const POST_MAGHRIB_PRAYERS: AllPrayerName[] = ['maghrib', 'isha'];
+```
+
+**`src/hooks/usePrayerLog.ts` (line 35)**
+```typescript
+// Before
+const POST_MAGHRIB_PRAYERS: AllPrayerName[] = ['maghrib', 'isha', 'nisfulLayl'];
+// After
+const POST_MAGHRIB_PRAYERS: AllPrayerName[] = ['maghrib', 'isha'];
+```
+
+This makes Nisful Layl use `preMaghribHijri` (same as Fajr, Zuhr, Asr), which correctly assigns it to the same Islamic night it belongs to.
 
