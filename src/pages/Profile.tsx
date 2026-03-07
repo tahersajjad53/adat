@@ -15,12 +15,15 @@ import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignP
 import ThemeSelector from '@/components/profile/ThemeSelector';
 import TagOrderPreferences from '@/components/profile/TagOrderPreferences';
 import { initPushNotifications } from '@/utils/pushNotifications';
+import OnTimeMeter from '@/components/profile/OnTimeMeter';
+import { useOnTimePrayerStats } from '@/hooks/useOnTimePrayerStats';
 
 type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications' | 'today-view';
 
 const Profile: React.FC = () => {
   const { user, signOut } = useAuth();
   const { toast } = useToast();
+  const { percentage, totalTracked, loading: statsLoading } = useOnTimePrayerStats();
   const [activeSection, setActiveSection] = useState<ProfileSection>('menu');
   
   const [fullName, setFullName] = useState('');
@@ -416,6 +419,11 @@ const Profile: React.FC = () => {
         <div>
           <h1 className="text-4xl font-normal tracking-tight font-display">Profile</h1>
           <p className="text-base text-muted-foreground mt-1 font-normal">Manage your account settings.</p>
+        </div>
+
+        {/* On-Time Prayer Meter */}
+        <div className="rounded-xl border border-border bg-card p-6">
+          <OnTimeMeter percentage={percentage} totalTracked={totalTracked} />
         </div>
 
         <div className="space-y-3">
