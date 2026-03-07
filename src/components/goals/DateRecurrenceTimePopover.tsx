@@ -30,6 +30,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import TimePicker from './TimePicker';
 import RecurrenceSelector from './RecurrenceSelector';
+import HijriCalendarGrid from './HijriCalendarGrid';
 import type { RecurrenceType, RecurrencePattern } from '@/types/goals';
 
 const DAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -96,9 +97,10 @@ export interface DateRecurrenceTimePopoverProps {
   preferredTime: string | null;
   onPreferredTimeChange: (time: string | null) => void;
   disabled?: boolean;
-  /** For one-time goals, we use due_date; for recurring, dueDate is not used by popover (parent handles) */
   isOneTime?: boolean;
 }
+
+type CalendarMode = 'gregorian' | 'hijri';
 
 const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
   date,
@@ -114,13 +116,14 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
   disabled = false,
   isOneTime = false,
 }) => {
-  const { location } = useCalendar();
+  const { location, currentDate: calendarDate } = useCalendar();
   const isMobile = useIsMobile();
   const timezone = location?.timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   const [open, setOpen] = useState(false);
   const [showRecurrence, setShowRecurrence] = useState(false);
   const [showCustomRecurrence, setShowCustomRecurrence] = useState(false);
+  const [calendarMode, setCalendarMode] = useState<CalendarMode>('gregorian');
 
   const getTodayInTz = (): Date => {
     const opts: Intl.DateTimeFormatOptions = {
@@ -143,11 +146,49 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
 
   const toYMD = (d: Date) => format(d, 'yyyy-MM-dd');
 
+  // Get today's Hijri (Maghrib-aware) for display
+  const todayHijri = calendarDate?.hijri ?? gregorianToBohra(todayTz, timezone);
+  const tomorrowHijri = calendarDate
+    ? gregorianToBohra(tomorrowTz, timezone)
+    : gregorianToBohra(tomorrowTz, timezone);
+  // If after Maghrib, tomorrow's Hijri is advanced too
+  const tomorrowHijriDisplay = calendarDate?.isAfterMaghrib
+    ? (() => {
+        const h = gregorianToBohra(tomorrowTz, timezone);
+        return { ...h, day: h.day + 1 > 30 ? 1 : h.day + 1, monthName: h.monthName };
+        // Simplified — use proper advance
+      })()
+    : tomorrowHijri;
+
+  const formatHijriShort = (h: { day: number; monthName: string }) =>
+    `${h.day} ${h.monthName}`;
+
+  // Preset right-side labels depend on calendar mode
+  const getPresetRight = (gregDate: Date) => {
+    if (calendarMode === 'hijri') {
+      const h = gregorianToBohra(gregDate, timezone);
+      // If after Maghrib, advance the Hijri day for display
+      if (calendarDate?.isAfterMaghrib && toYMD(gregDate) === toYMD(todayTz)) {
+        return formatHijriShort(todayHijri);
+      }
+      return formatHijriShort(h);
+    }
+    return format(gregDate, 'EEE');
+  };
+
+  const getNextWeekRight = (gregDate: Date) => {
+    if (calendarMode === 'hijri') {
+      const h = gregorianToBohra(gregDate, timezone);
+      return formatHijriShort(h);
+    }
+    return format(gregDate, 'EEE d MMM');
+  };
+
   const presetOptions = [
-    { label: 'Today', date: todayTz, icon: CalendarIcon, right: format(todayTz, 'EEE') },
-    { label: 'Tomorrow', date: tomorrowTz, icon: SunLight, right: format(tomorrowTz, 'EEE') },
-    { label: 'This weekend', date: weekendTz, icon: Sofa, right: format(weekendTz, 'EEE') },
-    { label: 'Next week', date: nextWeekTz, icon: CalendarArrowDown, right: format(nextWeekTz, 'EEE d MMM') },
+    { label: 'Today', date: todayTz, icon: CalendarIcon, right: getPresetRight(todayTz) },
+    { label: 'Tomorrow', date: tomorrowTz, icon: SunLight, right: getPresetRight(tomorrowTz) },
+    { label: 'This weekend', date: weekendTz, icon: Sofa, right: getPresetRight(weekendTz) },
+    { label: 'Next week', date: nextWeekTz, icon: CalendarArrowDown, right: getNextWeekRight(nextWeekTz) },
   ];
 
   const handlePreset = (newDate: string | null) => {
@@ -176,11 +217,18 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
     if (d) onDateChange(toYMD(d));
   };
 
+  const handleHijriDateSelect = (dateStr: string) => {
+    onDateChange(dateStr);
+  };
+
   const selectedDate = date ? new Date(date + 'T12:00:00') : undefined;
   const dayOfWeek = date ? new Date(date + 'T12:00:00').getDay() : 0;
   const dayOfMonth = date ? new Date(date + 'T12:00:00').getDate() : 1;
   const monthOfYear = date ? new Date(date + 'T12:00:00').getMonth() + 1 : 1;
   const hijriDate = date ? gregorianToBohra(new Date(date + 'T12:00:00'), timezone) : null;
+
+  // Default calendar type for recurrence presets based on mode
+  const defaultCalType = calendarMode === 'hijri' ? 'hijri' : 'gregorian';
 
   const recurrencePresets = [
     { label: 'Off', onClick: () => handleRecurrencePreset('one-time') },
@@ -193,25 +241,29 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
       label: 'Every weekday (Mon–Fri)',
       onClick: () => handleRecurrencePreset('weekly', [1, 2, 3, 4, 5]),
     },
-    {
-      label: `Every month on the ${dayOfMonth}${getOrdinal(dayOfMonth)}`,
-      onClick: () =>
-        handleRecurrencePreset('custom', undefined, {
-          type: 'monthly',
-          monthlyDay: dayOfMonth,
-          calendarType: 'gregorian',
-        }),
-    },
-    {
-      label: `Every year on ${dayOfMonth} ${MONTH_NAMES[monthOfYear - 1]}`,
-      onClick: () =>
-        handleRecurrencePreset('annual', undefined, {
-          type: 'annual',
-          annualMonth: monthOfYear,
-          monthlyDay: dayOfMonth,
-          calendarType: 'gregorian',
-        }),
-    },
+    // Gregorian monthly/annual
+    ...(calendarMode === 'gregorian' ? [
+      {
+        label: `Every month on the ${dayOfMonth}${getOrdinal(dayOfMonth)}`,
+        onClick: () =>
+          handleRecurrencePreset('custom', undefined, {
+            type: 'monthly',
+            monthlyDay: dayOfMonth,
+            calendarType: 'gregorian',
+          }),
+      },
+      {
+        label: `Every year on ${dayOfMonth} ${MONTH_NAMES[monthOfYear - 1]}`,
+        onClick: () =>
+          handleRecurrencePreset('annual', undefined, {
+            type: 'annual',
+            annualMonth: monthOfYear,
+            monthlyDay: dayOfMonth,
+            calendarType: 'gregorian',
+          }),
+      },
+    ] : []),
+    // Hijri monthly/annual
     ...(hijriDate ? [
       {
         label: `Every month on ${hijriDate.day} ${hijriDate.monthName} (Hijri)`,
@@ -257,8 +309,53 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
     </button>
   );
 
+  // Header: show the alternate calendar as subtitle
+  const headerTitle = date
+    ? calendarMode === 'hijri' && hijriDate
+      ? formatHijriDate(hijriDate, 'long') + ' H'
+      : formatDateShort(date)
+    : 'Pick a date';
+
+  const headerSubtitle = date
+    ? calendarMode === 'hijri'
+      ? formatDateShort(date)
+      : hijriDate
+        ? formatHijriDate(hijriDate, 'long') + ' H'
+        : null
+    : null;
+
+  const calendarToggle = (
+    <div className="flex items-center bg-muted rounded-lg p-0.5 mx-2 mb-2">
+      <button
+        type="button"
+        onClick={() => setCalendarMode('gregorian')}
+        className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
+          calendarMode === 'gregorian'
+            ? 'bg-background text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground'
+        }`}
+      >
+        Gregorian
+      </button>
+      <button
+        type="button"
+        onClick={() => setCalendarMode('hijri')}
+        className={`flex-1 text-xs font-medium py-1.5 px-3 rounded-md transition-colors ${
+          calendarMode === 'hijri'
+            ? 'bg-background text-foreground shadow-sm'
+            : 'text-muted-foreground hover:text-foreground'
+        }`}
+      >
+        Hijri
+      </button>
+    </div>
+  );
+
   const modalContent = (
     <div className="min-w-[320px] max-h-[70vh] overflow-y-auto">
+      {/* Calendar mode toggle */}
+      {calendarToggle}
+
       {/* Date presets */}
       <div className="px-2 py-2 space-y-0.5">
         {presetOptions.map((opt) => (
@@ -288,11 +385,20 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
       {/* Calendar */}
       <div className="border-t px-4 py-3 w-full flex justify-center">
         <div className="w-fit">
-          <Calendar
-            mode="single"
-            selected={selectedDate}
-            onSelect={handleDateSelect}
-          />
+          {calendarMode === 'gregorian' ? (
+            <Calendar
+              mode="single"
+              selected={selectedDate}
+              onSelect={handleDateSelect}
+            />
+          ) : (
+            <HijriCalendarGrid
+              selected={date}
+              todayHijri={todayHijri}
+              onSelect={handleHijriDateSelect}
+              timezone={timezone}
+            />
+          )}
         </div>
       </div>
 
@@ -370,7 +476,6 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
           variant="default"
           className="w-full"
           onClick={() => {
-            // Defer close so parent state from preset/date selection is committed before sheet unmounts
             setTimeout(() => setOpen(false), 0);
           }}
         >
@@ -386,9 +491,9 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
         <SheetTrigger asChild>{triggerButton}</SheetTrigger>
         <SheetContent side="bottom" className="h-[85vh] overflow-y-auto">
           <SheetHeader className="text-left">
-            <SheetTitle>{date ? formatDateShort(date) : 'Pick a date'}</SheetTitle>
-            {hijriDate && (
-              <p className="text-sm text-muted-foreground">{formatHijriDate(hijriDate, 'long')} H</p>
+            <SheetTitle>{headerTitle}</SheetTitle>
+            {headerSubtitle && (
+              <p className="text-sm text-muted-foreground">{headerSubtitle}</p>
             )}
           </SheetHeader>
           <div className="py-4">{modalContent}</div>
@@ -402,9 +507,9 @@ const DateRecurrenceTimePopover: React.FC<DateRecurrenceTimePopoverProps> = ({
       <DialogTrigger asChild>{triggerButton}</DialogTrigger>
       <DialogContent className="sm:max-w-md max-h-[85vh] overflow-y-auto">
         <DialogHeader className="text-left">
-          <DialogTitle>{date ? formatDateShort(date) : 'Pick a date'}</DialogTitle>
-          {hijriDate && (
-            <p className="text-sm text-muted-foreground">{formatHijriDate(hijriDate, 'long')} H</p>
+          <DialogTitle>{headerTitle}</DialogTitle>
+          {headerSubtitle && (
+            <p className="text-sm text-muted-foreground">{headerSubtitle}</p>
           )}
         </DialogHeader>
         {modalContent}
