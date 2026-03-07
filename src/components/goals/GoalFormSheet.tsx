@@ -80,6 +80,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   onOpenChange,
   goal,
   onSubmit,
+  onDelete,
   isLoading = false,
 }) => {
   const isMobile = useIsMobile();
