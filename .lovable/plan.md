@@ -1,12 +1,16 @@
 
 
-## Remove Center Dot from OnTimeMeter
+## Improve Dashboard card information layout
 
-**`src/components/profile/OnTimeMeter.tsx`** — Remove the two `<circle>` elements that form the needle's center dot (the filled primary circle r=4 and the smaller primary-foreground circle r=2). These overlap with the percentage text in the center.
+### Changes
 
-Lines to remove:
-```tsx
-<circle cx={cx} cy={cy} r={4} className="fill-primary" />
-<circle cx={cx} cy={cy} r={2} className="fill-primary-foreground" />
-```
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
+
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
