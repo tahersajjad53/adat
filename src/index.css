@@ -182,16 +182,22 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
 
   /* Progress meter theming */
   .meter-track {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.08);
   }
   .meter-fill {
-    background-color: hsl(var(--accent));
+    background-color: hsl(var(--foreground) / 0.6);
   }
   .theme-khalaf .meter-track {
-    background: rgba(255, 255, 255, 0.35);
+    background: rgba(0, 0, 0, 0.1);
   }
   .theme-khalaf .meter-fill {
-    background-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(0, 0, 0, 0.5);
+  }
+  .theme-bhukur .meter-track {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  .theme-bhukur .meter-fill {
+    background-color: rgba(255, 255, 255, 0.6);
   }
 
   .theme-bhukur .logo-themed {
@@ -202,38 +208,58 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
   /* Prayer-time gradients */
   .gradient-fajr {
     background: linear-gradient(135deg, 
-      hsl(210 50% 42%) 0%, 
-      hsl(200 55% 52%) 100%);
+      hsl(210 35% 80%) 0%, 
+      hsl(200 40% 85%) 100%);
   }
 
   .gradient-zuhr {
     background: linear-gradient(135deg, 
-      hsl(45 85% 55%) 0%, 
-      hsl(35 80% 50%) 100%);
+      hsl(45 50% 82%) 0%, 
+      hsl(35 45% 78%) 100%);
   }
 
   .gradient-asr {
     background: linear-gradient(135deg, 
-      hsl(40 75% 50%) 0%, 
-      hsl(25 70% 50%) 100%);
+      hsl(40 45% 80%) 0%, 
+      hsl(25 40% 78%) 100%);
   }
 
   .gradient-maghrib {
     background: linear-gradient(135deg, 
-      hsl(20 85% 55%) 0%, 
-      hsl(350 60% 55%) 100%);
+      hsl(20 50% 82%) 0%, 
+      hsl(350 40% 80%) 100%);
   }
 
   .gradient-isha {
     background: linear-gradient(135deg, 
-      hsl(270 50% 35%) 0%, 
-      hsl(250 55% 30%) 100%);
+      hsl(270 30% 78%) 0%, 
+      hsl(250 35% 75%) 100%);
   }
 
   .gradient-nisful-layl {
     background: linear-gradient(135deg, 
-      hsl(240 55% 25%) 0%, 
-      hsl(230 60% 20%) 100%);
+      hsl(240 30% 75%) 0%, 
+      hsl(230 35% 72%) 100%);
+  }
+
+  /* Bhukur dark mode: richer pastels */
+  .theme-bhukur .gradient-fajr {
+    background: linear-gradient(135deg, hsl(210 40% 38%) 0%, hsl(200 45% 42%) 100%);
+  }
+  .theme-bhukur .gradient-zuhr {
+    background: linear-gradient(135deg, hsl(45 55% 42%) 0%, hsl(35 50% 38%) 100%);
+  }
+  .theme-bhukur .gradient-asr {
+    background: linear-gradient(135deg, hsl(40 50% 40%) 0%, hsl(25 45% 38%) 100%);
+  }
+  .theme-bhukur .gradient-maghrib {
+    background: linear-gradient(135deg, hsl(20 55% 42%) 0%, hsl(350 45% 40%) 100%);
+  }
+  .theme-bhukur .gradient-isha {
+    background: linear-gradient(135deg, hsl(270 35% 38%) 0%, hsl(250 40% 35%) 100%);
+  }
+  .theme-bhukur .gradient-nisful-layl {
+    background: linear-gradient(135deg, hsl(240 35% 35%) 0%, hsl(230 40% 32%) 100%);
   }
 
   .pattern-celebration {

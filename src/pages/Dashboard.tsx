@@ -158,7 +158,7 @@ const Dashboard: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={requestLocationPermission}
-              className="mt-3 gap-2 border-white/30 text-white hover:bg-white/10 hover:text-white"
+              className="mt-3 gap-2 border-foreground/20 text-foreground hover:bg-foreground/10 hover:text-foreground"
             >
               <MapPin className="h-4 w-4" />
               Set your location
@@ -172,7 +172,7 @@ const Dashboard: React.FC = () => {
               style={{
                 width: `${overallPercentage}%`,
                 backgroundImage:
-                  'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(255,255,255,0.2) 3px, rgba(255,255,255,0.2) 6px)',
+                  'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 6px)',
               }}
             />
           </div>
@@ -180,25 +180,25 @@ const Dashboard: React.FC = () => {
           {prayerToShow ? (
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-xs uppercase tracking-widest text-white/70 font-normal">
+                <span className="text-xs uppercase tracking-widest text-foreground/60 font-normal">
                   {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
                 </span>
                 <div className="flex items-center gap-3 mt-1">
-                  <div className="rounded-full p-2 bg-white/20">
-                    <PrayerIcon className="h-5 w-5 text-white" />
+                  <div className="rounded-full p-2 bg-foreground/10">
+                    <PrayerIcon className="h-5 w-5 text-foreground" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-white font-display">
+                    <h3 className="text-2xl font-bold text-foreground font-display">
                       {prayerToShow.displayName}
                     </h3>
-                    <span className="text-sm text-white/80">{prayerToShow.time}</span>
+                    <span className="text-sm text-foreground/70">{prayerToShow.time}</span>
                   </div>
                 </div>
               </div>
 
               <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
                 {prayerToShow.isCompleted && (
-                  <div className="flex items-center gap-1 text-white/80 text-sm">
+                  <div className="flex items-center gap-1 text-foreground/70 text-sm">
                     <Check className="h-4 w-4" />
                     <span>Done</span>
                   </div>
@@ -206,12 +206,12 @@ const Dashboard: React.FC = () => {
                 <Checkbox
                   checked={prayerToShow.isCompleted}
                   onCheckedChange={() => togglePrayer(prayerToShow.name)}
-                  className="h-6 w-6 border-white/50 data-[state=checked]:bg-white/30 data-[state=checked]:text-white"
+                  className="h-6 w-6 border-foreground/30 data-[state=checked]:bg-foreground/20 data-[state=checked]:text-foreground"
                 />
               </div>
             </div>
           ) : (
-            <p className="text-white/80 text-sm font-medium">Reflect, rest, renew.</p>
+            <p className="text-foreground/70 text-sm font-medium">Reflect, rest, renew.</p>
           )}
         </TimeOfDayCard>
         </div>
