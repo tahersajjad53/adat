@@ -223,7 +223,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       </div>
 
       {/* Description: Add placeholder when empty */}
-      <CondensedAttributeRow icon={<Page className="size-4" />}>
+      <CondensedAttributeRow icon={<Page className="size-4" />} className="items-start pt-2">
         <Textarea
           id="goalDescription"
           value={description}
