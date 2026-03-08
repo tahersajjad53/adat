@@ -201,7 +201,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
             }}
           />
         </div>
-        <p className="text-sm text-muted-foreground">{recurrenceSummary}</p>
+        
 
         {/* Tag selector */}
         <div className="flex flex-wrap gap-2 pt-1">
