@@ -192,7 +192,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
             placeholder="e.g., Quran tilawat"
             disabled={isLoading}
             required
-            className="flex-1 min-w-0 h-9"
+            className="flex-1 min-w-0 h-11 text-lg font-medium"
             onFocus={(e) => {
               const target = e.target;
               setTimeout(() => {
