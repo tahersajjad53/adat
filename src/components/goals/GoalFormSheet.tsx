@@ -181,9 +181,9 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   );
 
   const formContent = (
-    <form onSubmit={handleSubmit} className="space-y-2">
+    <form onSubmit={handleSubmit} className="space-y-4">
       {/* Title block: circle + title inline, recurrence summary below */}
-      <div className="space-y-1">
+      <div className="space-y-3">
         <div className="flex items-center min-h-9">
           <Input
             id="goalTitle"
@@ -223,7 +223,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
       </div>
 
       {/* Description: Add placeholder when empty */}
-      <CondensedAttributeRow icon={<Page className="size-4" />}>
+      <CondensedAttributeRow icon={<Page className="size-4" />} className="items-start pt-2">
         <Textarea
           id="goalDescription"
           value={description}
