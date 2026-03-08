@@ -184,8 +184,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
     <form onSubmit={handleSubmit} className="space-y-2">
       {/* Title block: circle + title inline, recurrence summary below */}
       <div className="space-y-1">
-        <div className="flex items-center gap-3 min-h-9">
-          <Circle className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+        <div className="flex items-center min-h-9">
           <Input
             id="goalTitle"
             value={title}
