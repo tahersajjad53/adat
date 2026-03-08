@@ -184,8 +184,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
     <form onSubmit={handleSubmit} className="space-y-2">
       {/* Title block: circle + title inline, recurrence summary below */}
       <div className="space-y-1">
-        <div className="flex items-center gap-3 min-h-9">
-          <Circle className="size-5 shrink-0 text-muted-foreground" aria-hidden />
+        <div className="flex items-center min-h-9">
           <Input
             id="goalTitle"
             value={title}
@@ -202,10 +201,10 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
             }}
           />
         </div>
-        <p className="text-sm text-muted-foreground pl-8">{recurrenceSummary}</p>
+        <p className="text-sm text-muted-foreground">{recurrenceSummary}</p>
 
         {/* Tag selector */}
-        <div className="flex flex-wrap gap-2 pl-8 pt-1">
+        <div className="flex flex-wrap gap-2 pt-1">
           {dbTags.map((t) => (
             <button
               key={t.value}

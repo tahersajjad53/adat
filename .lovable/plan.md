@@ -1,12 +1,16 @@
 
 
-## Remove Circle Icon from Goal Form Title
+## Improve Dashboard card information layout
 
-### Changes in `src/components/goals/GoalFormSheet.tsx`
+### Changes
 
-1. **Remove the `Circle` icon** from line 188
-2. **Remove the `gap-3`** from the flex container (line 187) since there's no icon anymore
-3. **Remove `pl-8`** from the recurrence summary (line 205) and tag selector (line 208) since they no longer need to align with the icon offset
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-This gives the title input full width and more visual prominence.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
