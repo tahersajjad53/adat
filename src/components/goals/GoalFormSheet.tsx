@@ -204,7 +204,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         <p className="text-sm text-muted-foreground">{recurrenceSummary}</p>
 
         {/* Tag selector */}
-        <div className="flex flex-wrap gap-2 pl-8 pt-1">
+        <div className="flex flex-wrap gap-2 pt-1">
           {dbTags.map((t) => (
             <button
               key={t.value}
