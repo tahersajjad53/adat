@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { WeekRow } from '@/components/calendar/WeekRow';
 import { CalendarTimeline } from '@/components/calendar/CalendarTimeline';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
@@ -68,13 +68,22 @@ const Calendar: React.FC = () => {
   // Goal editing
   const [editingGoal, setEditingGoal] = useState<GoalWithStatus | null>(null);
 
+  // Listen for "Today" button in app header
+  useEffect(() => {
+    const handleGoToToday = () => {
+      setSelectedDate(new Date());
+      setWeekOffset(0);
+    };
+    window.addEventListener('calendar:goToToday', handleGoToToday);
+    return () => window.removeEventListener('calendar:goToToday', handleGoToToday);
+  }, []);
+
   const handleShiftWeek = useCallback((dir: -1 | 1) => {
     setWeekOffset(prev => prev + dir);
   }, []);
 
   const handleSelectDate = useCallback((date: Date) => {
     setSelectedDate(date);
-    // If the date is outside the current week, shift the week
     const weekStart = weekDates[0];
     const weekEnd = weekDates[6];
     if (date < weekStart || date > weekEnd) {
@@ -109,19 +118,9 @@ const Calendar: React.FC = () => {
 
       {/* Selected date header */}
       <div className="px-1 flex justify-between items-baseline">
-        <div className="flex items-baseline gap-3">
-          {!showingToday && (
-            <button
-              onClick={() => { setSelectedDate(new Date()); setWeekOffset(0); }}
-              className="text-sm font-medium text-primary"
-            >
-              Today
-            </button>
-          )}
-          <h2 className="font-display tracking-tight font-normal text-xl">
-            {showingToday ? 'Today' : selectedDateLabel}
-          </h2>
-        </div>
+        <h2 className="font-display tracking-tight font-normal text-xl">
+          {showingToday ? 'Today' : selectedDateLabel}
+        </h2>
         <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
       </div>
 

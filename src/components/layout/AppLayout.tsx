@@ -33,6 +33,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const isGoalsPage = location.pathname === '/goals';
   const isNamazPage = location.pathname === '/namaz';
+  const isCalendarPage = location.pathname === '/calendar';
   const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
@@ -58,7 +59,16 @@ export function AppLayout({ children }: AppLayoutProps) {
         <header className="sticky top-0 z-40 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50">
           <div className="container flex h-14 items-center">
             {/* Left spacer */}
-            <div className="w-10" />
+            {isCalendarPage ? (
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('calendar:goToToday'))}
+                className="text-sm font-medium text-primary w-10 text-left"
+              >
+                Today
+              </button>
+            ) : (
+              <div className="w-10" />
+            )}
             {/* Centered logo */}
             <div className="flex-1 flex justify-center">
               <img src={ibadatLogo} alt="Ibadat" className="h-6 w-auto logo-themed" />
