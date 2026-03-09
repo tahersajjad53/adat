@@ -22,7 +22,7 @@ import { useOverdueGoals } from '@/hooks/useOverdueGoals';
 import { useDynamicGoals } from '@/hooks/useDynamicGoals';
 import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
-import type { GoalWithStatus } from '@/types/goals';
+import type { Goal, GoalWithStatus } from '@/types/goals';
 import WhatsNewPopup from '@/components/WhatsNewPopup';
 
 const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
@@ -45,7 +45,8 @@ const Dashboard: React.FC = () => {
   const { overdueGoals, completeOverdue, isCompletingOverdue } = useOverdueGoals();
   const overdueGoalIds = useMemo(() => new Set(overdueGoals.map((o) => o.goal.id)), [overdueGoals]);
   const [goalFormOpen, setGoalFormOpen] = useState(false);
-  const { goals, createGoal, deleteGoal, isCreating } = useGoals();
+  const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
+  const { goals, createGoal, updateGoal, deleteGoal, isCreating, isUpdating } = useGoals();
 
   // Dynamic goals
   const { dynamicGoals } = useDynamicGoals();
@@ -234,6 +235,7 @@ const Dashboard: React.FC = () => {
           onDynamicToggle={toggleDynamic}
           isDynamicToggling={isDynamicToggling}
           onCreateGoal={() => setGoalFormOpen(true)}
+          onEditGoal={(goal) => { setEditingGoal(goal); setGoalFormOpen(true); }}
           sortedGoals={sortedGoals}
           tags={tags}
           tagSortOrder={tagSortOrder}
@@ -241,9 +243,23 @@ const Dashboard: React.FC = () => {
 
         <GoalFormSheet
           open={goalFormOpen}
-          onOpenChange={setGoalFormOpen}
-          onSubmit={async (data) => { await createGoal(data); }}
-          isLoading={isCreating}
+          onOpenChange={(open) => { if (!open) { setGoalFormOpen(false); setEditingGoal(null); } }}
+          goal={editingGoal}
+          onSubmit={async (data) => {
+            if (editingGoal) {
+              await updateGoal(editingGoal.id, data);
+            } else {
+              await createGoal(data);
+            }
+            setGoalFormOpen(false);
+            setEditingGoal(null);
+          }}
+          onDelete={editingGoal ? async (id) => {
+            await deleteGoal(id);
+            setGoalFormOpen(false);
+            setEditingGoal(null);
+          } : undefined}
+          isLoading={isCreating || isUpdating}
         />
 
         <WhatsNewPopup />

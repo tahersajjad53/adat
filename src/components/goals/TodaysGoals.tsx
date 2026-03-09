@@ -40,6 +40,7 @@ interface TodaysGoalsProps {
   sortedGoals?: GoalWithStatus[];
   tags?: TagOption[];
   tagSortOrder?: string[];
+  onEditGoal?: (goal: Goal) => void;
 }
 
 // Helper type for grouped items
@@ -67,6 +68,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   sortedGoals,
   tags = [],
   tagSortOrder = [],
+  onEditGoal,
 }) => {
   const navigate = useNavigate();
   const { triggerConfetti, ConfettiPortal } = useConfetti();
@@ -189,11 +191,23 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
         />
         <div
           className="flex-1 min-w-0 cursor-pointer"
-          onClick={() => setViewingGoal(isDynamic ? { ...goal, isDynamic: true } : { ...goal, isCompleted: completed })}
+          onClick={() => {
+            if (isDynamic) {
+              setViewingGoal({ ...goal, isDynamic: true });
+            } else {
+              onEditGoal?.(goal);
+            }
+          }}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') setViewingGoal(isDynamic ? { ...goal, isDynamic: true } : { ...goal, isCompleted: completed });
+            if (e.key === 'Enter') {
+              if (isDynamic) {
+                setViewingGoal({ ...goal, isDynamic: true });
+              } else {
+                onEditGoal?.(goal);
+              }
+            }
           }}
         >
           <div className="flex items-center gap-2 flex-wrap">
@@ -253,11 +267,11 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
         />
         <div
           className="flex-1 min-w-0 cursor-pointer"
-          onClick={() => setViewingGoal({ ...overdue.goal, isCompleted: false })}
+          onClick={() => onEditGoal?.(overdue.goal)}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') setViewingGoal({ ...overdue.goal, isCompleted: false });
+            if (e.key === 'Enter') onEditGoal?.(overdue.goal);
           }}
         >
           <span className="text-base font-medium">{overdue.goal.title}</span>
