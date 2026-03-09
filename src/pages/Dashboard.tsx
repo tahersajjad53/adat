@@ -247,7 +247,7 @@ const Dashboard: React.FC = () => {
           goal={editingGoal}
           onSubmit={async (data) => {
             if (editingGoal) {
-              await updateGoal({ id: editingGoal.id, input: data });
+              await updateGoal(editingGoal.id, data);
             } else {
               await createGoal(data);
             }
