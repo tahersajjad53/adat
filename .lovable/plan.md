@@ -1,29 +1,16 @@
 
 
-## Add "Today" Navigation Button to Calendar Header
+## Improve Dashboard card information layout
 
-### Change
+### Changes
 
-**`src/pages/Calendar.tsx`** (lines 103-109) — Add a text-only "Today" button on the left side of the date header row. It appears only when the user is not viewing the current day, and resets both `selectedDate` and `weekOffset` to today.
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-```tsx
-<div className="px-1 flex justify-between items-baseline">
-  <div className="flex items-baseline gap-3">
-    {!showingToday && (
-      <button
-        onClick={() => { setSelectedDate(new Date()); setWeekOffset(0); }}
-        className="text-sm font-medium text-primary"
-      >
-        Today
-      </button>
-    )}
-    <h2 className="font-display tracking-tight font-normal text-xl">
-      {showingToday ? 'Today' : selectedDateLabel}
-    </h2>
-  </div>
-  <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
-</div>
-```
-
-When viewing today, the button hides (since the heading already says "Today"). When viewing any other date, the "Today" button appears at the left margin for quick return.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
