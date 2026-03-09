@@ -68,13 +68,22 @@ const Calendar: React.FC = () => {
   // Goal editing
   const [editingGoal, setEditingGoal] = useState<GoalWithStatus | null>(null);
 
+  // Listen for "Today" button in app header
+  useEffect(() => {
+    const handleGoToToday = () => {
+      setSelectedDate(new Date());
+      setWeekOffset(0);
+    };
+    window.addEventListener('calendar:goToToday', handleGoToToday);
+    return () => window.removeEventListener('calendar:goToToday', handleGoToToday);
+  }, []);
+
   const handleShiftWeek = useCallback((dir: -1 | 1) => {
     setWeekOffset(prev => prev + dir);
   }, []);
 
   const handleSelectDate = useCallback((date: Date) => {
     setSelectedDate(date);
-    // If the date is outside the current week, shift the week
     const weekStart = weekDates[0];
     const weekEnd = weekDates[6];
     if (date < weekStart || date > weekEnd) {
