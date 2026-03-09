@@ -68,6 +68,7 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
   sortedGoals,
   tags = [],
   tagSortOrder = [],
+  onEditGoal,
 }) => {
   const navigate = useNavigate();
   const { triggerConfetti, ConfettiPortal } = useConfetti();
