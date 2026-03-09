@@ -267,11 +267,11 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
         />
         <div
           className="flex-1 min-w-0 cursor-pointer"
-          onClick={() => setViewingGoal({ ...overdue.goal, isCompleted: false })}
+          onClick={() => onEditGoal?.(overdue.goal)}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') setViewingGoal({ ...overdue.goal, isCompleted: false });
+            if (e.key === 'Enter') onEditGoal?.(overdue.goal);
           }}
         >
           <span className="text-base font-medium">{overdue.goal.title}</span>
