@@ -36,6 +36,16 @@ export function AppLayout({ children }: AppLayoutProps) {
   const isCalendarPage = location.pathname === '/calendar';
   const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const [calendarShowingToday, setCalendarShowingToday] = useState(true);
+
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setCalendarShowingToday(detail?.showingToday ?? true);
+    };
+    window.addEventListener('calendar:showingTodayChanged', handler);
+    return () => window.removeEventListener('calendar:showingTodayChanged', handler);
+  }, []);
 
   const handleAddGoal = () => setGoalFormOpen(true);
 
@@ -59,7 +69,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <header className="sticky top-0 z-40 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50">
           <div className="container flex h-14 items-center">
             {/* Left spacer */}
-            {isCalendarPage ? (
+            {isCalendarPage && !calendarShowingToday ? (
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('calendar:goToToday'))}
                 className="text-sm font-medium text-primary w-10 text-left"

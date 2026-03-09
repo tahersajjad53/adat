@@ -68,6 +68,10 @@ const Calendar: React.FC = () => {
   // Goal editing
   const [editingGoal, setEditingGoal] = useState<GoalWithStatus | null>(null);
 
+  const todayKey = formatDateKey(new Date());
+  const selectedKey = formatDateKey(selectedDate);
+  const showingToday = todayKey === selectedKey;
+
   // Listen for "Today" button in app header
   useEffect(() => {
     const handleGoToToday = () => {
@@ -76,6 +80,18 @@ const Calendar: React.FC = () => {
     };
     window.addEventListener('calendar:goToToday', handleGoToToday);
     return () => window.removeEventListener('calendar:goToToday', handleGoToToday);
+  }, []);
+
+  // Notify header whether we're showing today
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('calendar:showingTodayChanged', { detail: { showingToday } }));
+  }, [showingToday]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      window.dispatchEvent(new CustomEvent('calendar:showingTodayChanged', { detail: { showingToday: true } }));
+    };
   }, []);
 
   const handleShiftWeek = useCallback((dir: -1 | 1) => {
@@ -101,9 +117,6 @@ const Calendar: React.FC = () => {
   });
   const selectedHijriLabel = formatHijriDate(selectedHijri, 'long');
 
-  const todayKey = formatDateKey(new Date());
-  const selectedKey = formatDateKey(selectedDate);
-  const showingToday = todayKey === selectedKey;
 
   return (
     <div className="container py-6 max-w-xl mx-auto space-y-5">
