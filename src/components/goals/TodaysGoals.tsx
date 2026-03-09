@@ -191,11 +191,23 @@ const TodaysGoals: React.FC<TodaysGoalsProps> = ({
         />
         <div
           className="flex-1 min-w-0 cursor-pointer"
-          onClick={() => setViewingGoal(isDynamic ? { ...goal, isDynamic: true } : { ...goal, isCompleted: completed })}
+          onClick={() => {
+            if (isDynamic) {
+              setViewingGoal({ ...goal, isDynamic: true });
+            } else {
+              onEditGoal?.(goal);
+            }
+          }}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
-            if (e.key === 'Enter') setViewingGoal(isDynamic ? { ...goal, isDynamic: true } : { ...goal, isCompleted: completed });
+            if (e.key === 'Enter') {
+              if (isDynamic) {
+                setViewingGoal({ ...goal, isDynamic: true });
+              } else {
+                onEditGoal?.(goal);
+              }
+            }
           }}
         >
           <div className="flex items-center gap-2 flex-wrap">
