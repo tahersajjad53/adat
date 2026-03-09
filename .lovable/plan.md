@@ -1,23 +1,16 @@
 
 
-## Style "Today" Recurrence Badge as Green Pill
+## Improve Dashboard card information layout
 
-### Change
+### Changes
 
-**`src/components/goals/GoalCard.tsx`** (line 134-136) — Conditionally apply a pastel green background when `recurrenceLabel === 'Today'`:
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-```tsx
-<Badge
-  variant="secondary"
-  className={`text-[10px] px-1.5 py-0.5 shrink-0 ${
-    recurrenceLabel === 'Today'
-      ? 'bg-green-100 text-green-900 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800'
-      : ''
-  }`}
->
-  {recurrenceLabel}
-</Badge>
-```
-
-This targets only the "Today" label with a pastel green fill and dark text, leaving all other recurrence labels (Daily, Weekly, etc.) unchanged. Dark mode gets a subtle green tint.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
