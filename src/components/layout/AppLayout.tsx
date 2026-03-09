@@ -36,6 +36,16 @@ export function AppLayout({ children }: AppLayoutProps) {
   const isCalendarPage = location.pathname === '/calendar';
   const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const [calendarShowingToday, setCalendarShowingToday] = useState(true);
+
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setCalendarShowingToday(detail?.showingToday ?? true);
+    };
+    window.addEventListener('calendar:showingTodayChanged', handler);
+    return () => window.removeEventListener('calendar:showingTodayChanged', handler);
+  }, []);
 
   const handleAddGoal = () => setGoalFormOpen(true);
 
