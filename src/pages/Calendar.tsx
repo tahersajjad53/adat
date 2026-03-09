@@ -117,9 +117,6 @@ const Calendar: React.FC = () => {
   });
   const selectedHijriLabel = formatHijriDate(selectedHijri, 'long');
 
-  const todayKey = formatDateKey(new Date());
-  const selectedKey = formatDateKey(selectedDate);
-  const showingToday = todayKey === selectedKey;
 
   return (
     <div className="container py-6 max-w-xl mx-auto space-y-5">
