@@ -235,6 +235,7 @@ const Dashboard: React.FC = () => {
           onDynamicToggle={toggleDynamic}
           isDynamicToggling={isDynamicToggling}
           onCreateGoal={() => setGoalFormOpen(true)}
+          onEditGoal={(goal) => { setEditingGoal(goal); setGoalFormOpen(true); }}
           sortedGoals={sortedGoals}
           tags={tags}
           tagSortOrder={tagSortOrder}
@@ -242,9 +243,23 @@ const Dashboard: React.FC = () => {
 
         <GoalFormSheet
           open={goalFormOpen}
-          onOpenChange={setGoalFormOpen}
-          onSubmit={async (data) => { await createGoal(data); }}
-          isLoading={isCreating}
+          onOpenChange={(open) => { if (!open) { setGoalFormOpen(false); setEditingGoal(null); } }}
+          goal={editingGoal}
+          onSubmit={async (data) => {
+            if (editingGoal) {
+              await updateGoal({ id: editingGoal.id, input: data });
+            } else {
+              await createGoal(data);
+            }
+            setGoalFormOpen(false);
+            setEditingGoal(null);
+          }}
+          onDelete={editingGoal ? async (id) => {
+            await deleteGoal(id);
+            setGoalFormOpen(false);
+            setEditingGoal(null);
+          } : undefined}
+          isLoading={isCreating || isUpdating}
         />
 
         <WhatsNewPopup />
