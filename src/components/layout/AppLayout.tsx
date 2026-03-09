@@ -33,6 +33,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const navigate = useNavigate();
   const isGoalsPage = location.pathname === '/goals';
   const isNamazPage = location.pathname === '/namaz';
+  const isCalendarPage = location.pathname === '/calendar';
   const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
 
