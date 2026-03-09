@@ -78,6 +78,18 @@ const Calendar: React.FC = () => {
     return () => window.removeEventListener('calendar:goToToday', handleGoToToday);
   }, []);
 
+  // Notify header whether we're showing today
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('calendar:showingTodayChanged', { detail: { showingToday } }));
+  }, [showingToday]);
+
+  // Clean up on unmount
+  useEffect(() => {
+    return () => {
+      window.dispatchEvent(new CustomEvent('calendar:showingTodayChanged', { detail: { showingToday: true } }));
+    };
+  }, []);
+
   const handleShiftWeek = useCallback((dir: -1 | 1) => {
     setWeekOffset(prev => prev + dir);
   }, []);
