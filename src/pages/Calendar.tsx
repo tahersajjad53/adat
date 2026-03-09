@@ -68,6 +68,10 @@ const Calendar: React.FC = () => {
   // Goal editing
   const [editingGoal, setEditingGoal] = useState<GoalWithStatus | null>(null);
 
+  const todayKey = formatDateKey(new Date());
+  const selectedKey = formatDateKey(selectedDate);
+  const showingToday = todayKey === selectedKey;
+
   // Listen for "Today" button in app header
   useEffect(() => {
     const handleGoToToday = () => {
