@@ -40,6 +40,7 @@ interface TodaysGoalsProps {
   sortedGoals?: GoalWithStatus[];
   tags?: TagOption[];
   tagSortOrder?: string[];
+  onEditGoal?: (goal: Goal) => void;
 }
 
 // Helper type for grouped items
