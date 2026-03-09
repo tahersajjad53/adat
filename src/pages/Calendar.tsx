@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { WeekRow } from '@/components/calendar/WeekRow';
 import { CalendarTimeline } from '@/components/calendar/CalendarTimeline';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
