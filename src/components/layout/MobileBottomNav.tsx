@@ -54,18 +54,21 @@ export function MobileBottomNav({ onAddGoal, onAddTasbeeh }: MobileBottomNavProp
                 <Plus className="h-6 w-6" strokeWidth={2.5} />
               </button>
             </PopoverTrigger>
-            <PopoverContent side="top" align="center" className="w-44 p-1" sideOffset={12}>
+            <PopoverContent side="top" align="center" className="w-56 p-2" sideOffset={12}>
               <button
                 onClick={() => { setMenuOpen(false); onAddGoal(); }}
-                className="w-full text-left px-3 py-2.5 text-sm rounded-md hover:bg-accent transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg hover:bg-accent transition-colors"
               >
-                New Goal
+                <Archery className="h-5 w-5 text-muted-foreground" />
+                <span>New Goal</span>
               </button>
+              <div className="h-px bg-border mx-2 my-1" />
               <button
                 onClick={() => { setMenuOpen(false); onAddTasbeeh(); }}
-                className="w-full text-left px-3 py-2.5 text-sm rounded-md hover:bg-accent transition-colors"
+                className="w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg hover:bg-accent transition-colors"
               >
-                Tasbeeh Counter
+                <Clock className="h-5 w-5 text-muted-foreground" />
+                <span>Tasbeeh Counter</span>
               </button>
             </PopoverContent>
           </Popover>
