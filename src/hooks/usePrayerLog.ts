@@ -78,36 +78,17 @@ export function usePrayerLog(): UsePrayerLogReturn {
   const gregorianDate = useMemo(() => {
     if (!currentDate) return null;
     const greg = currentDate.gregorian;
-    let effectiveDate = new Date(greg);
-
-    if (currentDate.isAfterMaghrib) {
-      // Extract hour in user's timezone
-      const tz = location?.timezone;
-      let hour: number;
-      if (tz) {
-        const fmt = new Intl.DateTimeFormat('en-US', {
-          hour: 'numeric', hour12: false, timeZone: tz,
-        });
-        const parts = fmt.formatToParts(greg);
-        hour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
-      } else {
-        hour = greg.getHours();
-      }
-      if (hour < 4) {
-        effectiveDate.setDate(effectiveDate.getDate() - 1);
-      }
-    }
 
     // Format as YYYY-MM-DD in local timezone (not UTC)
     const tz = location?.timezone;
     if (tz) {
       const fmt = new Intl.DateTimeFormat('en-CA', { timeZone: tz }); // en-CA gives YYYY-MM-DD
-      return fmt.format(effectiveDate);
+      return fmt.format(greg);
     }
     // Fallback: local timezone
-    const y = effectiveDate.getFullYear();
-    const m = String(effectiveDate.getMonth() + 1).padStart(2, '0');
-    const d = String(effectiveDate.getDate()).padStart(2, '0');
+    const y = greg.getFullYear();
+    const m = String(greg.getMonth() + 1).padStart(2, '0');
+    const d = String(greg.getDate()).padStart(2, '0');
     return `${y}-${m}-${d}`;
   }, [currentDate, location?.timezone]);
 
