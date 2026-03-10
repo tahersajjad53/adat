@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Circle, CheckCircle, Page, Calendar, Bell, Trash } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useKeyboardOffset } from '@/hooks/use-keyboard-offset';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

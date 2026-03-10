@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useKeyboardOffset } from '@/hooks/use-keyboard-offset';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';

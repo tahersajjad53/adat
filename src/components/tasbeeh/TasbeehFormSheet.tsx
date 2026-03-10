@@ -17,6 +17,7 @@ interface TasbeehFormSheetProps {
 
 export default function TasbeehFormSheet({ open, onOpenChange, onSubmit, isLoading, initial }: TasbeehFormSheetProps) {
   const isMobile = useIsMobile();
+  const keyboardOffset = useKeyboardOffset();
   const [title, setTitle] = useState('');
   const [target, setTarget] = useState('');
 
