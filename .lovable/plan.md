@@ -1,16 +1,11 @@
 
 
-## Improve Dashboard card information layout
+## Full-Width Plus Button Menu on Mobile
 
-### Changes
+Change the PopoverContent from fixed `w-56` to full-width with horizontal margins, consistent with the app's mobile popup geometry pattern (`w-[calc(100%-2rem)]`).
 
-**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
-- Increase icon size from `h-4 w-4` to `h-6 w-6`
-- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
-- Split the Gregorian date and location onto separate lines instead of combining them with `·`
-- Location shown on its own line below the Gregorian date
+### Change: `src/components/layout/MobileBottomNav.tsx`
 
-**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
-- Remove the "Ada" label span entirely
-- Keep just the percentage number
+- Line 57: Replace `className="w-56 p-2"` with `className="w-[calc(100vw-2rem)] p-2"` on PopoverContent
+- This gives the menu full viewport width minus 1rem margin on each side, matching the existing mobile popup convention
 
