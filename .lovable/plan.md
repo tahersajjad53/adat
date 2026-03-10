@@ -1,11 +1,16 @@
 
 
-## Remove Redundant scrollIntoView Workaround from GoalFormSheet
+## Improve Dashboard card information layout
 
-The `useKeyboardOffset` hook now properly handles keyboard avoidance by adjusting the sheet's bottom padding. The older `scrollIntoView` workaround on the title input's `onFocus` (lines 198-203) is no longer needed and causes the "overcompensating" behavior visible in the screenshot — the form jumps too aggressively when the keyboard appears.
+### Changes
 
-### Change: `src/components/goals/GoalFormSheet.tsx`
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-- **Remove** the `onFocus` handler from the title `<Input>` (lines 198-203) that does `scrollIntoView` with a 300ms delay
-- The `useKeyboardOffset` + `paddingBottom` on `SheetContent` is sufficient to keep inputs visible
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
