@@ -33,7 +33,7 @@ interface AppSidebarProps {
   onAddTasbeeh?: () => void;
 }
 
-export function AppSidebar({ onAddGoal }: AppSidebarProps) {
+export function AppSidebar({ onAddGoal, onAddTasbeeh }: AppSidebarProps) {
   const { user, signOut } = useAuth();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
