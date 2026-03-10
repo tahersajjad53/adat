@@ -14,7 +14,9 @@ import {
 import { AppSidebar } from './AppSidebar';
 import { MobileBottomNav } from './MobileBottomNav';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
+import TasbeehFormSheet from '@/components/tasbeeh/TasbeehFormSheet';
 import { useGoals } from '@/hooks/useGoals';
+import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 import ibadatLogo from '@/assets/ibadat-logo.svg';
