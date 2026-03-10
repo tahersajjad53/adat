@@ -84,6 +84,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   isLoading = false,
 }) => {
   const isMobile = useIsMobile();
+  const keyboardOffset = useKeyboardOffset();
   const { tags: dbTags } = useTags();
 
   const [title, setTitle] = useState('');
