@@ -1,8 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Home, Clock, User, Archery, Plus, Calendar as CalendarIcon } from 'iconoir-react';
 import { NavLink } from '@/components/NavLink';
 import { cn } from '@/lib/utils';
 import { InstallBanner } from '@/components/pwa/InstallBanner';
+import {
+  Popover, PopoverContent, PopoverTrigger,
+} from '@/components/ui/popover';
+
 const leftItems = [
   { title: 'Today', url: '/today', icon: Home },
   { title: 'Calendar', url: '/calendar', icon: CalendarIcon },
@@ -15,9 +19,12 @@ const rightItems = [
 
 interface MobileBottomNavProps {
   onAddGoal: () => void;
+  onAddTasbeeh: () => void;
 }
 
-export function MobileBottomNav({ onAddGoal }: MobileBottomNavProps) {
+export function MobileBottomNav({ onAddGoal, onAddTasbeeh }: MobileBottomNavProps) {
+  const [menuOpen, setMenuOpen] = useState(false);
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 pb-safe">
       <InstallBanner />
@@ -37,14 +44,31 @@ export function MobileBottomNav({ onAddGoal }: MobileBottomNavProps) {
           </NavLink>
         ))}
 
-        {/* Center + button */}
+        {/* Center + button with popover */}
         <div className="flex items-center justify-center flex-1">
-          <button
-            onClick={onAddGoal}
-            className="flex items-center justify-center h-12 w-12 -mt-5 rounded-full bg-primary text-primary-foreground shadow-lg active:scale-95 transition-transform"
-          >
-            <Plus className="h-6 w-6" strokeWidth={2.5} />
-          </button>
+          <Popover open={menuOpen} onOpenChange={setMenuOpen}>
+            <PopoverTrigger asChild>
+              <button
+                className="flex items-center justify-center h-12 w-12 -mt-5 rounded-full bg-primary text-primary-foreground shadow-lg active:scale-95 transition-transform"
+              >
+                <Plus className="h-6 w-6" strokeWidth={2.5} />
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="top" align="center" className="w-44 p-1" sideOffset={12}>
+              <button
+                onClick={() => { setMenuOpen(false); onAddGoal(); }}
+                className="w-full text-left px-3 py-2.5 text-sm rounded-md hover:bg-accent transition-colors"
+              >
+                New Goal
+              </button>
+              <button
+                onClick={() => { setMenuOpen(false); onAddTasbeeh(); }}
+                className="w-full text-left px-3 py-2.5 text-sm rounded-md hover:bg-accent transition-colors"
+              >
+                Tasbeeh Counter
+              </button>
+            </PopoverContent>
+          </Popover>
         </div>
 
         {rightItems.map((item) => (
