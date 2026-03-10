@@ -29,7 +29,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const isMobile = useIsMobile();
   const location = useLocation();
   const [goalFormOpen, setGoalFormOpen] = useState(false);
+  const [tasbeehFormOpen, setTasbeehFormOpen] = useState(false);
   const { createGoal, isCreating } = useGoals();
+  const { createCounter, isCreating: isCreatingTasbeeh } = useTasbeehCounters();
   
 
   const navigate = useNavigate();
