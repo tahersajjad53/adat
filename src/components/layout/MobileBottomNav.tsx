@@ -54,7 +54,7 @@ export function MobileBottomNav({ onAddGoal, onAddTasbeeh }: MobileBottomNavProp
                 <Plus className="h-6 w-6" strokeWidth={2.5} />
               </button>
             </PopoverTrigger>
-            <PopoverContent side="top" align="center" className="w-56 p-2" sideOffset={12}>
+            <PopoverContent side="top" align="center" <PopoverContent side="top" align="center" className="w-[calc(100vw-2rem)] p-2" sideOffset={12}> sideOffset={12}>
               <button
                 onClick={() => { setMenuOpen(false); onAddGoal(); }}
                 className="w-full flex items-center gap-3 px-4 py-3.5 text-base rounded-lg hover:bg-accent transition-colors"
