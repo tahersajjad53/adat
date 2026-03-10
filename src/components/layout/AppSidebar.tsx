@@ -102,6 +102,14 @@ export function AppSidebar({ onAddGoal, onAddTasbeeh }: AppSidebarProps) {
                   <span>Add Goal</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {onAddTasbeeh && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="Tasbeeh Counter" onClick={onAddTasbeeh}>
+                    <Plus className="h-4 w-4" />
+                    <span>Tasbeeh Counter</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

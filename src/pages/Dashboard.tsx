@@ -220,6 +220,16 @@ const Dashboard: React.FC = () => {
         </TimeOfDayCard>
         </div>
 
+        {/* Tasbeeh Counters */}
+        {tasbeehCounters.length > 0 && (
+          <div className="space-y-2">
+            <h2 className="text-sm font-medium text-muted-foreground px-1">Tasbeeh</h2>
+            {tasbeehCounters.map(c => (
+              <TasbeehCard key={c.id} counter={c} onDelete={deleteTasbeeh} />
+            ))}
+          </div>
+        )}
+
         {/* Today's Goals */}
         <TodaysGoals
           goalsDueToday={goalsDueToday}

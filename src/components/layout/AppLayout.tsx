@@ -161,7 +161,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar onAddGoal={handleAddGoal} />
+        <AppSidebar onAddGoal={handleAddGoal} onAddTasbeeh={() => setTasbeehFormOpen(true)} />
         <div className="flex-1 flex flex-col">
           {/* Desktop header with sidebar trigger */}
           <header className="sticky top-0 z-40 bg-background border-b border-border">
