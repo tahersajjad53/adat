@@ -3,9 +3,10 @@ import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useTheme, ThemeName } from '@/contexts/ThemeContext';
 
-const WHATS_NEW_KEY = 'whats-new-v2';
+const WHATS_NEW_KEY = 'whats-new-v3';
 
 const UPDATES = [
+  { emoji: '📿', text: 'Tasbeeh counters with beautiful radial progress rings' },
   { emoji: '🎨', text: 'Softer pastel prayer gradients across the app' },
   { emoji: '📅', text: 'Swipe between weeks on the Calendar page' },
   { emoji: '🏷️', text: 'Goals are now grouped by tags on your Today page' },
