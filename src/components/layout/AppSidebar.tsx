@@ -30,6 +30,7 @@ const navItems = [
 
 interface AppSidebarProps {
   onAddGoal: () => void;
+  onAddTasbeeh?: () => void;
 }
 
 export function AppSidebar({ onAddGoal }: AppSidebarProps) {
