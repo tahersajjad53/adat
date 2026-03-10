@@ -22,6 +22,8 @@ import { useOverdueGoals } from '@/hooks/useOverdueGoals';
 import { useDynamicGoals } from '@/hooks/useDynamicGoals';
 import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
+import { TasbeehCard } from '@/components/tasbeeh/TasbeehCard';
 import type { Goal, GoalWithStatus } from '@/types/goals';
 import WhatsNewPopup from '@/components/WhatsNewPopup';
 
