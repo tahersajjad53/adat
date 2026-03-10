@@ -195,12 +195,6 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
             disabled={isLoading}
             required
             className="flex-1 min-w-0 h-11 text-lg font-medium"
-            onFocus={(e) => {
-              const target = e.target;
-              setTimeout(() => {
-                target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-              }, 300);
-            }}
           />
         </div>
         
