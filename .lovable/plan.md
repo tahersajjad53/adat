@@ -1,16 +1,14 @@
 
 
-## Improve Dashboard card information layout
+## Always Show Radial Ring on Tasbeeh Counter Page
 
-### Changes
+The radial progress ring is conditionally hidden when no target is set (`hasTarget` check). It should always be visible — showing a full decorative ring when there's no target, and a progress ring when there is one.
 
-**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
-- Increase icon size from `h-4 w-4` to `h-6 w-6`
-- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
-- Split the Gregorian date and location onto separate lines instead of combining them with `·`
-- Location shown on its own line below the Gregorian date
+### Change: `src/pages/TasbeehCounter.tsx`
 
-**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
-- Remove the "Ada" label span entirely
-- Keep just the percentage number
+1. **Always render the SVG ring** — remove the `{hasTarget && ...}` conditional around the SVG
+2. When no target is set, show the full ring using `hsl(var(--primary))` at reduced opacity as a decorative border
+3. When a target is set, show the progress arc as it currently works
+
+The track circle (muted background) renders always. The progress circle renders with `strokeDashoffset = 0` (full ring) when no target, or the calculated offset when there is a target.
 
