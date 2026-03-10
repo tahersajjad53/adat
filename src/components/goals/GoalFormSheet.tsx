@@ -330,7 +330,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="max-h-[85dvh] flex flex-col" onOpenAutoFocus={(e) => e.preventDefault()}>
+        <SheetContent side="bottom" className="max-h-[85dvh] flex flex-col transition-[padding]" onOpenAutoFocus={(e) => e.preventDefault()} style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}>
           <SheetHeader className="text-left">
             <SheetTitle>{formTitle}</SheetTitle>
             <SheetDescription>{formDescription}</SheetDescription>
