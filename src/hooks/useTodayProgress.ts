@@ -72,7 +72,7 @@ export function useTodayProgress(
     const goalsTotal = goalsDueToday.length + dynamicTotal;
     const goalsPercentage = goalsTotal > 0 
       ? Math.round(((goalsCompleted + dynamicCompleted) / goalsTotal) * 100) 
-      : 100; // 100% if no goals due
+      : 0; // 0% if no goals due
 
     // Combined progress
     const overallTotal = prayerTotal + goalsTotal;
