@@ -89,25 +89,24 @@ const TasbeehCounterPage: React.FC = () => {
           style={{ width: size, height: size }}
         >
           {/* Radial ring */}
-          {hasTarget && (
-            <svg className="absolute inset-0" width={size} height={size}>
-              {/* Track */}
-              <circle
-                cx={size / 2} cy={size / 2} r={radius}
-                fill="none" stroke="hsl(var(--muted))" strokeWidth={strokeWidth}
-              />
-              {/* Progress */}
-              <circle
-                cx={size / 2} cy={size / 2} r={radius}
-                fill="none" stroke="hsl(var(--primary))" strokeWidth={strokeWidth}
-                strokeLinecap="round"
-                strokeDasharray={circumference}
-                strokeDashoffset={offset}
-                className="transition-all duration-150"
-                style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
-              />
-            </svg>
-          )}
+          <svg className="absolute inset-0" width={size} height={size}>
+            {/* Track */}
+            <circle
+              cx={size / 2} cy={size / 2} r={radius}
+              fill="none" stroke="hsl(var(--muted))" strokeWidth={strokeWidth}
+            />
+            {/* Progress / decorative ring */}
+            <circle
+              cx={size / 2} cy={size / 2} r={radius}
+              fill="none" stroke="hsl(var(--primary))" strokeWidth={strokeWidth}
+              strokeLinecap="round"
+              strokeDasharray={circumference}
+              strokeDashoffset={hasTarget ? offset : 0}
+              opacity={hasTarget ? 1 : 0.25}
+              className="transition-all duration-150"
+              style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
+            />
+          </svg>
           {/* Count */}
           <span className="text-6xl font-bold text-foreground font-display tabular-nums">
             {counter.current_count}
