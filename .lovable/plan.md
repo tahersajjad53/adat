@@ -1,17 +1,16 @@
 
 
-## Improve Plus Button Popover Menu
-
-The reference image shows a macOS-style popover with each option having an icon on the left, generous padding, and a clean card-like appearance. The current menu is small text-only buttons.
+## Improve Dashboard card information layout
 
 ### Changes
 
-**`src/components/layout/MobileBottomNav.tsx`**
-- Widen popover from `w-44` to `w-56`, increase padding to `p-2`
-- Add icons: `Archery` for New Goal, a counter/repeat icon for Tasbeeh Counter (e.g. `Restart` or similar from Iconoir)
-- Each menu item: icon + label in a row, with `px-4 py-3.5 text-base` for larger tap targets
-- Add a subtle separator between items
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-**`src/components/layout/AppSidebar.tsx`**
-- Match the same icon treatment for the sidebar "Add Goal" and "Tasbeeh Counter" buttons (already has icons, just ensure consistency)
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
