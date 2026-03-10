@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useKeyboardOffset } from '@/hooks/use-keyboard-offset';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ interface TasbeehFormSheetProps {
 
 export default function TasbeehFormSheet({ open, onOpenChange, onSubmit, isLoading, initial }: TasbeehFormSheetProps) {
   const isMobile = useIsMobile();
+  const keyboardOffset = useKeyboardOffset();
   const [title, setTitle] = useState('');
   const [target, setTarget] = useState('');
 
@@ -62,7 +64,7 @@ export default function TasbeehFormSheet({ open, onOpenChange, onSubmit, isLoadi
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="rounded-t-2xl">
+        <SheetContent side="bottom" className="rounded-t-2xl transition-[padding]" style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}>
           <SheetHeader>
             <SheetTitle>{initial ? 'Edit Tasbeeh' : 'New Tasbeeh Counter'}</SheetTitle>
           </SheetHeader>
