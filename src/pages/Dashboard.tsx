@@ -147,7 +147,7 @@ const Dashboard: React.FC = () => {
     <div className="container py-8">
       <div className="max-w-2xl mx-auto space-y-8">
         {/* Unified Time-Aware Card */}
-        <div onClick={() => navigate('/namaz')} className="cursor-pointer">
+        <div onClick={() => navigate('/calendar')} className="cursor-pointer">
         <TimeOfDayCard currentPrayer={currentPrayerName}>
           <div className="flex items-start justify-between">
             <DateDisplay showLocation compact variant="light" />
