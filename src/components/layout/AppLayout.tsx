@@ -175,6 +175,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
       </div>
       <GoalFormSheet open={goalFormOpen} onOpenChange={setGoalFormOpen} onSubmit={handleGoalSubmit} isLoading={isCreating} />
+      <TasbeehFormSheet open={tasbeehFormOpen} onOpenChange={setTasbeehFormOpen} onSubmit={createCounter} isLoading={isCreatingTasbeeh} />
     </SidebarProvider>
   );
 }

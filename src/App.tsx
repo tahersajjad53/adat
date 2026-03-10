@@ -123,6 +123,16 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/tasbeeh/:id"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <TasbeehCounterPage />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
               <Route path="/elan" element={<Navigate to="/admin/elans" replace />} />
               <Route
                 path="/admin"
