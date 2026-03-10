@@ -49,6 +49,7 @@ const SabeelFormSheet: React.FC<SabeelFormSheetProps> = ({
   isLoading = false,
 }) => {
   const isMobile = useIsMobile();
+  const keyboardOffset = useKeyboardOffset();
   const { currentDate } = useCalendar();
 
   // Form state
