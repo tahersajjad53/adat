@@ -222,10 +222,9 @@ const Dashboard: React.FC = () => {
 
         {/* Tasbeeh Counters */}
         {tasbeehCounters.length > 0 && (
-          <div className="space-y-2">
-            <h2 className="text-sm font-medium text-muted-foreground px-1">Tasbeeh</h2>
-            {tasbeehCounters.map(c => (
-              <TasbeehCard key={c.id} counter={c} onDelete={deleteTasbeeh} />
+          <div className="flex gap-4 overflow-x-auto scrollbar-none px-1 py-1">
+            {tasbeehCounters.map((c, i) => (
+              <TasbeehCard key={c.id} counter={c} index={i} onDelete={deleteTasbeeh} />
             ))}
           </div>
         )}
