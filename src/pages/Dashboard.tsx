@@ -59,6 +59,7 @@ const Dashboard: React.FC = () => {
   } = useAdminGoalCompletions();
   const { goalSortOrder, tagSortOrder } = useUserPreferences();
   const { tags } = useTags();
+  const { counters: tasbeehCounters, deleteCounter: deleteTasbeeh } = useTasbeehCounters();
 
   const {
     prayerCompleted, prayerTotal, goalsCompleted, goalsTotal, goalsDueToday, overallPercentage,
