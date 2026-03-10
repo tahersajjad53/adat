@@ -22,6 +22,8 @@ import { useOverdueGoals } from '@/hooks/useOverdueGoals';
 import { useDynamicGoals } from '@/hooks/useDynamicGoals';
 import { useAdminGoalCompletions } from '@/hooks/useAdminGoalCompletions';
 import { useUserPreferences } from '@/hooks/useUserPreferences';
+import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
+import { TasbeehCard } from '@/components/tasbeeh/TasbeehCard';
 import type { Goal, GoalWithStatus } from '@/types/goals';
 import WhatsNewPopup from '@/components/WhatsNewPopup';
 
@@ -57,6 +59,7 @@ const Dashboard: React.FC = () => {
   } = useAdminGoalCompletions();
   const { goalSortOrder, tagSortOrder } = useUserPreferences();
   const { tags } = useTags();
+  const { counters: tasbeehCounters, deleteCounter: deleteTasbeeh } = useTasbeehCounters();
 
   const {
     prayerCompleted, prayerTotal, goalsCompleted, goalsTotal, goalsDueToday, overallPercentage,
@@ -216,6 +219,16 @@ const Dashboard: React.FC = () => {
           )}
         </TimeOfDayCard>
         </div>
+
+        {/* Tasbeeh Counters */}
+        {tasbeehCounters.length > 0 && (
+          <div className="space-y-2">
+            <h2 className="text-sm font-medium text-muted-foreground px-1">Tasbeeh</h2>
+            {tasbeehCounters.map(c => (
+              <TasbeehCard key={c.id} counter={c} onDelete={deleteTasbeeh} />
+            ))}
+          </div>
+        )}
 
         {/* Today's Goals */}
         <TodaysGoals

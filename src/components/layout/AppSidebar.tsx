@@ -30,9 +30,10 @@ const navItems = [
 
 interface AppSidebarProps {
   onAddGoal: () => void;
+  onAddTasbeeh?: () => void;
 }
 
-export function AppSidebar({ onAddGoal }: AppSidebarProps) {
+export function AppSidebar({ onAddGoal, onAddTasbeeh }: AppSidebarProps) {
   const { user, signOut } = useAuth();
   const { state } = useSidebar();
   const isCollapsed = state === 'collapsed';
@@ -101,6 +102,14 @@ export function AppSidebar({ onAddGoal }: AppSidebarProps) {
                   <span>Add Goal</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
+              {onAddTasbeeh && (
+                <SidebarMenuItem>
+                  <SidebarMenuButton tooltip="Tasbeeh Counter" onClick={onAddTasbeeh}>
+                    <Plus className="h-4 w-4" />
+                    <span>Tasbeeh Counter</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>

@@ -14,7 +14,9 @@ import {
 import { AppSidebar } from './AppSidebar';
 import { MobileBottomNav } from './MobileBottomNav';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
+import TasbeehFormSheet from '@/components/tasbeeh/TasbeehFormSheet';
 import { useGoals } from '@/hooks/useGoals';
+import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 import ibadatLogo from '@/assets/ibadat-logo.svg';
@@ -27,7 +29,9 @@ export function AppLayout({ children }: AppLayoutProps) {
   const isMobile = useIsMobile();
   const location = useLocation();
   const [goalFormOpen, setGoalFormOpen] = useState(false);
+  const [tasbeehFormOpen, setTasbeehFormOpen] = useState(false);
   const { createGoal, isCreating } = useGoals();
+  const { createCounter, isCreating: isCreatingTasbeeh } = useTasbeehCounters();
   
 
   const navigate = useNavigate();
@@ -126,8 +130,9 @@ export function AppLayout({ children }: AppLayoutProps) {
         <main>{children}</main>
         
         {/* Bottom navigation */}
-        <MobileBottomNav onAddGoal={handleAddGoal} />
+        <MobileBottomNav onAddGoal={handleAddGoal} onAddTasbeeh={() => setTasbeehFormOpen(true)} />
         <GoalFormSheet open={goalFormOpen} onOpenChange={setGoalFormOpen} onSubmit={handleGoalSubmit} isLoading={isCreating} />
+        <TasbeehFormSheet open={tasbeehFormOpen} onOpenChange={setTasbeehFormOpen} onSubmit={async (data) => { await createCounter(data); }} isLoading={isCreatingTasbeeh} />
         <AlertDialog open={clearConfirmOpen} onOpenChange={setClearConfirmOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -156,7 +161,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <SidebarProvider>
       <div className="min-h-screen flex w-full">
-        <AppSidebar onAddGoal={handleAddGoal} />
+        <AppSidebar onAddGoal={handleAddGoal} onAddTasbeeh={() => setTasbeehFormOpen(true)} />
         <div className="flex-1 flex flex-col">
           {/* Desktop header with sidebar trigger */}
           <header className="sticky top-0 z-40 bg-background border-b border-border">
@@ -170,6 +175,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         </div>
       </div>
       <GoalFormSheet open={goalFormOpen} onOpenChange={setGoalFormOpen} onSubmit={handleGoalSubmit} isLoading={isCreating} />
+      <TasbeehFormSheet open={tasbeehFormOpen} onOpenChange={setTasbeehFormOpen} onSubmit={async (data) => { await createCounter(data); }} isLoading={isCreatingTasbeeh} />
     </SidebarProvider>
   );
 }

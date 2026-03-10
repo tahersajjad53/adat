@@ -20,6 +20,7 @@ import Goals from "./pages/Goals";
 import CompletedGoals from "./pages/CompletedGoals";
 import Calendar from "./pages/Calendar";
 import DynamicGoalsSettings from "./pages/DynamicGoalsSettings";
+import TasbeehCounterPage from "./pages/TasbeehCounter";
 import NotFound from "./pages/NotFound";
 import AdminLayout from "./components/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -118,6 +119,16 @@ const App = () => (
                   <ProtectedRoute>
                     <AppLayout>
                       <Namaz />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/tasbeeh/:id"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <TasbeehCounterPage />
                     </AppLayout>
                   </ProtectedRoute>
                 }
