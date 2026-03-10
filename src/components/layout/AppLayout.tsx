@@ -132,7 +132,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         {/* Bottom navigation */}
         <MobileBottomNav onAddGoal={handleAddGoal} onAddTasbeeh={() => setTasbeehFormOpen(true)} />
         <GoalFormSheet open={goalFormOpen} onOpenChange={setGoalFormOpen} onSubmit={handleGoalSubmit} isLoading={isCreating} />
-        <TasbeehFormSheet open={tasbeehFormOpen} onOpenChange={setTasbeehFormOpen} onSubmit={createCounter} isLoading={isCreatingTasbeeh} />
+        <TasbeehFormSheet open={tasbeehFormOpen} onOpenChange={setTasbeehFormOpen} onSubmit={async (data) => { await createCounter(data); }} isLoading={isCreatingTasbeeh} />
         <AlertDialog open={clearConfirmOpen} onOpenChange={setClearConfirmOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>
