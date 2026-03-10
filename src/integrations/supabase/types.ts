@@ -523,6 +523,39 @@ export type Database = {
         }
         Relationships: []
       }
+      tasbeeh_counters: {
+        Row: {
+          created_at: string
+          current_count: number
+          id: string
+          is_active: boolean
+          target_count: number | null
+          title: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_count?: number
+          id?: string
+          is_active?: boolean
+          target_count?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_count?: number
+          id?: string
+          is_active?: boolean
+          target_count?: number | null
+          title?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           dynamic_goals_enabled: boolean
