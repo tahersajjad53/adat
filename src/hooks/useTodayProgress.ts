@@ -39,8 +39,18 @@ export function useTodayProgress(
   const { goals, isLoading: goalsLoading } = useGoals();
   const { isCompleted, isLoading: completionsLoading } = useGoalCompletions();
 
-  const hijriDate = currentDate?.hijri;
-  const gregorianDate = currentDate?.gregorian;
+  const hijriDate = currentDate?.preMaghribHijri ?? currentDate?.hijri;
+  const gregorianDate = useMemo(() => {
+    if (!currentDate) return null;
+    const greg = currentDate.gregorian;
+    // During midnight–4AM window, the Islamic day still belongs to the previous Gregorian day
+    if (currentDate.isAfterMaghrib && greg.getHours() < 4) {
+      const adjusted = new Date(greg);
+      adjusted.setDate(adjusted.getDate() - 1);
+      return adjusted;
+    }
+    return greg;
+  }, [currentDate]);
 
   const progressData = useMemo(() => {
     // Prayer progress - count required prayers only (not optional)
