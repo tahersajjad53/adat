@@ -142,7 +142,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : isCalendarPage && !calendarShowingToday ? (
+            ) : isCalendarPage && (calendarInMonthView || !calendarShowingToday) ? (
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('calendar:goToToday'))}
                 className="text-sm font-medium text-primary w-10 text-right"
