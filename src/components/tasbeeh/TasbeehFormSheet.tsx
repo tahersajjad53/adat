@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardOffset } from '@/hooks/use-keyboard-offset';
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 
 interface TasbeehFormSheetProps {
   open: boolean;
@@ -20,6 +19,10 @@ export default function TasbeehFormSheet({ open, onOpenChange, onSubmit, isLoadi
   const keyboardOffset = useKeyboardOffset();
   const [title, setTitle] = useState('');
   const [target, setTarget] = useState('');
+
+  const isEditing = !!initial;
+  const formTitle = isEditing ? 'Edit Tasbeeh' : 'New Tasbeeh';
+  const formDescription = isEditing ? 'Update your tasbeeh details' : 'Create a new tasbeeh to track';
 
   useEffect(() => {
     if (open) {
@@ -38,42 +41,50 @@ export default function TasbeehFormSheet({ open, onOpenChange, onSubmit, isLoadi
 
   const form = (
     <div className="space-y-4 py-4">
-      <div className="space-y-2">
-        <Label htmlFor="tasbeeh-title">Name</Label>
-        <Input
-          id="tasbeeh-title"
-          placeholder="e.g. Salawat"
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="tasbeeh-target">Target count</Label>
-        <Input
-          id="tasbeeh-target"
-          type="number"
-          placeholder="Leave empty for unlimited"
-          value={target}
-          onChange={e => setTarget(e.target.value)}
-          min={1}
-        />
-      </div>
+      <Input
+        id="tasbeeh-title"
+        placeholder="Name (e.g. Subhan Allah)"
+        value={title}
+        onChange={e => setTitle(e.target.value)}
+        className="h-11 text-lg font-medium"
+      />
+      <Input
+        id="tasbeeh-target"
+        type="number"
+        placeholder="Target count (leave empty for unlimited)"
+        value={target}
+        onChange={e => setTarget(e.target.value)}
+        min={1}
+      />
+    </div>
+  );
+
+  const footer = (
+    <div className="flex gap-3">
+      <Button variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading} className="flex-1">
+        Cancel
+      </Button>
+      <Button onClick={handleSubmit} disabled={isLoading} className="flex-1">
+        {isEditing ? 'Update' : 'Create'}
+      </Button>
     </div>
   );
 
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="rounded-t-2xl transition-[padding]" style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}>
-          <SheetHeader>
-            <SheetTitle>{initial ? 'Edit Tasbeeh' : 'New Tasbeeh Counter'}</SheetTitle>
+        <SheetContent
+          side="bottom"
+          className="max-h-[85dvh] flex flex-col rounded-t-2xl transition-[padding]"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+          style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}
+        >
+          <SheetHeader className="text-left">
+            <SheetTitle>{formTitle}</SheetTitle>
+            <SheetDescription>{formDescription}</SheetDescription>
           </SheetHeader>
-          {form}
-          <SheetFooter>
-            <Button onClick={handleSubmit} disabled={isLoading} className="w-full">
-              {initial ? 'Update' : 'Create'}
-            </Button>
-          </SheetFooter>
+          <div className="flex-1 overflow-y-auto">{form}</div>
+          <SheetFooter>{footer}</SheetFooter>
         </SheetContent>
       </Sheet>
     );
@@ -81,17 +92,13 @@ export default function TasbeehFormSheet({ open, onOpenChange, onSubmit, isLoadi
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{initial ? 'Edit Tasbeeh' : 'New Tasbeeh Counter'}</DialogTitle>
+          <DialogTitle>{formTitle}</DialogTitle>
+          <DialogDescription>{formDescription}</DialogDescription>
         </DialogHeader>
         {form}
-        <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancel</Button>
-          <Button onClick={handleSubmit} disabled={isLoading}>
-            {initial ? 'Update' : 'Create'}
-          </Button>
-        </DialogFooter>
+        <DialogFooter>{footer}</DialogFooter>
       </DialogContent>
     </Dialog>
   );
