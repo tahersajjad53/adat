@@ -179,6 +179,7 @@ const TasbeehCounterPage: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <ConfettiPortal />
     </div>
   );
 };
