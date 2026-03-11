@@ -104,17 +104,15 @@ const TasbeehCounterPage: React.FC = () => {
         <button
           ref={buttonRef}
           onClick={handleTap}
-          className="relative grid place-items-center active:scale-95 transition-transform focus:outline-none"
+          className="relative active:scale-95 transition-transform focus:outline-none"
           style={{ width: size, height: size }}
         >
           {/* Radial ring */}
           <svg className="absolute inset-0" width={size} height={size}>
-            {/* Track */}
             <circle
               cx={size / 2} cy={size / 2} r={radius}
               fill="none" stroke="hsl(var(--muted))" strokeWidth={strokeWidth}
             />
-            {/* Progress / decorative ring */}
             <circle
               cx={size / 2} cy={size / 2} r={radius}
               fill="none" stroke="hsl(var(--primary))" strokeWidth={strokeWidth}
@@ -126,10 +124,12 @@ const TasbeehCounterPage: React.FC = () => {
               style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
             />
           </svg>
-          {/* Count */}
-          <span className="text-8xl font-bold text-foreground font-display tabular-nums leading-[0.85] translate-y-[2px]">
-            {counter.current_count}
-          </span>
+          {/* Count – absolute overlay for true centering */}
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="text-8xl font-bold text-foreground tabular-nums leading-none" style={{ transform: 'translateY(0.05em)' }}>
+              {counter.current_count}
+            </span>
+          </div>
         </button>
 
         {/* Target label */}
