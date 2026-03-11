@@ -1,6 +1,7 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { useMonthIndicators } from '@/hooks/useMonthIndicators';
+import { gregorianToBohra, HijriDate } from '@/lib/hijri';
 
 interface MonthViewProps {
   selectedDate: Date;
@@ -14,17 +15,20 @@ function formatDateKey(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+function toArabicNumerals(n: number): string {
+  return String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[+d]);
+}
+
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 function getMonthWeeks(year: number, month: number): (Date | null)[][] {
   const firstDay = new Date(year, month, 1);
-  const startDow = firstDay.getDay(); // 0=Sun
+  const startDow = firstDay.getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const weeks: (Date | null)[][] = [];
   let currentWeek: (Date | null)[] = [];
 
-  // Pad leading nulls
   for (let i = 0; i < startDow; i++) currentWeek.push(null);
 
   for (let day = 1; day <= daysInMonth; day++) {
@@ -35,7 +39,6 @@ function getMonthWeeks(year: number, month: number): (Date | null)[][] {
     }
   }
 
-  // Pad trailing nulls
   if (currentWeek.length > 0) {
     while (currentWeek.length < 7) currentWeek.push(null);
     weeks.push(currentWeek);
@@ -54,6 +57,36 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
   const { qazaDays, goalDays } = useMonthIndicators(displayYear, displayMonth);
   const weeks = getMonthWeeks(displayYear, displayMonth);
   const todayKey = formatDateKey(new Date());
+
+  // Precompute Hijri dates for all days in the month
+  const hijriMap = useMemo(() => {
+    const map = new Map<string, HijriDate>();
+    for (const week of weeks) {
+      for (const date of week) {
+        if (date) {
+          map.set(formatDateKey(date), gregorianToBohra(date));
+        }
+      }
+    }
+    return map;
+  }, [weeks]);
+
+  // Derive Hijri month span for header
+  const hijriHeader = useMemo(() => {
+    const firstDate = new Date(displayYear, displayMonth, 1);
+    const lastDate = new Date(displayYear, displayMonth + 1, 0);
+    const firstHijri = hijriMap.get(formatDateKey(firstDate));
+    const lastHijri = hijriMap.get(formatDateKey(lastDate));
+    if (!firstHijri || !lastHijri) return '';
+
+    if (firstHijri.month === lastHijri.month && firstHijri.year === lastHijri.year) {
+      return `${firstHijri.monthNameArabic} ${toArabicNumerals(firstHijri.year)}`;
+    }
+    if (firstHijri.year === lastHijri.year) {
+      return `${firstHijri.monthNameArabic} – ${lastHijri.monthNameArabic} ${toArabicNumerals(firstHijri.year)}`;
+    }
+    return `${firstHijri.monthNameArabic} ${toArabicNumerals(firstHijri.year)} – ${lastHijri.monthNameArabic} ${toArabicNumerals(lastHijri.year)}`;
+  }, [hijriMap, displayYear, displayMonth]);
 
   const monthLabel = new Date(displayYear, displayMonth).toLocaleDateString('en-US', {
     month: 'long',
@@ -105,9 +138,12 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
       onTouchEnd={onTouchEnd}
     >
       {/* Month/Year header */}
-      <h2 className="font-display tracking-tight font-normal text-xl text-center mb-4">
-        {monthLabel}
-      </h2>
+      <div className="text-center mb-4">
+        <h2 className="font-display tracking-tight font-normal text-xl">
+          {monthLabel}
+        </h2>
+        <p className="text-xs text-muted-foreground mt-0.5">{hijriHeader}</p>
+      </div>
 
       {/* Day names header */}
       <div className="grid grid-cols-7 mb-1">
@@ -131,19 +167,27 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
               const isToday = dk === todayKey;
               const hasQaza = qazaDays.has(dk);
               const hasGoals = goalDays.has(dk);
+              const hijri = hijriMap.get(dk);
 
               return (
                 <button
                   key={dk}
                   onClick={() => onSelectDate(date)}
                   className={cn(
-                    'flex flex-col items-center gap-0.5 rounded-xl py-2 transition-colors',
+                    'flex flex-col items-center gap-0 rounded-xl py-1.5 transition-colors',
                     isToday
                       ? 'bg-accent text-accent-foreground'
                       : 'text-foreground hover:bg-muted'
                   )}
                 >
-                  <span className="text-sm font-medium">{date.getDate()}</span>
+                  <span className="text-sm font-medium leading-tight">{date.getDate()}</span>
+                  {hijri && (
+                    <span className="text-[11px] text-muted-foreground leading-tight">
+                      {hijri.day === 1
+                        ? `${toArabicNumerals(hijri.day)} ${hijri.monthNameArabic.split(' ')[0]}`
+                        : toArabicNumerals(hijri.day)}
+                    </span>
+                  )}
                   <div className="flex gap-0.5 h-1.5">
                     {hasQaza && <span className="h-1.5 w-1.5 rounded-full bg-destructive" />}
                     {hasGoals && <span className="h-1.5 w-1.5 rounded-full bg-primary" />}
