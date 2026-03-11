@@ -41,6 +41,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [calendarShowingToday, setCalendarShowingToday] = useState(true);
+  const [calendarMonth, setCalendarMonth] = useState('');
 
   React.useEffect(() => {
     const handler = (e: Event) => {
@@ -49,6 +50,15 @@ export function AppLayout({ children }: AppLayoutProps) {
     };
     window.addEventListener('calendar:showingTodayChanged', handler);
     return () => window.removeEventListener('calendar:showingTodayChanged', handler);
+  }, []);
+
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setCalendarMonth(detail?.month ?? '');
+    };
+    window.addEventListener('calendar:monthChanged', handler);
+    return () => window.removeEventListener('calendar:monthChanged', handler);
   }, []);
 
   const handleAddGoal = () => setGoalFormOpen(true);
