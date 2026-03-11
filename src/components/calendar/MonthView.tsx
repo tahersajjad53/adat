@@ -174,7 +174,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
                   key={dk}
                   onClick={() => onSelectDate(date)}
                   className={cn(
-                    'flex flex-col items-center gap-0 rounded-xl py-1.5 transition-colors',
+                    'flex flex-col items-center gap-0 rounded-xl py-2.5 transition-colors',
                     isToday
                       ? 'bg-accent text-accent-foreground'
                       : 'text-foreground hover:bg-muted'
