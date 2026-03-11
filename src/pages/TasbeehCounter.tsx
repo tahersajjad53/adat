@@ -22,6 +22,8 @@ const TasbeehCounterPage: React.FC = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const { triggerCelebration, ConfettiPortal } = useConfetti();
 
   if (isLoading) {
     return (
