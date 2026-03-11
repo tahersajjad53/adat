@@ -57,12 +57,13 @@ export function DateDisplay({
         <div className="flex flex-col gap-1 ml-8">
           <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-foreground/70" : "text-muted-foreground")}>
             {gregorianFormatted}
+            {location?.city && (
+              <>
+                <span className={cn("mx-1.5 inline-block", isLight ? "text-foreground/50" : "text-muted-foreground/70")}>·</span>
+                {location.city}
+              </>
+            )}
           </span>
-          {location?.city && (
-            <span className={cn("text-xs uppercase tracking-widest whitespace-nowrap font-normal", isLight ? "text-foreground/70" : "text-muted-foreground")}>
-              {location.city}
-            </span>
-          )}
         </div>
       </div>;
   }

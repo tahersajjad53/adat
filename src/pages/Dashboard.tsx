@@ -191,7 +191,7 @@ const Dashboard: React.FC = () => {
                   <div className="rounded-full p-2 bg-foreground/10">
                     <PrayerIcon className="h-5 w-5 text-foreground" />
                   </div>
-                  <div>
+                  <div className="flex items-baseline gap-2">
                     <h3 className="text-2xl font-bold text-foreground font-display">
                       {prayerToShow.displayName}
                     </h3>
