@@ -1,16 +1,18 @@
 
 
-## Improve Dashboard card information layout
+## Reformat Month View Header
 
-### Changes
+### Change in `src/components/calendar/MonthView.tsx` (lines 140-146)
 
-**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
-- Increase icon size from `h-4 w-4` to `h-6 w-6`
-- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
-- Split the Gregorian date and location onto separate lines instead of combining them with `·`
-- Location shown on its own line below the Gregorian date
+Replace the centered stacked header with a single row: English month left-aligned, Hijri month right-aligned at `text-2xl`.
 
-**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
-- Remove the "Ada" label span entirely
-- Keep just the percentage number
+```tsx
+{/* Month/Year header */}
+<div className="flex items-baseline justify-between mb-4">
+  <h2 className="font-display tracking-tight font-normal text-xl">
+    {monthLabel}
+  </h2>
+  <p className="text-2xl text-muted-foreground">{hijriHeader}</p>
+</div>
+```
 
