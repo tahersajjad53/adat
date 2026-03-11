@@ -147,13 +147,29 @@ const Calendar: React.FC = () => {
   }, [weekDates]);
 
   // Formatted selected date display
-  const selectedHijri = preMaghribHijri;
   const selectedDateLabel = selectedDate.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
   });
-  const selectedHijriLabel = formatHijriDate(selectedHijri, 'long');
+
+  // Arabic Hijri month header for the visible week
+  const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  const toArabicNumerals = (n: number) => String(n).split('').map(d => ARABIC_DIGITS[parseInt(d)]).join('');
+
+  const weekHijriHeader = useMemo(() => {
+    const firstH = gregorianToBohra(weekDates[0]);
+    const lastH = gregorianToBohra(weekDates[6]);
+    const firstName = getHijriMonthName(firstH.month, true);
+    const lastName = getHijriMonthName(lastH.month, true);
+    if (firstH.month === lastH.month && firstH.year === lastH.year) {
+      return `${firstName} ${toArabicNumerals(firstH.year)}`;
+    }
+    if (firstH.year === lastH.year) {
+      return `${firstName} – ${lastName} ${toArabicNumerals(firstH.year)}`;
+    }
+    return `${firstName} ${toArabicNumerals(firstH.year)} – ${lastName} ${toArabicNumerals(lastH.year)}`;
+  }, [weekDates]);
 
 
   return (
