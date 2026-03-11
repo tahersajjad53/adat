@@ -108,7 +108,7 @@ const TasbeehCounterPage: React.FC = () => {
             />
           </svg>
           {/* Count */}
-          <span className="text-6xl font-bold text-foreground font-display tabular-nums">
+          <span className="text-8xl font-bold text-foreground font-display tabular-nums">
             {counter.current_count}
           </span>
         </button>
