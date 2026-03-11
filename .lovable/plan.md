@@ -1,13 +1,16 @@
 
 
-## Increase Hijri Text Size & Add Row Spacing in Month View
+## Improve Dashboard card information layout
 
-### Changes to `src/components/calendar/MonthView.tsx`
+### Changes
 
-1. **Hijri numeral size**: `text-lg` → `text-xl` (line 185)
-2. **Day cell padding**: `py-1.5` → `py-2.5` to give each row breathing room (line 177)
-3. **Empty cell padding**: `py-2` → `py-2.5` to match (line 163)
-4. **Add gap between week rows**: Add `gap-1` to the outer weeks container or wrap each row with spacing
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-This keeps day rows visually separated while the larger Hijri numerals fill the cell better.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 

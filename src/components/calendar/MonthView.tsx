@@ -155,12 +155,12 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
       </div>
 
       {/* Weeks grid */}
-      <div className={cn('transition-all duration-200 ease-out', slideClass)}>
+      <div className={cn('transition-all duration-200 ease-out grid gap-1', slideClass)}>
         {weeks.map((week, wi) => (
           <div key={wi} className="grid grid-cols-7">
             {week.map((date, di) => {
               if (!date) {
-                return <div key={`empty-${di}`} className="py-2" />;
+                return <div key={`empty-${di}`} className="py-2.5" />;
               }
 
               const dk = formatDateKey(date);
@@ -174,7 +174,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
                   key={dk}
                   onClick={() => onSelectDate(date)}
                   className={cn(
-                    'flex flex-col items-center gap-0 rounded-xl py-1.5 transition-colors',
+                    'flex flex-col items-center gap-0 rounded-xl py-2.5 transition-colors',
                     isToday
                       ? 'bg-accent text-accent-foreground'
                       : 'text-foreground hover:bg-muted'
@@ -182,7 +182,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
                 >
                   <span className="text-sm font-medium leading-tight">{date.getDate()}</span>
                   {hijri && (
-                    <span className="text-lg text-muted-foreground leading-none">
+                    <span className="text-xl text-muted-foreground leading-none">
                       {hijri.day === 1
                         ? `${toArabicNumerals(hijri.day)} ${hijri.monthNameArabic.split(' ')[0]}`
                         : toArabicNumerals(hijri.day)}
