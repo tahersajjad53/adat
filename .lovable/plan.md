@@ -1,16 +1,15 @@
 
 
-## Improve Dashboard card information layout
+## Swap Header Labels on Calendar Page
 
-### Changes
+Swap the left and right slots in the mobile header when on the Calendar page:
 
-**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
-- Increase icon size from `h-4 w-4` to `h-6 w-6`
-- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
-- Split the Gregorian date and location onto separate lines instead of combining them with `·`
-- Location shown on its own line below the Gregorian date
+- **Left slot**: Show the abbreviated month name (currently on the right)
+- **Right slot**: Show the "Today" button when not showing today (currently on the left)
 
-**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
-- Remove the "Ada" label span entirely
-- Keep just the percentage number
+### Changes in `src/components/layout/AppLayout.tsx`
+
+1. **Left slot** (`isCalendarPage` branch): Show `calendarMonth` text instead of the "Today" button
+2. **Right slot** (`isCalendarPage` branch): Show the "Today" button (with its `calendar:goToToday` dispatch) instead of the month text
+3. When showing today, right slot falls back to an empty spacer
 
