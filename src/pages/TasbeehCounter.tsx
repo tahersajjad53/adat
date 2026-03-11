@@ -68,23 +68,33 @@ const TasbeehCounterPage: React.FC = () => {
   return (
     <div className="container py-4 max-w-lg mx-auto flex flex-col min-h-[calc(100dvh-2rem)]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
-        <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-          <NavArrowLeft className="h-5 w-5" />
-        </Button>
-        <h1 className="text-lg font-semibold text-foreground truncate mx-4 text-center flex-1">
-          {counter.title || 'Tasbeeh'}
-        </h1>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon"><MoreHoriz className="h-5 w-5" /></Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="bg-popover">
-            <DropdownMenuItem onClick={() => setEditOpen(true)}>Edit</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setResetConfirm(true)}>Reset</DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setDeleteConfirm(true)} className="text-destructive">Delete</DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+      <div className="flex flex-col mb-4">
+        <div className="flex items-center justify-between">
+          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
+            <NavArrowLeft className="h-5 w-5" />
+          </Button>
+          <h1 className="text-lg font-semibold text-foreground truncate mx-4 text-center flex-1">
+            {counter.title || 'Tasbeeh'}
+          </h1>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon"><MoreHoriz className="h-5 w-5" /></Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="bg-popover">
+              <DropdownMenuItem onClick={() => setEditOpen(true)}>Edit</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setResetConfirm(true)}>Reset</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setDeleteConfirm(true)} className="text-destructive">Delete</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+        {/* Reset button below title */}
+        {counter.current_count > 0 && (
+          <div className="flex justify-center mt-2">
+            <Button variant="outline" size="sm" onClick={() => setResetConfirm(true)}>
+              Reset
+            </Button>
+          </div>
+        )}
       </div>
 
       {/* Tap area */}
@@ -127,13 +137,6 @@ const TasbeehCounterPage: React.FC = () => {
           <p className="mt-4 text-sm text-muted-foreground">
             {counter.current_count} / {counter.target_count}
           </p>
-        )}
-
-        {/* Reset button */}
-        {counter.current_count > 0 && (
-          <Button variant="outline" size="sm" className="mt-6" onClick={() => setResetConfirm(true)}>
-            Reset
-          </Button>
         )}
       </div>
 
