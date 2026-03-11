@@ -107,6 +107,24 @@ export function useConfetti() {
     setBursts((prev) => [...prev, { key, x, y }]);
   }, []);
 
+  const triggerCelebration = useCallback((element?: HTMLElement | null) => {
+    let x = window.innerWidth / 2;
+    let y = window.innerHeight / 2;
+
+    if (element) {
+      const rect = element.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top + rect.height / 2;
+    }
+
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        const key = ++keyRef.current;
+        setBursts((prev) => [...prev, { key, x, y }]);
+      }, i * 150);
+    }
+  }, []);
+
   const removeBurst = useCallback((key: number) => {
     setBursts((prev) => prev.filter((b) => b.key !== key));
   }, []);
@@ -131,5 +149,5 @@ export function useConfetti() {
     [bursts, removeBurst]
   );
 
-  return { triggerConfetti, ConfettiPortal };
+  return { triggerConfetti, triggerCelebration, ConfettiPortal };
 }

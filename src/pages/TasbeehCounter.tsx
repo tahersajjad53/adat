@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { NavArrowLeft, MoreHoriz } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 import TasbeehFormSheet from '@/components/tasbeeh/TasbeehFormSheet';
+import { useConfetti } from '@/components/ui/confetti';
 
 const TasbeehCounterPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -21,6 +22,8 @@ const TasbeehCounterPage: React.FC = () => {
   const [editOpen, setEditOpen] = useState(false);
   const [resetConfirm, setResetConfirm] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const { triggerCelebration, ConfettiPortal } = useConfetti();
 
   if (isLoading) {
     return (
@@ -45,8 +48,14 @@ const TasbeehCounterPage: React.FC = () => {
   const hasTarget = counter.target_count !== null && counter.target_count > 0;
 
   const handleTap = () => {
+    const willHitTarget = hasTarget && counter.current_count + 1 === counter.target_count;
     incrementCounter(counter.id);
-    if (typeof navigator.vibrate === 'function') navigator.vibrate(10);
+    if (willHitTarget) {
+      triggerCelebration(buttonRef.current);
+      if (typeof navigator.vibrate === 'function') navigator.vibrate([50, 30, 50, 30, 80]);
+    } else {
+      if (typeof navigator.vibrate === 'function') navigator.vibrate(10);
+    }
   };
 
   // SVG radial ring params
@@ -84,6 +93,7 @@ const TasbeehCounterPage: React.FC = () => {
         style={{ minHeight: '50vh' }}
       >
         <button
+          ref={buttonRef}
           onClick={handleTap}
           className="relative grid place-items-center active:scale-95 transition-transform focus:outline-none"
           style={{ width: size, height: size }}
@@ -169,6 +179,7 @@ const TasbeehCounterPage: React.FC = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+      <ConfettiPortal />
     </div>
   );
 };
