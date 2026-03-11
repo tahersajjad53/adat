@@ -31,6 +31,10 @@ export const WeekRow: React.FC<WeekRowProps> = ({
   onShiftWeek,
   qazaDays,
 }) => {
+  const hijriDates = useMemo(() =>
+    weekDates.map(d => gregorianToBohra(d)),
+  [weekDates]);
+
   const todayKey = formatDateKey(new Date());
   const selectedKey = formatDateKey(selectedDate);
   const touchStartX = useRef(0);
