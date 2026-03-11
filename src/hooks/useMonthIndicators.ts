@@ -41,6 +41,22 @@ export function useMonthIndicators(displayYear: number, displayMonth: number) {
   const endDate = monthDates.length > 0 ? formatDateKey(monthDates[monthDates.length - 1]) : '';
   const today = formatDateKey(new Date());
 
+  // Fetch user's signup date
+  const { data: profile } = useQuery({
+    queryKey: ['profile-created', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase
+        .from('profiles')
+        .select('created_at')
+        .eq('id', user.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+    staleTime: Infinity,
+  });
+
   // Fetch prayer logs for the month
   const { data: logs } = useQuery({
     queryKey: ['month-prayer-logs', user?.id, startDate, endDate],
@@ -59,10 +75,18 @@ export function useMonthIndicators(displayYear: number, displayMonth: number) {
     staleTime: 30000,
   });
 
-  // Qaza days: past days with missed prayers
+  const signupDateKey = useMemo(() => {
+    if (!profile?.created_at) return '';
+    return formatDateKey(new Date(profile.created_at));
+  }, [profile]);
+
+  // Qaza days: past days with missed prayers, only after signup
   const qazaDays = useMemo(() => {
     const result = new Set<string>();
-    const pastDates = monthDates.filter(d => formatDateKey(d) < today);
+    const pastDates = monthDates.filter(d => {
+      const dk = formatDateKey(d);
+      return dk < today && (!signupDateKey || dk > signupDateKey);
+    });
     for (const date of pastDates) {
       const dk = formatDateKey(date);
       const dayLogs = logs?.filter(l => l.gregorian_date === dk) || [];
@@ -74,7 +98,7 @@ export function useMonthIndicators(displayYear: number, displayMonth: number) {
       }
     }
     return result;
-  }, [logs, monthDates, today]);
+  }, [logs, monthDates, today, signupDateKey]);
 
   // Goal days: days that have at least one goal due
   const goalDays = useMemo(() => {

@@ -23,6 +23,22 @@ export function useWeekQazaIndicators(weekDates: Date[]) {
   const endDate = weekDates.length > 0 ? formatDateKey(weekDates[weekDates.length - 1]) : '';
   const today = formatDateKey(new Date());
 
+  // Fetch user's signup date
+  const { data: profile } = useQuery({
+    queryKey: ['profile-created', user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase
+        .from('profiles')
+        .select('created_at')
+        .eq('id', user.id)
+        .maybeSingle();
+      return data;
+    },
+    enabled: !!user,
+    staleTime: Infinity,
+  });
+
   const { data: logs } = useQuery({
     queryKey: ['week-prayer-logs', user?.id, startDate, endDate],
     queryFn: async () => {
@@ -40,10 +56,18 @@ export function useWeekQazaIndicators(weekDates: Date[]) {
     staleTime: 30000,
   });
 
+  const signupDateKey = useMemo(() => {
+    if (!profile?.created_at) return '';
+    return formatDateKey(new Date(profile.created_at));
+  }, [profile]);
+
   const qazaDays = useMemo(() => {
     const result = new Set<string>();
-    // Only check past days
-    const pastDates = weekDates.filter(d => formatDateKey(d) < today);
+    // Only check past days that are strictly after signup date
+    const pastDates = weekDates.filter(d => {
+      const dk = formatDateKey(d);
+      return dk < today && (!signupDateKey || dk > signupDateKey);
+    });
 
     for (const date of pastDates) {
       const dk = formatDateKey(date);
@@ -55,7 +79,7 @@ export function useWeekQazaIndicators(weekDates: Date[]) {
       if (hasMissed) result.add(dk);
     }
     return result;
-  }, [logs, weekDates, today]);
+  }, [logs, weekDates, today, signupDateKey]);
 
   return qazaDays;
 }

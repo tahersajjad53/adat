@@ -64,6 +64,8 @@ export function useMissedPrayers(): UseMissedPrayersReturn {
         }
 
         const startDate = new Date(profile.created_at);
+        // Start scanning from the day AFTER signup — user shouldn't have qaza on signup day
+        startDate.setDate(startDate.getDate() + 1);
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         yesterday.setHours(23, 59, 59, 999);
