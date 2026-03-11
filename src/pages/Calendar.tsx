@@ -92,7 +92,7 @@ const Calendar: React.FC = () => {
     const year = selectedDate.getFullYear();
     const currentYear = new Date().getFullYear();
     const month = year === currentYear
-      ? selectedDate.toLocaleDateString('en-US', { month: 'long' })
+      ? selectedDate.toLocaleDateString('en-US', { month: 'short' })
       : selectedDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
     window.dispatchEvent(new CustomEvent('calendar:monthChanged', { detail: { month } }));
   }, [selectedDate]);
