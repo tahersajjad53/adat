@@ -85,7 +85,7 @@ export function TasbeehCard({ counter, index = 0, onDelete }: TasbeehCardProps) 
 
           {/* Inner content */}
           <div className="absolute inset-[5px] rounded-full bg-card flex items-center justify-center">
-            <span className="text-lg font-bold text-card-foreground leading-none">
+            <span className="text-xl font-bold text-card-foreground leading-none">
               {counter.current_count}
             </span>
           </div>

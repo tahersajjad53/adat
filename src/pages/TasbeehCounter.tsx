@@ -63,7 +63,7 @@ const TasbeehCounterPage: React.FC = () => {
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <NavArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-lg font-semibold text-foreground truncate mx-4">
+        <h1 className="text-lg font-semibold text-foreground truncate mx-4 text-center flex-1">
           {counter.title || 'Tasbeeh'}
         </h1>
         <DropdownMenu>
@@ -108,7 +108,7 @@ const TasbeehCounterPage: React.FC = () => {
             />
           </svg>
           {/* Count */}
-          <span className="text-6xl font-bold text-foreground font-display tabular-nums">
+          <span className="text-8xl font-bold text-foreground font-display tabular-nums">
             {counter.current_count}
           </span>
         </button>
