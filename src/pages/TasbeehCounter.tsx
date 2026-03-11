@@ -48,8 +48,14 @@ const TasbeehCounterPage: React.FC = () => {
   const hasTarget = counter.target_count !== null && counter.target_count > 0;
 
   const handleTap = () => {
+    const willHitTarget = hasTarget && counter.current_count + 1 === counter.target_count;
     incrementCounter(counter.id);
-    if (typeof navigator.vibrate === 'function') navigator.vibrate(10);
+    if (willHitTarget) {
+      triggerCelebration(buttonRef.current);
+      if (typeof navigator.vibrate === 'function') navigator.vibrate([50, 30, 50, 30, 80]);
+    } else {
+      if (typeof navigator.vibrate === 'function') navigator.vibrate(10);
+    }
   };
 
   // SVG radial ring params
