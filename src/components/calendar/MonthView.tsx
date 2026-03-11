@@ -54,6 +54,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
   const animating = useRef(false);
   const touchStartY = useRef(0);
 
+  const selectedKey = formatDateKey(selectedDate);
   const { qazaDays, goalDays } = useMonthIndicators(displayYear, displayMonth);
   const weeks = getMonthWeeks(displayYear, displayMonth);
   const todayKey = formatDateKey(new Date());
