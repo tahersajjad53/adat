@@ -60,7 +60,7 @@ const TasbeehCounterPage: React.FC = () => {
 
   // SVG radial ring params
   const size = 260;
-  const strokeWidth = 10;
+  const strokeWidth = 18;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
