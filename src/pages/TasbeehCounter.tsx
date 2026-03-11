@@ -89,8 +89,7 @@ const TasbeehCounterPage: React.FC = () => {
 
       {/* Tap area */}
       <div
-        className="flex flex-col items-center justify-center select-none"
-        style={{ minHeight: '50vh' }}
+        className="flex flex-col items-center justify-end pb-[15vh] select-none flex-1"
       >
         <button
           ref={buttonRef}
