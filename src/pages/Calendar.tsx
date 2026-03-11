@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { WeekRow } from '@/components/calendar/WeekRow';
 import { CalendarTimeline } from '@/components/calendar/CalendarTimeline';
+import { MonthView } from '@/components/calendar/MonthView';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendarDay } from '@/hooks/useCalendarDay';
 import { useCalendarDayGoals } from '@/hooks/useCalendarDayGoals';
