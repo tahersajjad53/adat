@@ -93,6 +93,7 @@ const TasbeehCounterPage: React.FC = () => {
         style={{ minHeight: '50vh' }}
       >
         <button
+          ref={buttonRef}
           onClick={handleTap}
           className="relative grid place-items-center active:scale-95 transition-transform focus:outline-none"
           style={{ width: size, height: size }}
