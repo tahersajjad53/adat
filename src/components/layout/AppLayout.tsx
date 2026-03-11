@@ -83,13 +83,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         <header className="sticky top-0 z-40 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50">
           <div className="container flex h-14 items-center">
             {/* Left spacer */}
-            {isCalendarPage && !calendarShowingToday ? (
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('calendar:goToToday'))}
-                className="text-sm font-medium text-primary w-10 text-left"
-              >
-                Today
-              </button>
+            {isCalendarPage && calendarMonth ? (
+              <span className="text-sm font-medium text-muted-foreground w-10 text-left">{calendarMonth}</span>
             ) : (
               <div className="w-10" />
             )}
@@ -130,8 +125,13 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : isCalendarPage && calendarMonth ? (
-              <span className="text-sm font-medium text-muted-foreground w-10 text-right truncate">{calendarMonth}</span>
+            ) : isCalendarPage && !calendarShowingToday ? (
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('calendar:goToToday'))}
+                className="text-sm font-medium text-primary w-10 text-right"
+              >
+                Today
+              </button>
             ) : (
               <div className="w-10" />
             )}
