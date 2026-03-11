@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { NavArrowLeft, MoreHoriz } from 'iconoir-react';
 import { Button } from '@/components/ui/button';
