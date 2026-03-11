@@ -54,6 +54,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
   const animating = useRef(false);
   const touchStartY = useRef(0);
 
+  const selectedKey = formatDateKey(selectedDate);
   const { qazaDays, goalDays } = useMonthIndicators(displayYear, displayMonth);
   const weeks = getMonthWeeks(displayYear, displayMonth);
   const todayKey = formatDateKey(new Date());
@@ -165,6 +166,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
 
               const dk = formatDateKey(date);
               const isToday = dk === todayKey;
+              const isSelected = dk === selectedKey;
               const hasQaza = qazaDays.has(dk);
               const hasGoals = goalDays.has(dk);
               const hijri = hijriMap.get(dk);
@@ -175,14 +177,19 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
                   onClick={() => onSelectDate(date)}
                   className={cn(
                     'flex flex-col items-center gap-0 rounded-xl py-2.5 transition-colors',
-                    isToday
-                      ? 'bg-accent text-accent-foreground'
-                      : 'text-foreground hover:bg-muted'
+                    isSelected
+                      ? 'bg-primary text-primary-foreground'
+                      : isToday
+                        ? 'bg-accent text-accent-foreground'
+                        : 'text-foreground hover:bg-muted'
                   )}
                 >
                   <span className="text-sm font-medium leading-tight">{date.getDate()}</span>
                   {hijri && (
-                    <span className="text-xl text-muted-foreground leading-none">
+                    <span className={cn(
+                      'text-xl leading-none',
+                      isSelected ? 'text-primary-foreground/90' : 'text-muted-foreground'
+                    )}>
                       {hijri.day === 1
                         ? `${toArabicNumerals(hijri.day)} ${hijri.monthNameArabic.split(' ')[0]}`
                         : toArabicNumerals(hijri.day)}
