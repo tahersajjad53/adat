@@ -130,6 +130,8 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
+            ) : isCalendarPage && calendarMonth ? (
+              <span className="text-sm font-medium text-muted-foreground w-10 text-right truncate">{calendarMonth}</span>
             ) : (
               <div className="w-10" />
             )}
