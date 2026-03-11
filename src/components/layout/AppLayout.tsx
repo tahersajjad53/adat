@@ -84,7 +84,12 @@ export function AppLayout({ children }: AppLayoutProps) {
           <div className="container flex h-14 items-center">
             {/* Left spacer */}
             {isCalendarPage && calendarMonth ? (
-              <span className="text-sm font-medium text-muted-foreground w-10 text-left">{calendarMonth}</span>
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('calendar:toggleMonthView'))}
+                className="text-sm font-medium text-primary w-10 text-left"
+              >
+                {calendarMonth}
+              </button>
             ) : (
               <div className="w-10" />
             )}

@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { WeekRow } from '@/components/calendar/WeekRow';
 import { CalendarTimeline } from '@/components/calendar/CalendarTimeline';
+import { MonthView } from '@/components/calendar/MonthView';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendarDay } from '@/hooks/useCalendarDay';
 import { useCalendarDayGoals } from '@/hooks/useCalendarDayGoals';
@@ -35,6 +36,7 @@ function formatDateKey(d: Date): string {
 const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [weekOffset, setWeekOffset] = useState(0);
+  const [calendarView, setCalendarView] = useState<'week' | 'month'>('week');
   const { location } = useCalendar();
 
   const weekCenter = useMemo(() => {
@@ -77,9 +79,17 @@ const Calendar: React.FC = () => {
     const handleGoToToday = () => {
       setSelectedDate(new Date());
       setWeekOffset(0);
+      setCalendarView('week');
     };
     window.addEventListener('calendar:goToToday', handleGoToToday);
     return () => window.removeEventListener('calendar:goToToday', handleGoToToday);
+  }, []);
+
+  // Listen for month view toggle from header
+  useEffect(() => {
+    const handler = () => setCalendarView(prev => prev === 'week' ? 'month' : 'week');
+    window.addEventListener('calendar:toggleMonthView', handler);
+    return () => window.removeEventListener('calendar:toggleMonthView', handler);
   }, []);
 
   // Notify header whether we're showing today
@@ -111,6 +121,7 @@ const Calendar: React.FC = () => {
 
   const handleSelectDate = useCallback((date: Date) => {
     setSelectedDate(date);
+    setCalendarView('week');
     const weekStart = weekDates[0];
     const weekEnd = weekDates[6];
     if (date < weekStart || date > weekEnd) {
@@ -131,39 +142,48 @@ const Calendar: React.FC = () => {
 
   return (
     <div className="container py-6 max-w-xl mx-auto space-y-5">
-      {/* Week navigator */}
-      <WeekRow
-        weekDates={weekDates}
-        selectedDate={selectedDate}
-        onSelectDate={handleSelectDate}
-        onShiftWeek={handleShiftWeek}
-        qazaDays={qazaDays}
-      />
+      {calendarView === 'month' ? (
+        <MonthView
+          selectedDate={selectedDate}
+          onSelectDate={handleSelectDate}
+        />
+      ) : (
+        <>
+          {/* Week navigator */}
+          <WeekRow
+            weekDates={weekDates}
+            selectedDate={selectedDate}
+            onSelectDate={handleSelectDate}
+            onShiftWeek={handleShiftWeek}
+            qazaDays={qazaDays}
+          />
 
-      {/* Selected date header */}
-      <div className="px-1 flex justify-between items-baseline">
-        <h2 className="font-display tracking-tight font-normal text-xl">
-          {showingToday ? 'Today' : selectedDateLabel}
-        </h2>
-        <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
-      </div>
+          {/* Selected date header */}
+          <div className="px-1 flex justify-between items-baseline">
+            <h2 className="font-display tracking-tight font-normal text-xl">
+              {showingToday ? 'Today' : selectedDateLabel}
+            </h2>
+            <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
+          </div>
 
-      {/* Timeline */}
-      <CalendarTimeline
-        prayers={prayers}
-        allDayGoals={allDayGoals}
-        timedGoals={timedGoals}
-        isToday={isToday}
-        isPast={isPast}
-        isFuture={isFuture}
-        isLoading={prayersLoading || goalsLoading}
-        onTogglePrayer={togglePrayer}
-        onFulfillQaza={fulfillQaza}
-        onToggleGoal={toggleCompletion}
-        onEditGoal={setEditingGoal}
-        onDeleteGoal={deleteGoal}
-        isGoalToggling={isToggling}
-      />
+          {/* Timeline */}
+          <CalendarTimeline
+            prayers={prayers}
+            allDayGoals={allDayGoals}
+            timedGoals={timedGoals}
+            isToday={isToday}
+            isPast={isPast}
+            isFuture={isFuture}
+            isLoading={prayersLoading || goalsLoading}
+            onTogglePrayer={togglePrayer}
+            onFulfillQaza={fulfillQaza}
+            onToggleGoal={toggleCompletion}
+            onEditGoal={setEditingGoal}
+            onDeleteGoal={deleteGoal}
+            isGoalToggling={isToggling}
+          />
+        </>
+      )}
 
       {/* Goal edit sheet */}
       <GoalFormSheet
