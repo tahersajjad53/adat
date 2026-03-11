@@ -142,39 +142,48 @@ const Calendar: React.FC = () => {
 
   return (
     <div className="container py-6 max-w-xl mx-auto space-y-5">
-      {/* Week navigator */}
-      <WeekRow
-        weekDates={weekDates}
-        selectedDate={selectedDate}
-        onSelectDate={handleSelectDate}
-        onShiftWeek={handleShiftWeek}
-        qazaDays={qazaDays}
-      />
+      {calendarView === 'month' ? (
+        <MonthView
+          selectedDate={selectedDate}
+          onSelectDate={handleSelectDate}
+        />
+      ) : (
+        <>
+          {/* Week navigator */}
+          <WeekRow
+            weekDates={weekDates}
+            selectedDate={selectedDate}
+            onSelectDate={handleSelectDate}
+            onShiftWeek={handleShiftWeek}
+            qazaDays={qazaDays}
+          />
 
-      {/* Selected date header */}
-      <div className="px-1 flex justify-between items-baseline">
-        <h2 className="font-display tracking-tight font-normal text-xl">
-          {showingToday ? 'Today' : selectedDateLabel}
-        </h2>
-        <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
-      </div>
+          {/* Selected date header */}
+          <div className="px-1 flex justify-between items-baseline">
+            <h2 className="font-display tracking-tight font-normal text-xl">
+              {showingToday ? 'Today' : selectedDateLabel}
+            </h2>
+            <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
+          </div>
 
-      {/* Timeline */}
-      <CalendarTimeline
-        prayers={prayers}
-        allDayGoals={allDayGoals}
-        timedGoals={timedGoals}
-        isToday={isToday}
-        isPast={isPast}
-        isFuture={isFuture}
-        isLoading={prayersLoading || goalsLoading}
-        onTogglePrayer={togglePrayer}
-        onFulfillQaza={fulfillQaza}
-        onToggleGoal={toggleCompletion}
-        onEditGoal={setEditingGoal}
-        onDeleteGoal={deleteGoal}
-        isGoalToggling={isToggling}
-      />
+          {/* Timeline */}
+          <CalendarTimeline
+            prayers={prayers}
+            allDayGoals={allDayGoals}
+            timedGoals={timedGoals}
+            isToday={isToday}
+            isPast={isPast}
+            isFuture={isFuture}
+            isLoading={prayersLoading || goalsLoading}
+            onTogglePrayer={togglePrayer}
+            onFulfillQaza={fulfillQaza}
+            onToggleGoal={toggleCompletion}
+            onEditGoal={setEditingGoal}
+            onDeleteGoal={deleteGoal}
+            isGoalToggling={isToggling}
+          />
+        </>
+      )}
 
       {/* Goal edit sheet */}
       <GoalFormSheet
