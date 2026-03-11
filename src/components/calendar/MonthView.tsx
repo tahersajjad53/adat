@@ -182,7 +182,7 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
                 >
                   <span className="text-sm font-medium leading-tight">{date.getDate()}</span>
                   {hijri && (
-                    <span className="text-[11px] text-muted-foreground leading-tight">
+                    <span className="text-base text-muted-foreground leading-tight">
                       {hijri.day === 1
                         ? `${toArabicNumerals(hijri.day)} ${hijri.monthNameArabic.split(' ')[0]}`
                         : toArabicNumerals(hijri.day)}
