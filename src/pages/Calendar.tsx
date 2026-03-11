@@ -86,12 +86,27 @@ const Calendar: React.FC = () => {
     return () => window.removeEventListener('calendar:goToToday', handleGoToToday);
   }, []);
 
-  // Listen for month view toggle from header
+  // Listen for month view toggle from header (week → month only)
   useEffect(() => {
-    const handler = () => setCalendarView(prev => prev === 'week' ? 'month' : 'week');
+    const handler = () => setCalendarView('month');
     window.addEventListener('calendar:toggleMonthView', handler);
     return () => window.removeEventListener('calendar:toggleMonthView', handler);
   }, []);
+
+  // Listen for "go to current month" from header (reset month view to present month)
+  useEffect(() => {
+    const handler = () => {
+      setCalendarView('month');
+      setMonthViewResetKey(prev => prev + 1);
+    };
+    window.addEventListener('calendar:goToCurrentMonth', handler);
+    return () => window.removeEventListener('calendar:goToCurrentMonth', handler);
+  }, []);
+
+  // Broadcast view changes so header knows current view
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('calendar:viewChanged', { detail: { view: calendarView } }));
+  }, [calendarView]);
 
   // Notify header whether we're showing today
   useEffect(() => {
