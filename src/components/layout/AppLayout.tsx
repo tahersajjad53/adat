@@ -42,6 +42,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [calendarShowingToday, setCalendarShowingToday] = useState(true);
   const [calendarMonth, setCalendarMonth] = useState('');
+  const [calendarInMonthView, setCalendarInMonthView] = useState(false);
 
   React.useEffect(() => {
     const handler = (e: Event) => {
@@ -59,6 +60,15 @@ export function AppLayout({ children }: AppLayoutProps) {
     };
     window.addEventListener('calendar:monthChanged', handler);
     return () => window.removeEventListener('calendar:monthChanged', handler);
+  }, []);
+
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setCalendarInMonthView(detail?.view === 'month');
+    };
+    window.addEventListener('calendar:viewChanged', handler);
+    return () => window.removeEventListener('calendar:viewChanged', handler);
   }, []);
 
   const handleAddGoal = () => setGoalFormOpen(true);
@@ -85,7 +95,9 @@ export function AppLayout({ children }: AppLayoutProps) {
             {/* Left spacer */}
             {isCalendarPage && calendarMonth ? (
               <button
-                onClick={() => window.dispatchEvent(new CustomEvent('calendar:toggleMonthView'))}
+                onClick={() => window.dispatchEvent(new CustomEvent(
+                  calendarInMonthView ? 'calendar:goToCurrentMonth' : 'calendar:toggleMonthView'
+                ))}
                 className="text-sm font-medium text-primary w-10 text-left"
               >
                 {calendarMonth}

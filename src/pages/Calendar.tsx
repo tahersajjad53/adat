@@ -37,6 +37,7 @@ const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [weekOffset, setWeekOffset] = useState(0);
   const [calendarView, setCalendarView] = useState<'week' | 'month'>('week');
+  const [monthViewResetKey, setMonthViewResetKey] = useState(0);
   const { location } = useCalendar();
 
   const weekCenter = useMemo(() => {
@@ -85,12 +86,27 @@ const Calendar: React.FC = () => {
     return () => window.removeEventListener('calendar:goToToday', handleGoToToday);
   }, []);
 
-  // Listen for month view toggle from header
+  // Listen for month view toggle from header (week → month only)
   useEffect(() => {
-    const handler = () => setCalendarView(prev => prev === 'week' ? 'month' : 'week');
+    const handler = () => setCalendarView('month');
     window.addEventListener('calendar:toggleMonthView', handler);
     return () => window.removeEventListener('calendar:toggleMonthView', handler);
   }, []);
+
+  // Listen for "go to current month" from header (reset month view to present month)
+  useEffect(() => {
+    const handler = () => {
+      setCalendarView('month');
+      setMonthViewResetKey(prev => prev + 1);
+    };
+    window.addEventListener('calendar:goToCurrentMonth', handler);
+    return () => window.removeEventListener('calendar:goToCurrentMonth', handler);
+  }, []);
+
+  // Broadcast view changes so header knows current view
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('calendar:viewChanged', { detail: { view: calendarView } }));
+  }, [calendarView]);
 
   // Notify header whether we're showing today
   useEffect(() => {
@@ -144,6 +160,7 @@ const Calendar: React.FC = () => {
     <div className="container py-6 max-w-xl mx-auto space-y-5">
       {calendarView === 'month' ? (
         <MonthView
+          key={monthViewResetKey}
           selectedDate={selectedDate}
           onSelectDate={handleSelectDate}
         />
