@@ -42,6 +42,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [calendarShowingToday, setCalendarShowingToday] = useState(true);
   const [calendarMonth, setCalendarMonth] = useState('');
+  const [calendarInMonthView, setCalendarInMonthView] = useState(false);
 
   React.useEffect(() => {
     const handler = (e: Event) => {
