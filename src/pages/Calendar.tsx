@@ -36,6 +36,7 @@ function formatDateKey(d: Date): string {
 const Calendar: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [weekOffset, setWeekOffset] = useState(0);
+  const [calendarView, setCalendarView] = useState<'week' | 'month'>('week');
   const { location } = useCalendar();
 
   const weekCenter = useMemo(() => {
