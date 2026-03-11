@@ -60,13 +60,13 @@ const TasbeehCounterPage: React.FC = () => {
 
   // SVG radial ring params
   const size = 260;
-  const strokeWidth = 10;
+  const strokeWidth = 18;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="container py-4 max-w-lg mx-auto">
+    <div className="container py-4 max-w-lg mx-auto flex flex-col min-h-[calc(100dvh-2rem)]">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
@@ -89,8 +89,7 @@ const TasbeehCounterPage: React.FC = () => {
 
       {/* Tap area */}
       <div
-        className="flex flex-col items-center justify-center select-none"
-        style={{ minHeight: '50vh' }}
+        className="flex flex-col items-center justify-end pb-[15vh] select-none flex-1"
       >
         <button
           ref={buttonRef}
