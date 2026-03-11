@@ -182,36 +182,24 @@ const Dashboard: React.FC = () => {
           </div>
 
           {prayerToShow ? (
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-xs uppercase tracking-widest text-foreground/60 font-normal">
-                  {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
-                </span>
-                <div className="flex items-center gap-3 mt-1">
-                  <div className="rounded-full p-2 bg-foreground/10">
-                    <PrayerIcon className="h-5 w-5 text-foreground" />
-                  </div>
-                  <div className="flex items-baseline gap-2">
-                    <h3 className="text-2xl font-bold text-foreground font-display">
-                      {prayerToShow.displayName}
-                    </h3>
-                    <span className="text-sm text-foreground/70">{prayerToShow.time}</span>
-                  </div>
+          <div>
+              <span className="text-xs uppercase tracking-widest text-foreground/60 font-normal">
+                {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
+              </span>
+              <div className="flex items-center gap-3 mt-1">
+                <div onClick={(e) => e.stopPropagation()}>
+                  <Checkbox
+                    checked={prayerToShow.isCompleted}
+                    onCheckedChange={() => togglePrayer(prayerToShow.name)}
+                    className="h-6 w-6 border-foreground/30 data-[state=checked]:bg-foreground/20 data-[state=checked]:text-foreground"
+                  />
                 </div>
-              </div>
-
-              <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-                {prayerToShow.isCompleted && (
-                  <div className="flex items-center gap-1 text-foreground/70 text-sm">
-                    <Check className="h-4 w-4" />
-                    <span>Done</span>
-                  </div>
-                )}
-                <Checkbox
-                  checked={prayerToShow.isCompleted}
-                  onCheckedChange={() => togglePrayer(prayerToShow.name)}
-                  className="h-6 w-6 border-foreground/30 data-[state=checked]:bg-foreground/20 data-[state=checked]:text-foreground"
-                />
+                <div className="flex items-baseline gap-2">
+                  <h3 className="text-2xl font-bold text-foreground font-display">
+                    {prayerToShow.displayName}
+                  </h3>
+                  <span className="text-sm text-foreground/70">{prayerToShow.time}</span>
+                </div>
               </div>
             </div>
           ) : (
