@@ -1,19 +1,16 @@
 
 
-## Add Month Name to Calendar Header (Right Side)
+## Improve Dashboard card information layout
 
-**Layout on calendar page:**
-- **Left**: "Today" button (stays exactly where it is, no change)
-- **Center**: Logo (unchanged)
-- **Right**: Month name (e.g. "March") — currently an empty `<div className="w-10" />`
+### Changes
 
-### 1. `src/pages/Calendar.tsx`
-- Add `useEffect` that dispatches `calendar:monthChanged` with month string from `selectedDate`
-- Format: "March" (current year) or "Mar 2025" (other years)
-- On unmount, dispatch empty string to clean up
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-### 2. `src/components/layout/AppLayout.tsx`
-- Add `calendarMonth` state, listen for `calendar:monthChanged` event
-- On calendar page right slot: show the month name (`text-sm font-medium text-muted-foreground`) instead of the empty spacer
-- Keep the "Today" button in its current left slot, unchanged
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
