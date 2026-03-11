@@ -138,13 +138,6 @@ const TasbeehCounterPage: React.FC = () => {
             {counter.current_count} / {counter.target_count}
           </p>
         )}
-
-        {/* Reset button */}
-        {counter.current_count > 0 && (
-          <Button variant="outline" size="sm" className="mt-6" onClick={() => setResetConfirm(true)}>
-            Reset
-          </Button>
-        )}
       </div>
 
       {/* Edit sheet */}
