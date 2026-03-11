@@ -66,7 +66,7 @@ const TasbeehCounterPage: React.FC = () => {
   const offset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="container py-4 max-w-lg mx-auto">
+    <div className="container py-4 max-w-lg mx-auto flex flex-col min-h-[calc(100dvh-2rem)]">
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
