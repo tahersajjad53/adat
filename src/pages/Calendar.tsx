@@ -196,7 +196,7 @@ const Calendar: React.FC = () => {
             <h2 className="font-display tracking-tight font-normal text-xl">
               {showingToday ? 'Today' : selectedDateLabel}
             </h2>
-            <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
+            <p className="text-2xl font-[Al-Kanz] text-muted-foreground">{weekHijriHeader}</p>
           </div>
 
           {/* Timeline */}
