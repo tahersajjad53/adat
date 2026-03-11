@@ -79,9 +79,17 @@ const Calendar: React.FC = () => {
     const handleGoToToday = () => {
       setSelectedDate(new Date());
       setWeekOffset(0);
+      setCalendarView('week');
     };
     window.addEventListener('calendar:goToToday', handleGoToToday);
     return () => window.removeEventListener('calendar:goToToday', handleGoToToday);
+  }, []);
+
+  // Listen for month view toggle from header
+  useEffect(() => {
+    const handler = () => setCalendarView(prev => prev === 'week' ? 'month' : 'week');
+    window.addEventListener('calendar:toggleMonthView', handler);
+    return () => window.removeEventListener('calendar:toggleMonthView', handler);
   }, []);
 
   // Notify header whether we're showing today
