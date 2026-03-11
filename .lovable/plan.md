@@ -1,19 +1,16 @@
 
 
-## Show "Today" CTA in Month View Header
+## Improve Dashboard card information layout
 
-Currently the "Today" button on the right only shows when `!calendarShowingToday` and NOT in month view (since the month view condition is checked first at line 145). The right slot shows nothing specific for month view.
+### Changes
 
-### Change in `src/components/layout/AppLayout.tsx` (lines 112-154)
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-Update the right-side conditional to show "Today" when on the calendar page **and** in month view, dispatching `calendar:goToToday` (which already resets to week view + today).
-
-The right-side logic becomes:
-1. Goals page → 3-dot menu
-2. Namaz page → 3-dot menu  
-3. **Calendar page in month view** → always show "Today"
-4. Calendar page in week view, not showing today → show "Today"
-5. Otherwise → empty spacer
-
-This reuses the existing `calendarInMonthView` state and the `calendar:goToToday` event already handled in `Calendar.tsx`.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
