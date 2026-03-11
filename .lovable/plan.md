@@ -1,18 +1,16 @@
 
 
-## Align TasbeehFormSheet UI with GoalFormSheet
+## Improve Dashboard card information layout
 
-The Tasbeeh form currently uses a basic layout with `Label` + `Input` pairs, a single action button on mobile, and no subtitle. The Goal form uses a more polished pattern: title + description in the header, inline title input (large, no label), a two-button footer (Cancel + action), and `SheetDescription`/`DialogDescription`.
+### Changes
 
-### Changes to `src/components/tasbeeh/TasbeehFormSheet.tsx`
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-1. **Add subtitle** — Import `SheetDescription` and `DialogDescription`, add "Create a new tasbeeh to track" (new) or "Update your tasbeeh details" (edit) below the title, matching the Goal form's pattern.
-
-2. **Remove labels, use inline inputs** — Remove the `Label` components. Make the name input large (`h-11 text-lg font-medium`) with just a placeholder, matching the Goal form's title input style. Keep the target count input as a regular input but without its label — use placeholder text only.
-
-3. **Two-button footer on mobile** — Change the mobile footer from a single full-width button to match the Goal form's footer: Cancel (outline) + Create/Update side by side with `flex gap-3`, both `flex-1`.
-
-4. **Add `onOpenAutoFocus` prevention** — Add `onOpenAutoFocus={(e) => e.preventDefault()}` to `SheetContent` to match the Goal form behavior.
-
-5. **Add `max-h-[85dvh] flex flex-col`** to mobile `SheetContent` for consistency.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
