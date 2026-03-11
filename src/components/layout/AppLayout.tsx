@@ -62,6 +62,15 @@ export function AppLayout({ children }: AppLayoutProps) {
     return () => window.removeEventListener('calendar:monthChanged', handler);
   }, []);
 
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setCalendarInMonthView(detail?.view === 'month');
+    };
+    window.addEventListener('calendar:viewChanged', handler);
+    return () => window.removeEventListener('calendar:viewChanged', handler);
+  }, []);
+
   const handleAddGoal = () => setGoalFormOpen(true);
 
   const handleGoalSubmit = async (data: any) => {
