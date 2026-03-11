@@ -138,11 +138,11 @@ export const MonthView: React.FC<MonthViewProps> = ({ selectedDate, onSelectDate
       onTouchEnd={onTouchEnd}
     >
       {/* Month/Year header */}
-      <div className="text-center mb-4">
+      <div className="flex items-baseline justify-between mb-4">
         <h2 className="font-display tracking-tight font-normal text-xl">
           {monthLabel}
         </h2>
-        <p className="text-xs text-muted-foreground mt-0.5">{hijriHeader}</p>
+        <p className="text-2xl text-muted-foreground">{hijriHeader}</p>
       </div>
 
       {/* Day names header */}
