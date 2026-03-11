@@ -95,7 +95,9 @@ export function AppLayout({ children }: AppLayoutProps) {
             {/* Left spacer */}
             {isCalendarPage && calendarMonth ? (
               <button
-                onClick={() => window.dispatchEvent(new CustomEvent('calendar:toggleMonthView'))}
+                onClick={() => window.dispatchEvent(new CustomEvent(
+                  calendarInMonthView ? 'calendar:goToCurrentMonth' : 'calendar:toggleMonthView'
+                ))}
                 className="text-sm font-medium text-primary w-10 text-left"
               >
                 {calendarMonth}

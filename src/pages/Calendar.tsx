@@ -160,6 +160,7 @@ const Calendar: React.FC = () => {
     <div className="container py-6 max-w-xl mx-auto space-y-5">
       {calendarView === 'month' ? (
         <MonthView
+          key={monthViewResetKey}
           selectedDate={selectedDate}
           onSelectDate={handleSelectDate}
         />
