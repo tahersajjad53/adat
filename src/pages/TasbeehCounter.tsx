@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 import TasbeehFormSheet from '@/components/tasbeeh/TasbeehFormSheet';
+import { useConfetti } from '@/components/ui/confetti';
 
 const TasbeehCounterPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
