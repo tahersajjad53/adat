@@ -121,6 +121,7 @@ const Calendar: React.FC = () => {
 
   const handleSelectDate = useCallback((date: Date) => {
     setSelectedDate(date);
+    setCalendarView('week');
     const weekStart = weekDates[0];
     const weekEnd = weekDates[6];
     if (date < weekStart || date > weekEnd) {
