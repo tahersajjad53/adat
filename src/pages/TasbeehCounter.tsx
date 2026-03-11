@@ -85,7 +85,7 @@ const TasbeehCounterPage: React.FC = () => {
       >
         <button
           onClick={handleTap}
-          className="relative flex items-center justify-center active:scale-95 transition-transform focus:outline-none"
+          className="relative grid place-items-center active:scale-95 transition-transform focus:outline-none"
           style={{ width: size, height: size }}
         >
           {/* Radial ring */}
@@ -108,7 +108,7 @@ const TasbeehCounterPage: React.FC = () => {
             />
           </svg>
           {/* Count */}
-          <span className="text-8xl font-bold text-foreground font-display tabular-nums leading-none">
+          <span className="text-8xl font-bold text-foreground font-display tabular-nums leading-[0.85] translate-y-[2px]">
             {counter.current_count}
           </span>
         </button>
