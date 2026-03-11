@@ -8,7 +8,7 @@ import { useCalendarDayGoals } from '@/hooks/useCalendarDayGoals';
 import { useWeekQazaIndicators } from '@/hooks/useWeekQazaIndicators';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
 import { useGoals } from '@/hooks/useGoals';
-import { formatHijriDate, gregorianToBohra } from '@/lib/hijri';
+import { formatHijriDate, gregorianToBohra, getHijriMonthName } from '@/lib/hijri';
 import { useCalendar } from '@/contexts/CalendarContext';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import type { GoalWithStatus } from '@/types/goals';
