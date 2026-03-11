@@ -1,5 +1,6 @@
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useMemo } from 'react';
 import { cn } from '@/lib/utils';
+import { gregorianToBohra } from '@/lib/hijri';
 
 interface WeekRowProps {
   weekDates: Date[];
@@ -16,6 +17,11 @@ function formatDateKey(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
+const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+function toArabicNumerals(n: number): string {
+  return String(n).split('').map(d => ARABIC_DIGITS[parseInt(d)]).join('');
+}
+
 const DAY_NAMES = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export const WeekRow: React.FC<WeekRowProps> = ({
@@ -25,6 +31,10 @@ export const WeekRow: React.FC<WeekRowProps> = ({
   onShiftWeek,
   qazaDays,
 }) => {
+  const hijriDates = useMemo(() =>
+    weekDates.map(d => gregorianToBohra(d)),
+  [weekDates]);
+
   const todayKey = formatDateKey(new Date());
   const selectedKey = formatDateKey(selectedDate);
   const touchStartX = useRef(0);
@@ -85,18 +95,19 @@ export const WeekRow: React.FC<WeekRowProps> = ({
           slideClass
         )}
       >
-        {weekDates.map((date) => {
+        {weekDates.map((date, i) => {
           const dk = formatDateKey(date);
           const isSelected = dk === selectedKey;
           const isToday = dk === todayKey;
           const hasQaza = qazaDays.has(dk);
+          const hijri = hijriDates[i];
 
           return (
             <button
               key={dk}
               onClick={() => onSelectDate(date)}
               className={cn(
-                'flex flex-1 flex-col items-center gap-0.5 rounded-xl py-2 transition-colors relative',
+                'flex flex-1 flex-col items-center gap-0.5 rounded-xl py-1.5 transition-colors relative',
                 isSelected
                   ? 'bg-primary text-primary-foreground'
                   : isToday
@@ -109,6 +120,12 @@ export const WeekRow: React.FC<WeekRowProps> = ({
               </span>
               <span className={cn('text-sm font-semibold', isSelected && 'text-primary-foreground')}>
                 {date.getDate()}
+              </span>
+              <span className={cn(
+                'text-lg leading-none font-[Al-Kanz]',
+                isSelected ? 'text-primary-foreground/70' : 'text-muted-foreground/60'
+              )}>
+                {toArabicNumerals(hijri.day)}
               </span>
               {hasQaza && (
                 <span className={cn(

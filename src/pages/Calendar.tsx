@@ -8,7 +8,7 @@ import { useCalendarDayGoals } from '@/hooks/useCalendarDayGoals';
 import { useWeekQazaIndicators } from '@/hooks/useWeekQazaIndicators';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
 import { useGoals } from '@/hooks/useGoals';
-import { formatHijriDate, gregorianToBohra } from '@/lib/hijri';
+import { formatHijriDate, gregorianToBohra, getHijriMonthName } from '@/lib/hijri';
 import { useCalendar } from '@/contexts/CalendarContext';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
 import type { GoalWithStatus } from '@/types/goals';
@@ -147,13 +147,29 @@ const Calendar: React.FC = () => {
   }, [weekDates]);
 
   // Formatted selected date display
-  const selectedHijri = preMaghribHijri;
   const selectedDateLabel = selectedDate.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'long',
     day: 'numeric',
   });
-  const selectedHijriLabel = formatHijriDate(selectedHijri, 'long');
+
+  // Arabic Hijri month header for the visible week
+  const ARABIC_DIGITS = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+  const toArabicNumerals = (n: number) => String(n).split('').map(d => ARABIC_DIGITS[parseInt(d)]).join('');
+
+  const weekHijriHeader = useMemo(() => {
+    const firstH = gregorianToBohra(weekDates[0]);
+    const lastH = gregorianToBohra(weekDates[6]);
+    const firstName = getHijriMonthName(firstH.month, true);
+    const lastName = getHijriMonthName(lastH.month, true);
+    if (firstH.month === lastH.month && firstH.year === lastH.year) {
+      return `${firstName} ${toArabicNumerals(firstH.year)}`;
+    }
+    if (firstH.year === lastH.year) {
+      return `${firstName} – ${lastName} ${toArabicNumerals(firstH.year)}`;
+    }
+    return `${firstName} ${toArabicNumerals(firstH.year)} – ${lastName} ${toArabicNumerals(lastH.year)}`;
+  }, [weekDates]);
 
 
   return (
@@ -180,7 +196,7 @@ const Calendar: React.FC = () => {
             <h2 className="font-display tracking-tight font-normal text-xl">
               {showingToday ? 'Today' : selectedDateLabel}
             </h2>
-            <p className="text-sm text-muted-foreground">{selectedHijriLabel}</p>
+            <p className="text-2xl font-[Al-Kanz] text-muted-foreground">{weekHijriHeader}</p>
           </div>
 
           {/* Timeline */}

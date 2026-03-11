@@ -1,26 +1,16 @@
 
 
-## Add Hijri Numerals & Arabic Month to Week View
+## Improve Dashboard card information layout
 
 ### Changes
 
-**`src/components/calendar/WeekRow.tsx`**:
-1. Import `gregorianToBohra` from `@/lib/hijri`
-2. Add `toArabicNumerals` helper (same as MonthView)
-3. Compute Hijri dates for all 7 week dates via `useMemo`
-4. Inside each day button, add the Hijri numeral below the Gregorian date at `text-lg` size using `toArabicNumerals(hijri.day)`, styled as `text-muted-foreground`
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-**`src/pages/Calendar.tsx`** (lines 178-184):
-1. Compute the Hijri month span for the visible week (similar to MonthView's `hijriHeader`) — check first and last day's Hijri months, show Arabic month name(s)
-2. Replace the right-side `selectedHijriLabel` (text-sm) with the Arabic Hijri month header at `text-2xl` size, matching the Month View's style
-3. Keep the left side ("Today" / date label) as-is
-
-The week header area will look like:
-```text
-Today                          محرم ١٤٤٧
-```
-or when spanning two months:
-```text
-Today                   محرم – صفر ١٤٤٧
-```
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
