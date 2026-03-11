@@ -63,7 +63,7 @@ const TasbeehCounterPage: React.FC = () => {
         <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
           <NavArrowLeft className="h-5 w-5" />
         </Button>
-        <h1 className="text-lg font-semibold text-foreground truncate mx-4">
+        <h1 className="text-lg font-semibold text-foreground truncate mx-4 text-center flex-1">
           {counter.title || 'Tasbeeh'}
         </h1>
         <DropdownMenu>
