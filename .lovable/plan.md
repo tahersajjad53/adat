@@ -1,16 +1,21 @@
 
 
-## Improve Dashboard card information layout
+## Fix Tasbeeh Text Sizing and Centering
 
-### Changes
+Three targeted changes:
 
-**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
-- Increase icon size from `h-4 w-4` to `h-6 w-6`
-- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
-- Split the Gregorian date and location onto separate lines instead of combining them with `·`
-- Location shown on its own line below the Gregorian date
+### 1. TasbeehCard (Today page) — larger, centered count
+**File: `src/components/tasbeeh/TasbeehCard.tsx`** line 88
 
-**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
-- Remove the "Ada" label span entirely
-- Keep just the percentage number
+Change `text-lg` to `text-xl` for the count number. The centering container (`flex items-center justify-center`) is already correct, so this just needs a size bump.
+
+### 2. TasbeehCounter detail page — center the title with nav arrows
+**File: `src/pages/TasbeehCounter.tsx`** line 66
+
+Add `text-center flex-1` to the h1 so it fills the space between the back button and the menu button, centering the title text properly.
+
+### 3. TasbeehCounter detail page — much larger, centered count
+**File: `src/pages/TasbeehCounter.tsx`** line 111
+
+Increase the count from `text-6xl` to `text-8xl` (or `text-[96px]`). The button already uses `flex items-center justify-center` with the SVG absolutely positioned, so the span is already centered — just needs the size increase.
 
