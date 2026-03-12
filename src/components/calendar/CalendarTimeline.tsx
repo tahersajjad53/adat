@@ -37,6 +37,7 @@ interface CalendarTimelineProps {
   onToggleGoal: (goalId: string) => void;
   onEditGoal: (goal: GoalWithStatus) => void;
   onDeleteGoal?: (goalId: string) => void;
+  onCreateGoal?: () => void;
   isGoalToggling?: boolean;
 }
 
