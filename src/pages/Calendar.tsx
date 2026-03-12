@@ -6,6 +6,7 @@ import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendarDay } from '@/hooks/useCalendarDay';
 import { useCalendarDayGoals } from '@/hooks/useCalendarDayGoals';
 import { useWeekQazaIndicators } from '@/hooks/useWeekQazaIndicators';
+import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
 import { useGoals } from '@/hooks/useGoals';
 import { formatHijriDate, gregorianToBohra, getHijriMonthName } from '@/lib/hijri';
