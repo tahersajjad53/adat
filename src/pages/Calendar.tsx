@@ -66,10 +66,11 @@ const Calendar: React.FC = () => {
   }, [preMaghribHijri]);
 
   const { toggleCompletion, isToggling } = useGoalCompletions({ forDate: hijriDateStr });
-  const { updateGoal, deleteGoal } = useGoals();
+  const { updateGoal, deleteGoal, createGoal } = useGoals();
 
   // Goal editing
   const [editingGoal, setEditingGoal] = useState<GoalWithStatus | null>(null);
+  const [creatingGoal, setCreatingGoal] = useState(false);
 
   const todayKey = formatDateKey(new Date());
   const selectedKey = formatDateKey(selectedDate);
@@ -213,6 +214,7 @@ const Calendar: React.FC = () => {
             onToggleGoal={toggleCompletion}
             onEditGoal={setEditingGoal}
             onDeleteGoal={deleteGoal}
+            onCreateGoal={() => setCreatingGoal(true)}
             isGoalToggling={isToggling}
           />
         </>
@@ -232,6 +234,21 @@ const Calendar: React.FC = () => {
         onDelete={async (id) => {
           await deleteGoal(id);
           setEditingGoal(null);
+        }}
+        isLoading={false}
+      />
+
+      {/* Goal create sheet */}
+      <GoalFormSheet
+        open={creatingGoal}
+        onOpenChange={(open) => { if (!open) setCreatingGoal(false); }}
+        goal={{
+          start_date: formatDateKey(selectedDate),
+          due_date: formatDateKey(selectedDate),
+        } as any}
+        onSubmit={async (data) => {
+          await createGoal(data);
+          setCreatingGoal(false);
         }}
         isLoading={false}
       />
