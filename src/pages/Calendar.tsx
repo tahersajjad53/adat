@@ -214,6 +214,7 @@ const Calendar: React.FC = () => {
             onToggleGoal={toggleCompletion}
             onEditGoal={setEditingGoal}
             onDeleteGoal={deleteGoal}
+            onCreateGoal={() => setCreatingGoal(true)}
             isGoalToggling={isToggling}
           />
         </>
