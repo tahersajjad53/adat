@@ -142,6 +142,16 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
 
       {/* Chronological card list */}
       <div className="space-y-3">
+        {/* Create Goal CTA */}
+        {onCreateGoal && (
+          <button
+            onClick={onCreateGoal}
+            className="w-full flex items-center gap-3 rounded-xl border border-dashed border-border px-4 py-4 text-muted-foreground hover:bg-muted/50 transition-colors"
+          >
+            <Plus className="h-5 w-5 shrink-0" />
+            <span className="text-base font-medium">Add Goal</span>
+          </button>
+        )}
         {items.map((item, idx) => {
           if (item.type === 'now') {
             return (
