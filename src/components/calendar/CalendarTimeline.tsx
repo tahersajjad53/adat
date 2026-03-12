@@ -214,6 +214,7 @@ function PrayerSlotCard({
   isFuture,
   onToggle,
   onFulfillQaza,
+  qazaMonitoringEnabled,
 }: {
   prayer: CalendarDayPrayer;
   isPast: boolean;
