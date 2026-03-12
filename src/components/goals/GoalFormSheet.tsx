@@ -71,6 +71,7 @@ interface GoalFormSheetProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   goal?: Goal | null;
+  defaultDate?: string;
   onSubmit: (data: GoalInput) => Promise<void>;
   onDelete?: (goalId: string) => Promise<void>;
   isLoading?: boolean;
@@ -80,6 +81,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   open,
   onOpenChange,
   goal,
+  defaultDate,
   onSubmit,
   onDelete,
   isLoading = false,
@@ -120,8 +122,9 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setRecurrenceType('one-time');
         setRecurrenceDays([]);
         setRecurrencePattern(null);
-        setDueDate(new Date().toISOString().split('T')[0]);
-        setStartDate(new Date().toISOString().split('T')[0]);
+        const dateStr = defaultDate || new Date().toISOString().split('T')[0];
+        setDueDate(dateStr);
+        setStartDate(dateStr);
         setIsActive(true);
         setPreferredTime(null);
         setReminderOffset(null);

@@ -242,10 +242,7 @@ const Calendar: React.FC = () => {
       <GoalFormSheet
         open={creatingGoal}
         onOpenChange={(open) => { if (!open) setCreatingGoal(false); }}
-        goal={{
-          start_date: formatDateKey(selectedDate),
-          due_date: formatDateKey(selectedDate),
-        } as any}
+        defaultDate={formatDateKey(selectedDate)}
         onSubmit={async (data) => {
           await createGoal(data);
           setCreatingGoal(false);
