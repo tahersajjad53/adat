@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Circle, Page, Calendar, Globe } from 'iconoir-react';
+import { Circle, Page, Calendar, Globe, Tag as TagIcon } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTags } from '@/hooks/useTags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';

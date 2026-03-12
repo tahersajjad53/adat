@@ -26,6 +26,7 @@ export interface AdminGoalInput {
   end_date?: string | null;
   due_date?: string | null;
   preferred_time?: string | null;
+  tag?: string | null;
   is_published?: boolean;
   sort_order?: number;
 }

@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { getRecurrenceDescription } from '@/lib/recurrence';
+import { useTags } from '@/hooks/useTags';
 import type { AdminGoal } from '@/types/adminGoals';
 
 interface AdminGoalCardProps {
