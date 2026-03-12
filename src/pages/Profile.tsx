@@ -11,7 +11,7 @@ import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 
 import { CITIES, type City } from '@/data/cities';
-import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignPencil, Bell, Archery } from 'iconoir-react';
+import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignPencil, Bell, Archery, Clock } from 'iconoir-react';
 import ThemeSelector from '@/components/profile/ThemeSelector';
 import TagOrderPreferences from '@/components/profile/TagOrderPreferences';
 import { initPushNotifications } from '@/utils/pushNotifications';
