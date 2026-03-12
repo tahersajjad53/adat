@@ -237,6 +237,21 @@ const Calendar: React.FC = () => {
         }}
         isLoading={false}
       />
+
+      {/* Goal create sheet */}
+      <GoalFormSheet
+        open={creatingGoal}
+        onOpenChange={(open) => { if (!open) setCreatingGoal(false); }}
+        goal={{
+          start_date: formatDateKey(selectedDate),
+          due_date: formatDateKey(selectedDate),
+        } as any}
+        onSubmit={async (data) => {
+          await createGoal(data);
+          setCreatingGoal(false);
+        }}
+        isLoading={false}
+      />
     </div>
   );
 };
