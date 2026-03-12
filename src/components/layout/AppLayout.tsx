@@ -19,6 +19,7 @@ import { useGoals } from '@/hooks/useGoals';
 import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
+import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 import ibadatLogo from '@/assets/ibadat-logo.svg';
 
 interface AppLayoutProps {
