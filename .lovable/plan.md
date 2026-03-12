@@ -1,56 +1,16 @@
 
 
-## Move "Add Goal" CTA above the dotted divider
+## Improve Dashboard card information layout
 
-### Current behavior
-The CTA sits inside the chronological timeline section, below the dotted divider.
+### Changes
 
-### Target behavior
-- CTA renders in the "All Day" section, after any all-day goal cards
-- If there are no all-day goals, still show the CTA (and the dotted divider below it)
-- The dotted divider appears whenever the CTA or all-day goals exist (not just when `allDayGoals.length > 0`)
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-### Change: `src/components/calendar/CalendarTimeline.tsx`
-
-Restructure lines ~114–155:
-
-```tsx
-<div className="space-y-4">
-  {/* All-day goals + Create CTA */}
-  {(allDayGoals.length > 0 || onCreateGoal) && (
-    <div className="space-y-2">
-      {allDayGoals.length > 0 && (
-        <>
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1">
-            All Day
-          </h3>
-          <div className="space-y-3">
-            {allDayGoals.map((goal) => (
-              <GoalTimelineCard ... />
-            ))}
-          </div>
-        </>
-      )}
-      {onCreateGoal && (
-        <button onClick={onCreateGoal} className="w-full flex items-center gap-3 rounded-xl border border-dashed border-border px-4 py-4 text-muted-foreground hover:bg-muted/50 transition-colors">
-          <Plus className="h-5 w-5 shrink-0" />
-          <span className="text-base font-medium">Add Goal</span>
-        </button>
-      )}
-    </div>
-  )}
-
-  {/* Divider — show when CTA or all-day goals exist AND there are timeline items */}
-  {(allDayGoals.length > 0 || onCreateGoal) && items.length > 0 && (
-    <div className="border-t border-dashed border-border" />
-  )}
-
-  {/* Chronological card list (remove CTA from here) */}
-  <div className="space-y-3">
-    {items.map(...)}
-  </div>
-</div>
-```
-
-Single file change, no new props needed.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
