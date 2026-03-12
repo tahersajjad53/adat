@@ -71,6 +71,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
       setHasEndDate(false);
       setIsPublished(false);
       setPreferredTime(null);
+      setTag(null);
     }
   }, [open, goal]);
 
