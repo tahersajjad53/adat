@@ -17,6 +17,7 @@ import TagOrderPreferences from '@/components/profile/TagOrderPreferences';
 import { initPushNotifications } from '@/utils/pushNotifications';
 import OnTimeMeter from '@/components/profile/OnTimeMeter';
 import { useOnTimePrayerStats } from '@/hooks/useOnTimePrayerStats';
+import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 
 type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications' | 'today-view';
 
@@ -35,6 +36,7 @@ const Profile: React.FC = () => {
   const [namazRemindersEnabled, setNamazRemindersEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { qazaMonitoringEnabled, setQazaMonitoring } = useQazaMonitoring();
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -486,6 +488,18 @@ const Profile: React.FC = () => {
             </div>
             <NavArrowRight className="h-5 w-5 text-muted-foreground" />
           </button>
+
+          {/* Monitor Qaza Namaz */}
+          <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <span className="text-base font-medium">Monitor Qaza Namaz</span>
+              <p className="text-sm text-muted-foreground">Track missed prayers and mark them as Ada</p>
+            </div>
+            <Switch
+              checked={qazaMonitoringEnabled}
+              onCheckedChange={setQazaMonitoring}
+            />
+          </div>
 
           {/* Sign Out */}
           <button

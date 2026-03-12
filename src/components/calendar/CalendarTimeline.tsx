@@ -39,6 +39,7 @@ interface CalendarTimelineProps {
   onDeleteGoal?: (goalId: string) => void;
   onCreateGoal?: () => void;
   isGoalToggling?: boolean;
+  qazaMonitoringEnabled?: boolean;
 }
 
 function parseTimeToMinutes(t: string): number {
@@ -66,6 +67,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
   onDeleteGoal,
   onCreateGoal,
   isGoalToggling,
+  qazaMonitoringEnabled = true,
 }) => {
   const nowRef = useRef<HTMLDivElement>(null);
   const currentPrayerRef = useRef<HTMLDivElement>(null);
@@ -176,6 +178,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
                   isFuture={isFuture}
                   onToggle={() => onTogglePrayer(item.prayer.name)}
                   onFulfillQaza={() => onFulfillQaza(item.prayer.name)}
+                  qazaMonitoringEnabled={qazaMonitoringEnabled}
                 />
               </div>
             );
@@ -211,6 +214,7 @@ function PrayerSlotCard({
   isFuture,
   onToggle,
   onFulfillQaza,
+  qazaMonitoringEnabled,
 }: {
   prayer: CalendarDayPrayer;
   isPast: boolean;
@@ -218,9 +222,10 @@ function PrayerSlotCard({
   isFuture: boolean;
   onToggle: () => void;
   onFulfillQaza: () => void;
+  qazaMonitoringEnabled?: boolean;
 }) {
-  // Past missed → qaza card
-  if (isPast && p.status === 'missed' && !p.isCompleted && !p.isQazaFulfilled) {
+  // Past missed → qaza card (only if monitoring enabled)
+  if (isPast && p.status === 'missed' && !p.isCompleted && !p.isQazaFulfilled && qazaMonitoringEnabled !== false) {
     return (
       <div className="flex items-center justify-between rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-4">
         <div>

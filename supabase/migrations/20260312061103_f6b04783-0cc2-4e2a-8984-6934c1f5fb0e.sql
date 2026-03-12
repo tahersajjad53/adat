@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN qaza_monitoring_enabled boolean NOT NULL DEFAULT true;

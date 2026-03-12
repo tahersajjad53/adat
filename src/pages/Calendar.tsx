@@ -6,6 +6,7 @@ import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendarDay } from '@/hooks/useCalendarDay';
 import { useCalendarDayGoals } from '@/hooks/useCalendarDayGoals';
 import { useWeekQazaIndicators } from '@/hooks/useWeekQazaIndicators';
+import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 import { useGoalCompletions } from '@/hooks/useGoalCompletions';
 import { useGoals } from '@/hooks/useGoals';
 import { formatHijriDate, gregorianToBohra, getHijriMonthName } from '@/lib/hijri';
@@ -39,6 +40,7 @@ const Calendar: React.FC = () => {
   const [calendarView, setCalendarView] = useState<'week' | 'month'>('week');
   const [monthViewResetKey, setMonthViewResetKey] = useState(0);
   const { location } = useCalendar();
+  const { qazaMonitoringEnabled } = useQazaMonitoring();
 
   const weekCenter = useMemo(() => {
     const d = new Date();
@@ -47,7 +49,8 @@ const Calendar: React.FC = () => {
   }, [weekOffset]);
 
   const weekDates = useMemo(() => getWeekDates(weekCenter), [weekCenter]);
-  const qazaDays = useWeekQazaIndicators(weekDates);
+  const rawQazaDays = useWeekQazaIndicators(weekDates);
+  const qazaDays = qazaMonitoringEnabled ? rawQazaDays : new Set<string>();
 
   const {
     prayers, togglePrayer, fulfillQaza,
@@ -216,6 +219,7 @@ const Calendar: React.FC = () => {
             onDeleteGoal={deleteGoal}
             onCreateGoal={() => setCreatingGoal(true)}
             isGoalToggling={isToggling}
+            qazaMonitoringEnabled={qazaMonitoringEnabled}
           />
         </>
       )}

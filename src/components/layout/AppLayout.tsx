@@ -19,6 +19,7 @@ import { useGoals } from '@/hooks/useGoals';
 import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 
 import { useMissedPrayers } from '@/hooks/useMissedPrayers';
+import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 import ibadatLogo from '@/assets/ibadat-logo.svg';
 
 interface AppLayoutProps {
@@ -39,6 +40,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const isNamazPage = location.pathname === '/namaz';
   const isCalendarPage = location.pathname === '/calendar';
   const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
+  const { qazaMonitoringEnabled } = useQazaMonitoring();
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [calendarShowingToday, setCalendarShowingToday] = useState(true);
   const [calendarMonth, setCalendarMonth] = useState('');
@@ -126,7 +128,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : isNamazPage ? (
+            ) : isNamazPage && qazaMonitoringEnabled ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-10 w-10">
