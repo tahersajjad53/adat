@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useCalendar } from '@/contexts/CalendarContext';
 import { getRecurrenceDescription } from '@/lib/recurrence';
+import { useTags } from '@/hooks/useTags';
 import type { AdminGoal } from '@/types/adminGoals';
 
 interface AdminGoalCardProps {
@@ -21,7 +22,9 @@ const AdminGoalCard: React.FC<AdminGoalCardProps> = ({
   goal, onEdit, onDelete, onTogglePublish,
 }) => {
   const { currentDate } = useCalendar();
+  const { tags: dbTags } = useTags();
   const recurrenceLabel = getRecurrenceDescription(goal as any, currentDate?.hijri);
+  const tagLabel = goal.tag ? dbTags.find((t) => t.value === goal.tag)?.label : null;
 
   const formatTime = (hhmm: string) => {
     const [h, m] = hhmm.split(':').map(Number);
@@ -44,6 +47,11 @@ const AdminGoalCard: React.FC<AdminGoalCardProps> = ({
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
             {recurrenceLabel}
           </Badge>
+          {tagLabel && (
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
+              {tagLabel}
+            </Badge>
+          )}
         </div>
         {goal.description && (
           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">

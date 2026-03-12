@@ -63,6 +63,7 @@ export type Database = {
           recurrence_type: string
           sort_order: number
           start_date: string
+          tag: string | null
           title: string
           updated_at: string
         }
@@ -79,6 +80,7 @@ export type Database = {
           recurrence_type?: string
           sort_order?: number
           start_date?: string
+          tag?: string | null
           title: string
           updated_at?: string
         }
@@ -95,6 +97,7 @@ export type Database = {
           recurrence_type?: string
           sort_order?: number
           start_date?: string
+          tag?: string | null
           title?: string
           updated_at?: string
         }

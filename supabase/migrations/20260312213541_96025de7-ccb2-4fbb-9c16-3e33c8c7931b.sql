@@ -1,0 +1,1 @@
+ALTER TABLE admin_goals ADD COLUMN tag text;

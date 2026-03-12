@@ -37,6 +37,7 @@ export function useAdminGoals() {
           end_date: input.end_date,
           due_date: input.due_date,
           preferred_time: input.preferred_time ?? null,
+          tag: input.tag ?? null,
           is_published: input.is_published ?? false,
           sort_order: maxOrder + 1,
         })

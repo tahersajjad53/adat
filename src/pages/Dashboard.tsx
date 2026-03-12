@@ -79,6 +79,7 @@ const Dashboard: React.FC = () => {
       recurrence_type: g.recurrence_type as GoalWithStatus['recurrence_type'],
       recurrence_days: g.recurrence_days ?? null,
       recurrence_pattern: g.recurrence_pattern as any,
+      tag: (g as any).tag as GoalWithStatus['tag'],
       is_active: true,
       id: `${DYNAMIC_PREFIX}${g.id}`,
       isCompleted: isDynamicCompleted(g.id),

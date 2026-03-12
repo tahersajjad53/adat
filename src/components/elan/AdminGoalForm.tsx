@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Circle, Page, Calendar, Globe } from 'iconoir-react';
+import { Circle, Page, Calendar, Globe, Label as TagIcon } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTags } from '@/hooks/useTags';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -28,6 +29,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
   open, onOpenChange, goal, onSubmit, isLoading = false,
 }) => {
   const isMobile = useIsMobile();
+  const { tags: dbTags } = useTags();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -40,6 +42,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
   const [hasEndDate, setHasEndDate] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [preferredTime, setPreferredTime] = useState<string | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -55,6 +58,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
       setHasEndDate(!!goal.end_date);
       setIsPublished(goal.is_published);
       setPreferredTime(goal.preferred_time ?? null);
+      setTag(goal.tag ?? null);
     } else {
       setTitle('');
       setDescription('');
@@ -67,6 +71,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
       setHasEndDate(false);
       setIsPublished(false);
       setPreferredTime(null);
+      setTag(null);
     }
   }, [open, goal]);
 
@@ -90,6 +95,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
       start_date: recurrenceType === 'one-time' && dueDate ? dueDate : startDate,
       end_date: hasEndDate && endDate ? endDate : null,
       preferred_time: preferredTime,
+      tag: tag,
       is_published: isPublished,
     });
     onOpenChange(false);
@@ -116,6 +122,24 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
             }, 300);
           }}
         />
+      </div>
+
+      {/* Tag selector */}
+      <div className="flex flex-wrap gap-2 pt-1">
+        {dbTags.map((t) => (
+          <button
+            key={t.value}
+            type="button"
+            onClick={() => setTag(tag === t.value ? null : t.value)}
+            className={`rounded-full px-3 py-1.5 text-xs leading-none font-medium border transition-colors ${
+              tag === t.value
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-secondary text-secondary-foreground border-border hover:bg-accent'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
       </div>
 
       <CondensedAttributeRow icon={<Page className="size-4" />}>
