@@ -17,6 +17,7 @@ import TagOrderPreferences from '@/components/profile/TagOrderPreferences';
 import { initPushNotifications } from '@/utils/pushNotifications';
 import OnTimeMeter from '@/components/profile/OnTimeMeter';
 import { useOnTimePrayerStats } from '@/hooks/useOnTimePrayerStats';
+import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 
 type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications' | 'today-view';
 
