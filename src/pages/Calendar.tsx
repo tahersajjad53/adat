@@ -66,7 +66,7 @@ const Calendar: React.FC = () => {
   }, [preMaghribHijri]);
 
   const { toggleCompletion, isToggling } = useGoalCompletions({ forDate: hijriDateStr });
-  const { updateGoal, deleteGoal } = useGoals();
+  const { updateGoal, deleteGoal, createGoal } = useGoals();
 
   // Goal editing
   const [editingGoal, setEditingGoal] = useState<GoalWithStatus | null>(null);
