@@ -10,12 +10,14 @@ import { useMissedPrayers } from '@/hooks/useMissedPrayers';
 import { usePrayerTimes, getCurrentPrayerWindow } from '@/hooks/usePrayerTimes';
 import { useTodayProgress } from '@/hooks/useTodayProgress';
 import { Clock, WarningCircle } from 'iconoir-react';
+import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 
 const Namaz: React.FC = () => {
   const { prayers, togglePrayer, isLoading: prayersLoading } = usePrayerLog();
   const { overallPercentage } = useTodayProgress(prayers, prayersLoading);
   const { missedPrayers, unfulfilledCount, fulfillPrayer, isLoading: missedLoading } = useMissedPrayers();
   const { prayerTimes } = usePrayerTimes();
+  const { qazaMonitoringEnabled } = useQazaMonitoring();
   
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayer = currentPrayerWindow?.current || null;
