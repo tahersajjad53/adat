@@ -124,6 +124,24 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
         />
       </div>
 
+      {/* Tag selector */}
+      <div className="flex flex-wrap gap-2 pt-1">
+        {dbTags.map((t) => (
+          <button
+            key={t.value}
+            type="button"
+            onClick={() => setTag(tag === t.value ? null : t.value)}
+            className={`rounded-full px-3 py-1.5 text-xs leading-none font-medium border transition-colors ${
+              tag === t.value
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-secondary text-secondary-foreground border-border hover:bg-accent'
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
       <CondensedAttributeRow icon={<Page className="size-4" />}>
         <Textarea
           value={description}

@@ -47,6 +47,11 @@ const AdminGoalCard: React.FC<AdminGoalCardProps> = ({
           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">
             {recurrenceLabel}
           </Badge>
+          {tagLabel && (
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 shrink-0">
+              {tagLabel}
+            </Badge>
+          )}
         </div>
         {goal.description && (
           <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
