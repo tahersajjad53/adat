@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Circle, CheckCircle, Page, Calendar, Bell, Trash } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardOffset } from '@/hooks/use-keyboard-offset';
