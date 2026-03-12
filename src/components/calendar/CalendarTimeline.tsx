@@ -39,6 +39,7 @@ interface CalendarTimelineProps {
   onDeleteGoal?: (goalId: string) => void;
   onCreateGoal?: () => void;
   isGoalToggling?: boolean;
+  qazaMonitoringEnabled?: boolean;
 }
 
 function parseTimeToMinutes(t: string): number {
