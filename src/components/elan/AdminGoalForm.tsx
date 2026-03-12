@@ -95,6 +95,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
       start_date: recurrenceType === 'one-time' && dueDate ? dueDate : startDate,
       end_date: hasEndDate && endDate ? endDate : null,
       preferred_time: preferredTime,
+      tag: tag,
       is_published: isPublished,
     });
     onOpenChange(false);
