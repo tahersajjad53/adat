@@ -462,36 +462,6 @@ const Profile: React.FC = () => {
         </div>
 
         <div className="space-y-3">
-          {/* Account Information */}
-          <button
-            onClick={() => setActiveSection('account')}
-            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
-          >
-            <div className="flex items-center gap-3">
-              <User className="h-5 w-5 text-primary" />
-              <div className="text-left">
-                <span className="text-base font-medium">Account Information</span>
-                <p className="text-sm text-muted-foreground">Name, email, and location settings</p>
-              </div>
-            </div>
-            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
-          </button>
-
-          {/* Notifications */}
-          <button
-            onClick={() => setActiveSection('notifications')}
-            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
-          >
-            <div className="flex items-center gap-3">
-              <Bell className="h-5 w-5 text-primary" />
-              <div className="text-left">
-                <span className="text-base font-medium">Notifications</span>
-                <p className="text-sm text-muted-foreground">Manage your alerts and reminders</p>
-              </div>
-            </div>
-            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
-          </button>
-
           {/* Today View */}
           <button
             onClick={() => setActiveSection('today-view')}
@@ -502,6 +472,21 @@ const Profile: React.FC = () => {
               <div className="text-left">
                 <span className="text-base font-medium">Today View</span>
                 <p className="text-sm text-muted-foreground">Reorder goal categories</p>
+              </div>
+            </div>
+            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
+          </button>
+
+          {/* Monitor Qaza Namaz */}
+          <button
+            onClick={() => setActiveSection('qaza')}
+            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center gap-3">
+              <Clock className="h-5 w-5 text-primary" />
+              <div className="text-left">
+                <span className="text-base font-medium">Monitor Qaza Namaz</span>
+                <p className="text-sm text-muted-foreground">Track missed prayers and mark them as Ada</p>
               </div>
             </div>
             <NavArrowRight className="h-5 w-5 text-muted-foreground" />
@@ -522,17 +507,35 @@ const Profile: React.FC = () => {
             <NavArrowRight className="h-5 w-5 text-muted-foreground" />
           </button>
 
-          {/* Monitor Qaza Namaz */}
-          <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <span className="text-base font-medium">Monitor Qaza Namaz</span>
-              <p className="text-sm text-muted-foreground">Track missed prayers and mark them as Ada</p>
+          {/* Notifications */}
+          <button
+            onClick={() => setActiveSection('notifications')}
+            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center gap-3">
+              <Bell className="h-5 w-5 text-primary" />
+              <div className="text-left">
+                <span className="text-base font-medium">Notifications</span>
+                <p className="text-sm text-muted-foreground">Manage your alerts and reminders</p>
+              </div>
             </div>
-            <Switch
-              checked={qazaMonitoringEnabled}
-              onCheckedChange={setQazaMonitoring}
-            />
-          </div>
+            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
+          </button>
+
+          {/* Account Information */}
+          <button
+            onClick={() => setActiveSection('account')}
+            className="w-full flex items-center justify-between rounded-xl border border-border bg-card p-4 transition-colors hover:bg-muted/50"
+          >
+            <div className="flex items-center gap-3">
+              <User className="h-5 w-5 text-primary" />
+              <div className="text-left">
+                <span className="text-base font-medium">Account Information</span>
+                <p className="text-sm text-muted-foreground">Name, email, and location settings</p>
+              </div>
+            </div>
+            <NavArrowRight className="h-5 w-5 text-muted-foreground" />
+          </button>
 
           {/* Sign Out */}
           <button
