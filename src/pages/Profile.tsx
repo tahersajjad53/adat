@@ -19,7 +19,7 @@ import OnTimeMeter from '@/components/profile/OnTimeMeter';
 import { useOnTimePrayerStats } from '@/hooks/useOnTimePrayerStats';
 import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 
-type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications' | 'today-view';
+type ProfileSection = 'menu' | 'account' | 'theme' | 'notifications' | 'today-view' | 'qaza';
 
 const Profile: React.FC = () => {
   const { user, signOut } = useAuth();
