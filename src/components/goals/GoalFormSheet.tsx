@@ -81,6 +81,7 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   open,
   onOpenChange,
   goal,
+  defaultDate,
   onSubmit,
   onDelete,
   isLoading = false,
