@@ -113,45 +113,48 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
 
   return (
     <div className="space-y-4">
-      {/* All-day goals */}
-      {allDayGoals.length > 0 && (
+      {/* All-day goals + Create CTA */}
+      {(allDayGoals.length > 0 || onCreateGoal) && (
         <div className="space-y-2">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1">
-            All Day
-          </h3>
-          <div className="space-y-3">
-            {allDayGoals.map((goal) => (
-              <GoalTimelineCard
-                key={goal.id}
-                goal={goal}
-                isFuture={isFuture}
-                onToggle={() => onToggleGoal(goal.id)}
-                onEdit={() => onEditGoal(goal)}
-                onDelete={onDeleteGoal ? () => onDeleteGoal(goal.id) : undefined}
-                isToggling={isGoalToggling}
-              />
-            ))}
-          </div>
+          {allDayGoals.length > 0 && (
+            <>
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground px-1">
+                All Day
+              </h3>
+              <div className="space-y-3">
+                {allDayGoals.map((goal) => (
+                  <GoalTimelineCard
+                    key={goal.id}
+                    goal={goal}
+                    isFuture={isFuture}
+                    onToggle={() => onToggleGoal(goal.id)}
+                    onEdit={() => onEditGoal(goal)}
+                    onDelete={onDeleteGoal ? () => onDeleteGoal(goal.id) : undefined}
+                    isToggling={isGoalToggling}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+          {onCreateGoal && (
+            <button
+              onClick={onCreateGoal}
+              className="w-full flex items-center gap-3 rounded-xl border border-dashed border-border px-4 py-4 text-muted-foreground hover:bg-muted/50 transition-colors"
+            >
+              <Plus className="h-5 w-5 shrink-0" />
+              <span className="text-base font-medium">Add Goal</span>
+            </button>
+          )}
         </div>
       )}
 
-      {/* Divider between all-day and timeline */}
-      {allDayGoals.length > 0 && items.length > 0 && (
+      {/* Divider */}
+      {(allDayGoals.length > 0 || onCreateGoal) && items.length > 0 && (
         <div className="border-t border-dashed border-border" />
       )}
 
       {/* Chronological card list */}
       <div className="space-y-3">
-        {/* Create Goal CTA */}
-        {onCreateGoal && (
-          <button
-            onClick={onCreateGoal}
-            className="w-full flex items-center gap-3 rounded-xl border border-dashed border-border px-4 py-4 text-muted-foreground hover:bg-muted/50 transition-colors"
-          >
-            <Plus className="h-5 w-5 shrink-0" />
-            <span className="text-base font-medium">Add Goal</span>
-          </button>
-        )}
         {items.map((item, idx) => {
           if (item.type === 'now') {
             return (
