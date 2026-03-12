@@ -42,6 +42,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
   const [hasEndDate, setHasEndDate] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [preferredTime, setPreferredTime] = useState<string | null>(null);
+  const [tag, setTag] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
