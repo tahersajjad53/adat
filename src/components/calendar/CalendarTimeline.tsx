@@ -221,9 +221,10 @@ function PrayerSlotCard({
   isFuture: boolean;
   onToggle: () => void;
   onFulfillQaza: () => void;
+  qazaMonitoringEnabled?: boolean;
 }) {
-  // Past missed → qaza card
-  if (isPast && p.status === 'missed' && !p.isCompleted && !p.isQazaFulfilled) {
+  // Past missed → qaza card (only if monitoring enabled)
+  if (isPast && p.status === 'missed' && !p.isCompleted && !p.isQazaFulfilled && qazaMonitoringEnabled !== false) {
     return (
       <div className="flex items-center justify-between rounded-xl border border-destructive/30 bg-destructive/5 px-4 py-4">
         <div>
