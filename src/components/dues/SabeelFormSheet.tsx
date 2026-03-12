@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardOffset } from '@/hooks/use-keyboard-offset';
 import { Button } from '@/components/ui/button';
@@ -50,7 +50,8 @@ const SabeelFormSheet: React.FC<SabeelFormSheetProps> = ({
   isLoading = false,
 }) => {
   const isMobile = useIsMobile();
-  const keyboardOffset = useKeyboardOffset();
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const keyboardOffset = useKeyboardOffset({ enabled: isMobile && open, containerRef: sheetRef });
   const { currentDate } = useCalendar();
 
   // Form state
@@ -324,7 +325,7 @@ const SabeelFormSheet: React.FC<SabeelFormSheetProps> = ({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[90vh] overflow-y-auto transition-[padding]" style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}>
+        <SheetContent ref={sheetRef} side="bottom" className="h-[90vh] overflow-y-auto" style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}>
           <SheetHeader className="text-left">
             <SheetTitle>{title}</SheetTitle>
             <SheetDescription>{description}</SheetDescription>

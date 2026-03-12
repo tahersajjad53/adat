@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useKeyboardOffset } from '@/hooks/use-keyboard-offset';
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetFooter } from '@/components/ui/sheet';
@@ -16,7 +16,8 @@ interface TasbeehFormSheetProps {
 
 export default function TasbeehFormSheet({ open, onOpenChange, onSubmit, isLoading, initial }: TasbeehFormSheetProps) {
   const isMobile = useIsMobile();
-  const keyboardOffset = useKeyboardOffset();
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const keyboardOffset = useKeyboardOffset({ enabled: isMobile && open, containerRef: sheetRef });
   const [title, setTitle] = useState('');
   const [target, setTarget] = useState('');
 
@@ -75,7 +76,8 @@ export default function TasbeehFormSheet({ open, onOpenChange, onSubmit, isLoadi
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
           side="bottom"
-          className="max-h-[85dvh] flex flex-col rounded-t-2xl transition-[padding]"
+          ref={sheetRef}
+          className="max-h-[85dvh] flex flex-col rounded-t-2xl"
           onOpenAutoFocus={(e) => e.preventDefault()}
           style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}
         >
