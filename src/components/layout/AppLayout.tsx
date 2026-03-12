@@ -40,6 +40,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   const isNamazPage = location.pathname === '/namaz';
   const isCalendarPage = location.pathname === '/calendar';
   const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
+  const { qazaMonitoringEnabled } = useQazaMonitoring();
   const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   const [calendarShowingToday, setCalendarShowingToday] = useState(true);
   const [calendarMonth, setCalendarMonth] = useState('');
