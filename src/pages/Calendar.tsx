@@ -40,6 +40,7 @@ const Calendar: React.FC = () => {
   const [calendarView, setCalendarView] = useState<'week' | 'month'>('week');
   const [monthViewResetKey, setMonthViewResetKey] = useState(0);
   const { location } = useCalendar();
+  const { qazaMonitoringEnabled } = useQazaMonitoring();
 
   const weekCenter = useMemo(() => {
     const d = new Date();
