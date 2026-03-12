@@ -29,6 +29,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
   open, onOpenChange, goal, onSubmit, isLoading = false,
 }) => {
   const isMobile = useIsMobile();
+  const { tags: dbTags } = useTags();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
