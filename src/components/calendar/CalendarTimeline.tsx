@@ -64,6 +64,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
   onToggleGoal,
   onEditGoal,
   onDeleteGoal,
+  onCreateGoal,
   isGoalToggling,
 }) => {
   const nowRef = useRef<HTMLDivElement>(null);
