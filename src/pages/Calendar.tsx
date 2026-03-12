@@ -219,6 +219,7 @@ const Calendar: React.FC = () => {
             onDeleteGoal={deleteGoal}
             onCreateGoal={() => setCreatingGoal(true)}
             isGoalToggling={isToggling}
+            qazaMonitoringEnabled={qazaMonitoringEnabled}
           />
         </>
       )}
