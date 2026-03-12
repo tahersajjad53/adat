@@ -489,6 +489,18 @@ const Profile: React.FC = () => {
             <NavArrowRight className="h-5 w-5 text-muted-foreground" />
           </button>
 
+          {/* Monitor Qaza Namaz */}
+          <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <span className="text-base font-medium">Monitor Qaza Namaz</span>
+              <p className="text-sm text-muted-foreground">Track missed prayers and mark them as Ada</p>
+            </div>
+            <Switch
+              checked={qazaMonitoringEnabled}
+              onCheckedChange={setQazaMonitoring}
+            />
+          </div>
+
           {/* Sign Out */}
           <button
             onClick={signOut}

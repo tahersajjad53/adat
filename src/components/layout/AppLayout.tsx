@@ -128,7 +128,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : isNamazPage ? (
+            ) : isNamazPage && qazaMonitoringEnabled ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-10 w-10">
