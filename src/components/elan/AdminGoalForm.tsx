@@ -58,6 +58,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
       setHasEndDate(!!goal.end_date);
       setIsPublished(goal.is_published);
       setPreferredTime(goal.preferred_time ?? null);
+      setTag(goal.tag ?? null);
     } else {
       setTitle('');
       setDescription('');
