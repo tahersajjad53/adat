@@ -67,6 +67,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
   onDeleteGoal,
   onCreateGoal,
   isGoalToggling,
+  qazaMonitoringEnabled = true,
 }) => {
   const nowRef = useRef<HTMLDivElement>(null);
   const currentPrayerRef = useRef<HTMLDivElement>(null);
