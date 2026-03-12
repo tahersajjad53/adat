@@ -325,7 +325,7 @@ const SabeelFormSheet: React.FC<SabeelFormSheetProps> = ({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="h-[90vh] overflow-y-auto transition-[padding]" style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}>
+        <SheetContent ref={sheetRef} side="bottom" className="h-[90vh] overflow-y-auto" style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}>
           <SheetHeader className="text-left">
             <SheetTitle>{title}</SheetTitle>
             <SheetDescription>{description}</SheetDescription>

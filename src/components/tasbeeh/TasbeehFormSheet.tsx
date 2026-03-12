@@ -76,7 +76,8 @@ export default function TasbeehFormSheet({ open, onOpenChange, onSubmit, isLoadi
       <Sheet open={open} onOpenChange={onOpenChange}>
         <SheetContent
           side="bottom"
-          className="max-h-[85dvh] flex flex-col rounded-t-2xl transition-[padding]"
+          ref={sheetRef}
+          className="max-h-[85dvh] flex flex-col rounded-t-2xl"
           onOpenAutoFocus={(e) => e.preventDefault()}
           style={{ paddingBottom: keyboardOffset > 0 ? keyboardOffset + 16 : undefined }}
         >
