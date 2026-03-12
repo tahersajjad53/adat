@@ -36,6 +36,7 @@ const Profile: React.FC = () => {
   const [namazRemindersEnabled, setNamazRemindersEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const { qazaMonitoringEnabled, setQazaMonitoring } = useQazaMonitoring();
 
   useEffect(() => {
     const fetchProfile = async () => {
