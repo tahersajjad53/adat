@@ -414,6 +414,39 @@ const Profile: React.FC = () => {
     );
   }
 
+  // Sub-section: Monitor Qaza Namaz
+  if (activeSection === 'qaza') {
+    return (
+      <div className="container py-8">
+        <div className="max-w-xl mx-auto space-y-6">
+          <button
+            onClick={() => setActiveSection('menu')}
+            className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <NavArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+
+          <div>
+            <h1 className="text-4xl font-normal tracking-tight font-display">Monitor Qaza Namaz</h1>
+            <p className="text-base text-muted-foreground mt-1 font-normal">Track and fulfil missed prayers.</p>
+          </div>
+
+          <div className="rounded-xl border border-border bg-card p-4 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <Label className="text-base font-medium">Monitor Qaza Namaz</Label>
+              <p className="text-sm text-muted-foreground">Track missed prayers and mark them as Ada</p>
+            </div>
+            <Switch
+              checked={qazaMonitoringEnabled}
+              onCheckedChange={setQazaMonitoring}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Main menu
   return (
     <div className="container py-8">
