@@ -401,6 +401,7 @@ export type Database = {
           namaz_reminders_enabled: boolean
           push_enabled: boolean
           push_token: string | null
+          qaza_monitoring_enabled: boolean
           theme: string | null
           timezone: string | null
           updated_at: string | null
@@ -419,6 +420,7 @@ export type Database = {
           namaz_reminders_enabled?: boolean
           push_enabled?: boolean
           push_token?: string | null
+          qaza_monitoring_enabled?: boolean
           theme?: string | null
           timezone?: string | null
           updated_at?: string | null
@@ -437,6 +439,7 @@ export type Database = {
           namaz_reminders_enabled?: boolean
           push_enabled?: boolean
           push_token?: string | null
+          qaza_monitoring_enabled?: boolean
           theme?: string | null
           timezone?: string | null
           updated_at?: string | null
