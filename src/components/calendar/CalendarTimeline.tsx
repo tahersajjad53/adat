@@ -10,7 +10,7 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import { cn } from '@/lib/utils';
-import { Undo, Clock, Check, WarningCircle, Trash } from 'iconoir-react';
+import { Undo, Clock, Check, WarningCircle, Trash, Plus } from 'iconoir-react';
 import { CalendarDayPrayer } from '@/hooks/useCalendarDay';
 import { AllPrayerName } from '@/hooks/usePrayerTimes';
 import type { GoalWithStatus } from '@/types/goals';
