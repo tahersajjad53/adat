@@ -22,7 +22,9 @@ const AdminGoalCard: React.FC<AdminGoalCardProps> = ({
   goal, onEdit, onDelete, onTogglePublish,
 }) => {
   const { currentDate } = useCalendar();
+  const { tags: dbTags } = useTags();
   const recurrenceLabel = getRecurrenceDescription(goal as any, currentDate?.hijri);
+  const tagLabel = goal.tag ? dbTags.find((t) => t.value === goal.tag)?.label : null;
 
   const formatTime = (hhmm: string) => {
     const [h, m] = hhmm.split(':').map(Number);
