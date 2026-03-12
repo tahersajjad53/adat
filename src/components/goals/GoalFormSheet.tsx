@@ -122,8 +122,9 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
         setRecurrenceType('one-time');
         setRecurrenceDays([]);
         setRecurrencePattern(null);
-        setDueDate(new Date().toISOString().split('T')[0]);
-        setStartDate(new Date().toISOString().split('T')[0]);
+        const dateStr = defaultDate || new Date().toISOString().split('T')[0];
+        setDueDate(dateStr);
+        setStartDate(dateStr);
         setIsActive(true);
         setPreferredTime(null);
         setReminderOffset(null);
