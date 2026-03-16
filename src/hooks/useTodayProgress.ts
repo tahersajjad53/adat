@@ -39,7 +39,7 @@ export function useTodayProgress(
   const { goals, isLoading: goalsLoading } = useGoals();
   const { isCompleted, isLoading: completionsLoading } = useGoalCompletions();
 
-  const hijriDate = currentDate?.hijri;
+  const hijriDate = currentDate?.preMaghribHijri;
   const gregorianDate = currentDate?.gregorian ?? null;
 
   const progressData = useMemo(() => {
