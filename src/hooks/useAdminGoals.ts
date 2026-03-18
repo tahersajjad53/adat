@@ -25,7 +25,7 @@ export function useAdminGoals() {
   const createMutation = useMutation({
     mutationFn: async (input: AdminGoalInput) => {
       const maxOrder = goals.reduce((max, g) => Math.max(max, g.sort_order), -1);
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('admin_goals')
         .insert({
           title: input.title,
