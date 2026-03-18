@@ -74,7 +74,7 @@ export function useAdminTags() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('tags')
         .delete()
         .eq('id', id);

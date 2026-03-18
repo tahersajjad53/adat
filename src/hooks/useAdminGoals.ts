@@ -78,7 +78,7 @@ export function useAdminGoals() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('admin_goals')
         .delete()
         .eq('id', id);

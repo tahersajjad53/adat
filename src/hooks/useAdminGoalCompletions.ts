@@ -52,7 +52,7 @@ export function useAdminGoalCompletions() {
         if (error) throw error;
         return { action: 'removed' as const };
       } else {
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('admin_goal_completions')
           .insert({
             user_id: user.id,
