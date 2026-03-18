@@ -39,7 +39,7 @@ export function useAdminTags() {
   const createMutation = useMutation({
     mutationFn: async (input: TagInput) => {
       const maxOrder = tags.length > 0 ? Math.max(...tags.map((t) => t.sort_order)) + 1 : 0;
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('tags')
         .insert({ ...input, sort_order: input.sort_order ?? maxOrder });
       if (error) throw error;
