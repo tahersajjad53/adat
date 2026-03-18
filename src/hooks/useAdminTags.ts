@@ -56,7 +56,7 @@ export function useAdminTags() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, input }: { id: string; input: Partial<TagInput> }) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('tags')
         .update(input)
         .eq('id', id);
