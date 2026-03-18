@@ -59,7 +59,7 @@ export function useAdminGoals() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, input }: { id: string; input: Partial<AdminGoalInput> }) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('admin_goals')
         .update(input)
         .eq('id', id);
