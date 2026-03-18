@@ -126,7 +126,9 @@ const TasbeehCounterPage: React.FC = () => {
           </svg>
           {/* Count – absolute overlay for true centering */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-8xl font-bold text-foreground tabular-nums leading-none" style={{ transform: 'translateY(0.05em)' }}>
+            <span className={`font-bold text-foreground tabular-nums leading-[0] ${
+              counter.current_count >= 10000 ? 'text-6xl' : counter.current_count >= 1000 ? 'text-7xl' : 'text-8xl'
+            }`}>
               {counter.current_count}
             </span>
           </div>
