@@ -51,7 +51,7 @@ export function useUserPreferences() {
   const sortOrderMutation = useMutation({
     mutationFn: async (order: string[]) => {
       if (!user) throw new Error('Not authenticated');
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_preferences')
         .upsert(
           { user_id: user.id, goal_sort_order: order },
