@@ -16,7 +16,7 @@ export function useUserPreferences() {
     queryKey: ['user-preferences', user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('user_preferences')
         .select('*')
         .eq('user_id', user.id)
