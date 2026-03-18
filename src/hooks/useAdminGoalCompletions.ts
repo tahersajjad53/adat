@@ -44,7 +44,7 @@ export function useAdminGoalCompletions() {
       }
       const existing = completionMap.get(adminGoalId);
       if (existing) {
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('admin_goal_completions')
           .delete()
           .eq('id', existing.id)
