@@ -1,19 +1,16 @@
 
 
-## Diagnosis: Corrupted Dependency State
+## Improve Dashboard card information layout
 
-The root error is:
-```
-Cannot find package 'vite' imported from /opt/template-node-modules/@vitejs/plugin-react-swc/index.js
-```
+### Changes
 
-This is an infrastructure-level dependency resolution failure. All the TypeScript errors (SheetContent missing `className`, `@supabase/supabase-js` missing exports, `@tanstack/react-query` missing `QueryClient`, etc.) are **cascading symptoms** — when Vite can't resolve, the TS compiler can't load type definitions from `node_modules`, so every third-party type breaks.
+**1. `src/components/calendar/DateDisplay.tsx`** — Update the compact variant:
+- Increase icon size from `h-4 w-4` to `h-6 w-6`
+- Increase Hijri date text from `text-sm sm:text-base` to `text-xl sm:text-2xl font-semibold`
+- Split the Gregorian date and location onto separate lines instead of combining them with `·`
+- Location shown on its own line below the Gregorian date
 
-The actual source code is correct. `sheet.tsx` properly extends `React.ComponentPropsWithoutRef` which includes `className`. The imports in `AuthContext.tsx`, `App.tsx`, etc. are all standard and valid.
-
-### Fix
-
-**Trigger a dependency reinstall** by making a trivial, no-op change to `package.json` — for example, bumping the version from `"0.0.0"` to `"0.0.1"`. This forces Lovable's build system to re-resolve and reinstall all packages, clearing the corrupted state.
-
-No other code changes needed. Single file, single line.
+**2. `src/components/namaz/DailyMeter.tsx`** — Update the compact variant:
+- Remove the "Ada" label span entirely
+- Keep just the percentage number
 
