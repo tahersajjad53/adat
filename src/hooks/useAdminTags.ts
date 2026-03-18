@@ -26,7 +26,7 @@ export function useAdminTags() {
   const { data: tags = [], isLoading } = useQuery({
     queryKey: ['admin-tags'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('tags')
         .select('*')
         .order('sort_order', { ascending: true });
