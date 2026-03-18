@@ -20,7 +20,7 @@ export function useAdminGoalCompletions() {
     queryKey: ['admin-goal-completions', user?.id, currentHijriDateStr],
     queryFn: async () => {
       if (!user || !currentHijriDateStr) return [];
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('admin_goal_completions')
         .select('*')
         .eq('user_id', user.id)
@@ -44,7 +44,7 @@ export function useAdminGoalCompletions() {
       }
       const existing = completionMap.get(adminGoalId);
       if (existing) {
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('admin_goal_completions')
           .delete()
           .eq('id', existing.id)
@@ -52,7 +52,7 @@ export function useAdminGoalCompletions() {
         if (error) throw error;
         return { action: 'removed' as const };
       } else {
-        const { error } = await (supabase as any)
+        const { error } = await supabase
           .from('admin_goal_completions')
           .insert({
             user_id: user.id,

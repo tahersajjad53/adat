@@ -12,7 +12,7 @@ export function useAdminGoals() {
   const { data: goals = [], isLoading } = useQuery({
     queryKey: ['admin-goals'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('admin_goals')
         .select('*')
         .order('sort_order', { ascending: true });
@@ -25,7 +25,7 @@ export function useAdminGoals() {
   const createMutation = useMutation({
     mutationFn: async (input: AdminGoalInput) => {
       const maxOrder = goals.reduce((max, g) => Math.max(max, g.sort_order), -1);
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('admin_goals')
         .insert({
           title: input.title,
@@ -59,7 +59,7 @@ export function useAdminGoals() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, input }: { id: string; input: Partial<AdminGoalInput> }) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('admin_goals')
         .update(input)
         .eq('id', id);
@@ -78,7 +78,7 @@ export function useAdminGoals() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('admin_goals')
         .delete()
         .eq('id', id);

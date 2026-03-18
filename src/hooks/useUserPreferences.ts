@@ -16,7 +16,7 @@ export function useUserPreferences() {
     queryKey: ['user-preferences', user?.id],
     queryFn: async () => {
       if (!user) return null;
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('user_preferences')
         .select('*')
         .eq('user_id', user.id)
@@ -34,7 +34,7 @@ export function useUserPreferences() {
   const toggleMutation = useMutation({
     mutationFn: async (enabled: boolean) => {
       if (!user) throw new Error('Not authenticated');
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_preferences')
         .upsert(
           { user_id: user.id, dynamic_goals_enabled: enabled },
@@ -51,7 +51,7 @@ export function useUserPreferences() {
   const sortOrderMutation = useMutation({
     mutationFn: async (order: string[]) => {
       if (!user) throw new Error('Not authenticated');
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_preferences')
         .upsert(
           { user_id: user.id, goal_sort_order: order },
@@ -67,7 +67,7 @@ export function useUserPreferences() {
   const tagSortOrderMutation = useMutation({
     mutationFn: async (order: string[]) => {
       if (!user) throw new Error('Not authenticated');
-      const { error } = await (supabase as any)
+      const { error } = await supabase
         .from('user_preferences')
         .upsert(
           { user_id: user.id, tag_sort_order: order },
