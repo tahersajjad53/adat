@@ -18,7 +18,7 @@ export function useDynamicGoals() {
   const { data: publishedGoals = [], isLoading } = useQuery({
     queryKey: ['admin-goals-published'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('admin_goals')
         .select('*')
         .eq('is_published', true)

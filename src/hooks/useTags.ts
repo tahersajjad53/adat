@@ -14,7 +14,7 @@ export function useTags() {
   const { data: tags = [], isLoading } = useQuery({
     queryKey: ['tags'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('tags')
         .select('slug, label')
         .eq('is_active', true)

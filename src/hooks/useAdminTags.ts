@@ -26,7 +26,7 @@ export function useAdminTags() {
   const { data: tags = [], isLoading } = useQuery({
     queryKey: ['admin-tags'],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('tags')
         .select('*')
         .order('sort_order', { ascending: true });
@@ -39,7 +39,7 @@ export function useAdminTags() {
   const createMutation = useMutation({
     mutationFn: async (input: TagInput) => {
       const maxOrder = tags.length > 0 ? Math.max(...tags.map((t) => t.sort_order)) + 1 : 0;
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('tags')
         .insert({ ...input, sort_order: input.sort_order ?? maxOrder });
       if (error) throw error;
@@ -56,7 +56,7 @@ export function useAdminTags() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, input }: { id: string; input: Partial<TagInput> }) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('tags')
         .update(input)
         .eq('id', id);
@@ -74,7 +74,7 @@ export function useAdminTags() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('tags')
         .delete()
         .eq('id', id);

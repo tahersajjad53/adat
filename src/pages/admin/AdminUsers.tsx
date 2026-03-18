@@ -55,7 +55,7 @@ const AdminUsers: React.FC = () => {
   const { data: users = [], isLoading } = useQuery<AdminUser[]>({
     queryKey: ['admin-users'],
     queryFn: async () => {
-      const { data, error } = await supabase.rpc('get_admin_users');
+      const { data, error } = await (supabase as any).rpc('get_admin_users');
       if (error) throw error;
       return data ?? [];
     },

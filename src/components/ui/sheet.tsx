@@ -48,15 +48,8 @@ const sheetVariants = cva(
 );
 
 interface SheetContentProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof sheetVariants> {
-  onOpenAutoFocus?: (event: Event) => void;
-  onCloseAutoFocus?: (event: Event) => void;
-  onEscapeKeyDown?: (event: KeyboardEvent) => void;
-  onPointerDownOutside?: (event: any) => void;
-  onInteractOutside?: (event: any) => void;
-  forceMount?: true;
-}
+  extends React.ComponentPropsWithoutRef<typeof SheetPrimitive.Content>,
+    VariantProps<typeof sheetVariants> {}
 
 const SheetContent = React.forwardRef<React.ElementRef<typeof SheetPrimitive.Content>, SheetContentProps>(
   ({ side = "right", className, children, ...props }, ref) => (
