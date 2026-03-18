@@ -12,7 +12,7 @@ export function useAdminGoals() {
   const { data: goals = [], isLoading } = useQuery({
     queryKey: ['admin-goals'],
     queryFn: async () => {
-      const { data, error } = await (supabase as any)
+      const { data, error } = await supabase
         .from('admin_goals')
         .select('*')
         .order('sort_order', { ascending: true });
