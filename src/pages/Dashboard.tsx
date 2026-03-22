@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { MapPin, SunLight, HalfMoon, Check } from 'iconoir-react';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendar } from '@/contexts/CalendarContext';
-import { DailyMeter } from '@/components/namaz/DailyMeter';
+
 import { TimeOfDayCard } from '@/components/namaz/TimeOfDayCard';
 import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/usePrayerTimes';
