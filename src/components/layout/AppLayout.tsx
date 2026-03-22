@@ -16,12 +16,6 @@ import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 
 import ibadatLogo from '@/assets/ibadat-logo.svg';
 
-export interface NamazMenuItem {
-  label: string;
-  disabled: boolean;
-  action: () => void;
-}
-
 interface AppLayoutProps {
   children: React.ReactNode;
 }
@@ -36,22 +30,10 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const navigate = useNavigate();
   const isGoalsPage = location.pathname === '/goals';
-  const isNamazPage = location.pathname === '/namaz';
   const isCalendarPage = location.pathname === '/calendar';
-  const [namazMenuItems, setNamazMenuItems] = useState<NamazMenuItem[]>([]);
   const [calendarShowingToday, setCalendarShowingToday] = useState(true);
   const [calendarMonth, setCalendarMonth] = useState('');
   const [calendarInMonthView, setCalendarInMonthView] = useState(false);
-
-  // Listen for namaz page menu items
-  React.useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      setNamazMenuItems(detail?.items ?? []);
-    };
-    window.addEventListener('namaz:menuChanged', handler);
-    return () => window.removeEventListener('namaz:menuChanged', handler);
-  }, []);
 
   React.useEffect(() => {
     const handler = (e: Event) => {
@@ -133,21 +115,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                   <DropdownMenuItem onClick={() => navigate('/goals/dynamic-goals')}>
                     Dynamic Goals
                   </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : isNamazPage && namazMenuItems.length > 0 ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10">
-                    <MoreHoriz className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover">
-                  {namazMenuItems.map((item, i) => (
-                    <DropdownMenuItem key={i} onClick={item.action} disabled={item.disabled}>
-                      {item.label}
-                    </DropdownMenuItem>
-                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : isCalendarPage && (calendarInMonthView || !calendarShowingToday) ? (
