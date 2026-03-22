@@ -15,7 +15,7 @@ import Signup from "./pages/Signup";
 import Today from "./pages/Dashboard";
 import Onboarding from "./pages/Onboarding";
 import Profile from "./pages/Profile";
-import Namaz from "./pages/Namaz";
+
 import Goals from "./pages/Goals";
 import CompletedGoals from "./pages/CompletedGoals";
 import Calendar from "./pages/Calendar";
