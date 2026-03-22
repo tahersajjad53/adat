@@ -16,12 +16,6 @@ import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 
 import ibadatLogo from '@/assets/ibadat-logo.svg';
 
-export interface NamazMenuItem {
-  label: string;
-  disabled: boolean;
-  action: () => void;
-}
-
 interface AppLayoutProps {
   children: React.ReactNode;
 }
