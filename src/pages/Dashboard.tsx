@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { MapPin, SunLight, HalfMoon, Check } from 'iconoir-react';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendar } from '@/contexts/CalendarContext';
-import { DailyMeter } from '@/components/namaz/DailyMeter';
+
 import { TimeOfDayCard } from '@/components/namaz/TimeOfDayCard';
 import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/usePrayerTimes';
@@ -153,10 +153,7 @@ const Dashboard: React.FC = () => {
         {/* Unified Time-Aware Card */}
         <div onClick={() => navigate('/calendar')} className="cursor-pointer">
         <TimeOfDayCard currentPrayer={currentPrayerName}>
-          <div className="flex items-start justify-between">
-            <DateDisplay showLocation compact variant="light" />
-            <DailyMeter percentage={overallPercentage} compact variant="light" />
-          </div>
+          <DateDisplay showLocation compact variant="light" />
 
           {!location?.city && (
             <Button
@@ -170,16 +167,21 @@ const Dashboard: React.FC = () => {
             </Button>
           )}
 
-          {/* Striped progress bar */}
-          <div className="meter-track mt-3 mb-4 h-2 w-full rounded-full overflow-hidden">
-            <div
-              className="meter-fill h-full rounded-full transition-all"
-              style={{
-                width: `${overallPercentage}%`,
-                backgroundImage:
-                  'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 6px)',
-              }}
-            />
+          {/* Inline percentage + progress bar */}
+          <div className="flex items-center gap-3 mt-3 mb-4">
+            <span className="shrink-0 text-2xl font-bold font-display text-foreground">
+              {overallPercentage}%
+            </span>
+            <div className="meter-track h-2 w-full rounded-full overflow-hidden flex-1">
+              <div
+                className="meter-fill h-full rounded-full transition-all"
+                style={{
+                  width: `${overallPercentage}%`,
+                  backgroundImage:
+                    'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 6px)',
+                }}
+              />
+            </div>
           </div>
 
           {prayerToShow ? (
