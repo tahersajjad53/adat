@@ -117,21 +117,6 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : isNamazPage && namazMenuItems.length > 0 ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-10 w-10">
-                    <MoreHoriz className="h-5 w-5" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="bg-popover">
-                  {namazMenuItems.map((item, i) => (
-                    <DropdownMenuItem key={i} onClick={item.action} disabled={item.disabled}>
-                      {item.label}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
             ) : isCalendarPage && (calendarInMonthView || !calendarShowingToday) ? (
               <button
                 onClick={() => window.dispatchEvent(new CustomEvent('calendar:goToToday'))}
