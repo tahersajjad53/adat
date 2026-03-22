@@ -35,16 +35,6 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [calendarMonth, setCalendarMonth] = useState('');
   const [calendarInMonthView, setCalendarInMonthView] = useState(false);
 
-  // Listen for namaz page menu items
-  React.useEffect(() => {
-    const handler = (e: Event) => {
-      const detail = (e as CustomEvent).detail;
-      setNamazMenuItems(detail?.items ?? []);
-    };
-    window.addEventListener('namaz:menuChanged', handler);
-    return () => window.removeEventListener('namaz:menuChanged', handler);
-  }, []);
-
   React.useEffect(() => {
     const handler = (e: Event) => {
       const detail = (e as CustomEvent).detail;
