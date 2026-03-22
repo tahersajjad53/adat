@@ -1,5 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { DailyMeter } from '@/components/namaz/DailyMeter';
 import { TimeOfDayCard } from '@/components/namaz/TimeOfDayCard';
@@ -15,12 +19,39 @@ import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 const Namaz: React.FC = () => {
   const { prayers, togglePrayer, isLoading: prayersLoading } = usePrayerLog();
   const { overallPercentage } = useTodayProgress(prayers, prayersLoading);
-  const { missedPrayers, unfulfilledCount, fulfillPrayer, isLoading: missedLoading } = useMissedPrayers();
+  const { missedPrayers, unfulfilledCount, fulfillPrayer, clearAllQaza, isLoading: missedLoading } = useMissedPrayers();
   const { prayerTimes } = usePrayerTimes();
   const { qazaMonitoringEnabled } = useQazaMonitoring();
+  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
   
   const currentPrayerWindow = prayerTimes ? getCurrentPrayerWindow(prayerTimes) : null;
   const currentPrayer = currentPrayerWindow?.current || null;
+
+  // Dispatch menu items to AppLayout header via custom event
+  const handleClearQaza = useCallback(() => {
+    setClearConfirmOpen(true);
+  }, []);
+
+  useEffect(() => {
+    if (qazaMonitoringEnabled) {
+      window.dispatchEvent(new CustomEvent('namaz:menuChanged', {
+        detail: {
+          items: [{
+            label: 'Clear Qaza Namaz',
+            disabled: unfulfilledCount === 0,
+            action: handleClearQaza,
+          }],
+        },
+      }));
+    } else {
+      window.dispatchEvent(new CustomEvent('namaz:menuChanged', { detail: { items: [] } }));
+    }
+
+    // Clear menu on unmount
+    return () => {
+      window.dispatchEvent(new CustomEvent('namaz:menuChanged', { detail: { items: [] } }));
+    };
+  }, [qazaMonitoringEnabled, unfulfilledCount, handleClearQaza]);
 
   return (
     <div className="container py-6 max-w-xl mx-auto space-y-6">
@@ -77,6 +108,28 @@ const Namaz: React.FC = () => {
         </div>
       )}
 
+      {/* Clear Qaza confirmation dialog */}
+      <AlertDialog open={clearConfirmOpen} onOpenChange={setClearConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Clear Qaza Namaz?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will mark all {unfulfilledCount} missed prayers as completed. New missed prayers will continue to appear going forward.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={async () => {
+                await clearAllQaza();
+                setClearConfirmOpen(false);
+              }}
+            >
+              Clear All
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

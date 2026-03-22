@@ -12,7 +12,7 @@ export function useDynamicGoals() {
   const { currentDate } = useCalendar();
   const { dynamicGoalsEnabled } = useUserPreferences();
 
-  const hijriDate = currentDate?.preMaghribHijri ?? currentDate?.hijri;
+  const hijriDate = currentDate?.preMaghribHijri;
   const gregorianDate = currentDate?.gregorian;
 
   const { data: publishedGoals = [], isLoading } = useQuery({

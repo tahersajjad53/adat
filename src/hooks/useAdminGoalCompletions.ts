@@ -9,7 +9,7 @@ export function useAdminGoalCompletions() {
   const { currentDate } = useCalendar();
   const queryClient = useQueryClient();
 
-  const hijriDate = currentDate?.preMaghribHijri ?? currentDate?.hijri;
+  const hijriDate = currentDate?.preMaghribHijri;
   const gregorianDate = currentDate?.gregorian;
 
   const currentHijriDateStr = hijriDate

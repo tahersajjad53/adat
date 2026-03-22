@@ -7,10 +7,6 @@ import { Button } from '@/components/ui/button';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuTrigger, DropdownMenuItem,
 } from '@/components/ui/dropdown-menu';
-import {
-  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
-  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { AppSidebar } from './AppSidebar';
 import { MobileBottomNav } from './MobileBottomNav';
 import GoalFormSheet from '@/components/goals/GoalFormSheet';
@@ -18,9 +14,13 @@ import TasbeehFormSheet from '@/components/tasbeeh/TasbeehFormSheet';
 import { useGoals } from '@/hooks/useGoals';
 import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 
-import { useMissedPrayers } from '@/hooks/useMissedPrayers';
-import { useQazaMonitoring } from '@/hooks/useQazaMonitoring';
 import ibadatLogo from '@/assets/ibadat-logo.svg';
+
+export interface NamazMenuItem {
+  label: string;
+  disabled: boolean;
+  action: () => void;
+}
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -33,18 +33,25 @@ export function AppLayout({ children }: AppLayoutProps) {
   const [tasbeehFormOpen, setTasbeehFormOpen] = useState(false);
   const { createGoal, isCreating } = useGoals();
   const { createCounter, isCreating: isCreatingTasbeeh } = useTasbeehCounters();
-  
 
   const navigate = useNavigate();
   const isGoalsPage = location.pathname === '/goals';
   const isNamazPage = location.pathname === '/namaz';
   const isCalendarPage = location.pathname === '/calendar';
-  const { unfulfilledCount, clearAllQaza } = useMissedPrayers();
-  const { qazaMonitoringEnabled } = useQazaMonitoring();
-  const [clearConfirmOpen, setClearConfirmOpen] = useState(false);
+  const [namazMenuItems, setNamazMenuItems] = useState<NamazMenuItem[]>([]);
   const [calendarShowingToday, setCalendarShowingToday] = useState(true);
   const [calendarMonth, setCalendarMonth] = useState('');
   const [calendarInMonthView, setCalendarInMonthView] = useState(false);
+
+  // Listen for namaz page menu items
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      setNamazMenuItems(detail?.items ?? []);
+    };
+    window.addEventListener('namaz:menuChanged', handler);
+    return () => window.removeEventListener('namaz:menuChanged', handler);
+  }, []);
 
   React.useEffect(() => {
     const handler = (e: Event) => {
@@ -128,7 +135,7 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : isNamazPage && qazaMonitoringEnabled ? (
+            ) : isNamazPage && namazMenuItems.length > 0 ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="h-10 w-10">
@@ -136,12 +143,11 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="bg-popover">
-                  <DropdownMenuItem
-                    onClick={() => setClearConfirmOpen(true)}
-                    disabled={unfulfilledCount === 0}
-                  >
-                    Clear Qaza Namaz
-                  </DropdownMenuItem>
+                  {namazMenuItems.map((item, i) => (
+                    <DropdownMenuItem key={i} onClick={item.action} disabled={item.disabled}>
+                      {item.label}
+                    </DropdownMenuItem>
+                  ))}
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : isCalendarPage && (calendarInMonthView || !calendarShowingToday) ? (
@@ -164,27 +170,6 @@ export function AppLayout({ children }: AppLayoutProps) {
         <MobileBottomNav onAddGoal={handleAddGoal} onAddTasbeeh={() => setTasbeehFormOpen(true)} />
         <GoalFormSheet open={goalFormOpen} onOpenChange={setGoalFormOpen} onSubmit={handleGoalSubmit} isLoading={isCreating} />
         <TasbeehFormSheet open={tasbeehFormOpen} onOpenChange={setTasbeehFormOpen} onSubmit={async (data) => { await createCounter(data); }} isLoading={isCreatingTasbeeh} />
-        <AlertDialog open={clearConfirmOpen} onOpenChange={setClearConfirmOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Clear Qaza Namaz?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will mark all {unfulfilledCount} missed prayers as completed. New missed prayers will continue to appear going forward.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={async () => {
-                  await clearAllQaza();
-                  setClearConfirmOpen(false);
-                }}
-              >
-                Clear All
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
     );
   }
