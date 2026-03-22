@@ -1,45 +1,44 @@
 
 
-## Fix Three Critical Stability Issues
+## Phase Out the Namaz Page
 
-### 1. Remove hijri fallback in useAdminGoalCompletions and useDynamicGoals
+Since the Namaz page is already inaccessible from navigation (not in bottom nav or sidebar), this is a cleanup task to remove dead code.
 
-Both hooks use `currentDate?.preMaghribHijri ?? currentDate?.hijri` which falls back to the post-Maghrib date, causing the same disappearing-completions bug fixed earlier for regular goals.
+### What gets removed
 
-**Files**: `src/hooks/useAdminGoalCompletions.ts` (line 12), `src/hooks/useDynamicGoals.ts` (line 15)
-**Change**: Replace `currentDate?.preMaghribHijri ?? currentDate?.hijri` with `currentDate?.preMaghribHijri` (no fallback).
+**Namaz-only files (delete)**
+| File | Reason |
+|---|---|
+| `src/pages/Namaz.tsx` | The page itself |
+| `src/components/namaz/PrayerList.tsx` | Only used by Namaz page |
+| `src/components/namaz/MissedPrayersList.tsx` | Only used by Namaz page |
+| `src/components/namaz/MissedPrayerCard.tsx` | Only used by MissedPrayersList |
+| `src/components/namaz/CurrentPrayerCard.tsx` | Not imported anywhere currently |
+| `src/hooks/useMissedPrayers.ts` | Only used by Namaz page |
 
-### 2. Move useMissedPrayers out of AppLayout
+**What stays (shared with Dashboard and/or Calendar)**
+| File | Used by |
+|---|---|
+| `src/components/namaz/TimeOfDayCard.tsx` | Dashboard, Namaz |
+| `src/components/namaz/DailyMeter.tsx` | Dashboard, Namaz |
+| `src/components/namaz/PrayerCard.tsx` | Calendar timeline |
+| `src/hooks/usePrayerLog.ts` | Dashboard |
+| `src/hooks/usePrayerTimes.ts` | Dashboard, Calendar, CalendarDay |
+| `src/hooks/useQazaMonitoring.ts` | Profile, Calendar |
+| `src/hooks/useOnTimePrayerStats.ts` | Profile |
+| `src/hooks/useWeekQazaIndicators.ts` | Calendar |
 
-`useMissedPrayers` runs an expensive historical scan on every page load because it's called in `AppLayout` (line 42). It's only needed for:
-- The Namaz page (already calls it directly)
-- The AppLayout header "Clear Qaza" menu (only visible on Namaz page)
-
-**File**: `src/components/layout/AppLayout.tsx`
-**Change**:
-- Remove `useMissedPrayers` import and call from AppLayout
-- The `unfulfilledCount` and `clearAllQaza` for the header menu need to come from the Namaz page instead
-- Lift the state via custom events (matching the existing pattern used for calendar state): Namaz page dispatches `namaz:qazaCountChanged` with `{ count, clearAllQaza }` and AppLayout listens
-- Alternatively (simpler): since the 3-dot menu with "Clear Qaza" only shows on Namaz page, move the menu trigger and AlertDialog into the Namaz page component itself, removing the need for AppLayout to know about qaza at all
-
-I'll use the simpler approach: move the "Clear Qaza" menu action into Namaz page and remove `useMissedPrayers` from AppLayout entirely.
-
-### 3. Add row limits to useMissedPrayers query
-
-The query fetches all `prayer_logs` since signup with no limit, which will hit Supabase's 1000-row default and cause silent data truncation.
-
-**File**: `src/hooks/useMissedPrayers.ts`
-**Changes**:
-- Paginate the Supabase query: fetch in batches of 1000 using `.range()` until all rows are retrieved
-- Add a safety cap (e.g., 90 days lookback) to avoid unbounded scans for long-tenured users, with the option to load older data on demand
-
-### Technical details
+### Files modified
 
 | File | Change |
 |---|---|
-| `src/hooks/useAdminGoalCompletions.ts` | Line 12: remove `?? currentDate?.hijri` fallback |
-| `src/hooks/useDynamicGoals.ts` | Line 15: remove `?? currentDate?.hijri` fallback |
-| `src/components/layout/AppLayout.tsx` | Remove `useMissedPrayers` import/call; remove qaza-specific header menu and AlertDialog |
-| `src/pages/Namaz.tsx` | Add the "Clear Qaza" header action (dispatch event for header menu, or embed menu directly) |
-| `src/hooks/useMissedPrayers.ts` | Add paginated fetching with `.range()` loops; cap default lookback to 90 days |
+| `src/App.tsx` | Remove Namaz import and `/namaz` route |
+| `src/components/layout/AppLayout.tsx` | Remove `isNamazPage`, `namazMenuItems` state, and the `namaz:menuChanged` event listener (all now dead code) |
+| `supabase/functions/send-namaz-reminders/index.ts` | Keep as-is (push notification backend, independent of page) |
+| Profile page | Keep as-is (namaz reminder toggle and qaza monitoring settings are still functional features) |
+
+### Summary
+- Delete 6 files (1 page, 3 components, 1 hook, 1 unused component)
+- Edit 2 files (App.tsx route removal, AppLayout cleanup)
+- Keep all shared prayer hooks/components used by Dashboard and Calendar
 
