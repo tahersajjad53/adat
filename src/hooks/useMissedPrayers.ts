@@ -26,8 +26,51 @@ interface UseMissedPrayersReturn {
   error: Error | null;
 }
 
+/** Default lookback window in days to avoid unbounded scans */
+const DEFAULT_LOOKBACK_DAYS = 90;
+
+/** Batch size for paginated Supabase queries (must be ≤ 1000) */
+const PAGE_SIZE = 1000;
+
 /**
- * Hook to fetch and manage missed prayers (prayers not completed on time)
+ * Fetch all prayer_logs for a date range using paginated queries
+ * to avoid Supabase's 1000-row default limit.
+ */
+async function fetchAllPrayerLogs(
+  userId: string,
+  startDateStr: string,
+  endDateStr: string
+) {
+  const allLogs: any[] = [];
+  let from = 0;
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('prayer_logs')
+      .select('*')
+      .eq('user_id', userId)
+      .gte('gregorian_date', startDateStr)
+      .lte('gregorian_date', endDateStr)
+      .range(from, from + PAGE_SIZE - 1);
+
+    if (error) throw error;
+
+    if (data && data.length > 0) {
+      allLogs.push(...data);
+    }
+
+    // If we got fewer rows than PAGE_SIZE, we've fetched everything
+    if (!data || data.length < PAGE_SIZE) break;
+
+    from += PAGE_SIZE;
+  }
+
+  return allLogs;
+}
+
+/**
+ * Hook to fetch and manage missed prayers (prayers not completed on time).
+ * Uses a 90-day lookback window by default to avoid unbounded historical scans.
  */
 export function useMissedPrayers(): UseMissedPrayersReturn {
   const { user } = useAuth();
@@ -63,26 +106,38 @@ export function useMissedPrayers(): UseMissedPrayersReturn {
           return;
         }
 
-        const startDate = new Date(profile.created_at);
-        // Start scanning from the day AFTER signup — user shouldn't have qaza on signup day
-        startDate.setDate(startDate.getDate() + 1);
+        // Start scanning from the day AFTER signup
+        const signupNextDay = new Date(profile.created_at);
+        signupNextDay.setDate(signupNextDay.getDate() + 1);
+
+        // Cap lookback to DEFAULT_LOOKBACK_DAYS to avoid unbounded scans
+        const lookbackStart = new Date();
+        lookbackStart.setDate(lookbackStart.getDate() - DEFAULT_LOOKBACK_DAYS);
+        lookbackStart.setHours(0, 0, 0, 0);
+
+        // Use the later of signup+1 or lookback cap
+        const startDate = signupNextDay > lookbackStart ? signupNextDay : lookbackStart;
+
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
         yesterday.setHours(23, 59, 59, 999);
 
-        // Get all prayer logs (including qaza completed ones) for the date range
-        const { data: prayerLogs, error: logsError } = await supabase
-          .from('prayer_logs')
-          .select('*')
-          .eq('user_id', user.id)
-          .gte('gregorian_date', startDate.toISOString().split('T')[0])
-          .lte('gregorian_date', yesterday.toISOString().split('T')[0]);
+        // No days to scan
+        if (startDate > yesterday) {
+          setMissedPrayers([]);
+          setIsLoading(false);
+          return;
+        }
 
-        if (logsError) throw logsError;
+        const startDateStr = startDate.toISOString().split('T')[0];
+        const endDateStr = yesterday.toISOString().split('T')[0];
+
+        // Get all prayer logs using paginated fetch
+        const prayerLogs = await fetchAllPrayerLogs(user.id, startDateStr, endDateStr);
 
         // Build a map of completed prayers
         const completedMap = new Map<string, { completedAt: Date | null; qazaAt: Date | null; id: string }>();
-        prayerLogs?.forEach((log) => {
+        prayerLogs.forEach((log: any) => {
           const key = `${log.prayer_date}-${log.prayer}`;
           completedMap.set(key, {
             completedAt: log.completed_at ? new Date(log.completed_at) : null,
