@@ -114,16 +114,6 @@ const App = () => (
                 }
               />
               <Route
-                path="/namaz"
-                element={
-                  <ProtectedRoute>
-                    <AppLayout>
-                      <Namaz />
-                    </AppLayout>
-                  </ProtectedRoute>
-                }
-              />
-              <Route
                 path="/tasbeeh/:id"
                 element={
                   <ProtectedRoute>
