@@ -30,9 +30,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const navigate = useNavigate();
   const isGoalsPage = location.pathname === '/goals';
-  const isNamazPage = location.pathname === '/namaz';
   const isCalendarPage = location.pathname === '/calendar';
-  const [namazMenuItems, setNamazMenuItems] = useState<NamazMenuItem[]>([]);
   const [calendarShowingToday, setCalendarShowingToday] = useState(true);
   const [calendarMonth, setCalendarMonth] = useState('');
   const [calendarInMonthView, setCalendarInMonthView] = useState(false);
