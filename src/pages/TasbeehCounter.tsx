@@ -47,6 +47,17 @@ const TasbeehCounterPage: React.FC = () => {
     : 0;
   const hasTarget = counter.target_count !== null && counter.target_count > 0;
 
+  // Contrast logic
+  const isInFill = hasTarget && percentage > 45;
+  const isHeaderInFill = hasTarget && percentage > 85;
+  const countColor = isInFill ? 'text-primary-foreground' : 'text-foreground';
+  const subtextColor = isInFill ? 'text-primary-foreground/80' : 'text-muted-foreground';
+  const headerColor = isHeaderInFill ? 'text-primary-foreground' : 'text-foreground';
+
+  // Fill height: when no target, show subtle 10% at low opacity
+  const fillHeight = hasTarget ? percentage : 10;
+  const fillOpacity = hasTarget ? 1 : 0.25;
+
   const handleTap = () => {
     const willHitTarget = hasTarget && counter.current_count + 1 === counter.target_count;
     incrementCounter(counter.id);
@@ -58,86 +69,62 @@ const TasbeehCounterPage: React.FC = () => {
     }
   };
 
-  // SVG radial ring params
-  const size = 260;
-  const strokeWidth = 18;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (percentage / 100) * circumference;
-
   return (
-    <div className="container py-4 max-w-lg mx-auto flex flex-col min-h-[calc(100dvh-2rem)]">
-      {/* Header */}
-      <div className="flex flex-col mb-4">
-        <div className="flex items-center justify-between">
-          <Button variant="ghost" size="icon" onClick={() => navigate(-1)}>
-            <NavArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold text-foreground truncate mx-4 text-center flex-1">
-            {counter.title || 'Tasbeeh'}
-          </h1>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon"><MoreHoriz className="h-5 w-5" /></Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="bg-popover">
-              <DropdownMenuItem onClick={() => setEditOpen(true)}>Edit</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setResetConfirm(true)}>Reset</DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setDeleteConfirm(true)} className="text-destructive">Delete</DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        {/* Reset button below title */}
-        {counter.current_count > 0 && (
-          <div className="flex justify-center mt-2">
-            <Button variant="outline" size="sm" onClick={() => setResetConfirm(true)}>
-              Reset
-            </Button>
-          </div>
-        )}
-      </div>
-
-      {/* Tap area */}
+    <>
+      {/* Liquid fill background */}
       <div
-        className="flex flex-col items-center justify-end pb-[15vh] select-none flex-1"
-      >
+        className="fixed inset-x-0 bottom-0 bg-primary transition-all duration-300 ease-out"
+        style={{ height: `${fillHeight}%`, opacity: fillOpacity }}
+      />
+
+      {/* Page content */}
+      <div className="relative z-10 flex flex-col min-h-dvh">
+        {/* Header */}
+        <div className="flex flex-col px-4 pt-4">
+          <div className="flex items-center justify-between">
+            <Button variant="ghost" size="icon" className={headerColor} onClick={() => navigate(-1)}>
+              <NavArrowLeft className="h-5 w-5" />
+            </Button>
+            <h1 className={`text-lg font-semibold truncate mx-4 text-center flex-1 transition-colors duration-300 ${headerColor}`}>
+              {counter.title || 'Tasbeeh'}
+            </h1>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="icon" className={headerColor}>
+                  <MoreHoriz className="h-5 w-5" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="bg-popover">
+                <DropdownMenuItem onClick={() => setEditOpen(true)}>Edit</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setResetConfirm(true)}>Reset</DropdownMenuItem>
+                <DropdownMenuItem onClick={() => setDeleteConfirm(true)} className="text-destructive">Delete</DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          {counter.current_count > 0 && (
+            <div className="flex justify-center mt-2">
+              <Button variant="outline" size="sm" onClick={() => setResetConfirm(true)}>
+                Reset
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Full-page tap area */}
         <button
           ref={buttonRef}
           onClick={handleTap}
-          className="relative active:scale-95 transition-transform focus:outline-none"
-          style={{ width: size, height: size }}
+          className="flex-1 flex flex-col items-center justify-center select-none active:opacity-80 transition-opacity focus:outline-none"
         >
-          {/* Radial ring */}
-          <svg className="absolute inset-0" width={size} height={size}>
-            <circle
-              cx={size / 2} cy={size / 2} r={radius}
-              fill="none" stroke="hsl(var(--muted))" strokeWidth={strokeWidth}
-            />
-            <circle
-              cx={size / 2} cy={size / 2} r={radius}
-              fill="none" stroke="hsl(var(--primary))" strokeWidth={strokeWidth}
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={hasTarget ? offset : 0}
-              opacity={hasTarget ? 1 : 0.25}
-              className="transition-all duration-150"
-              style={{ transform: 'rotate(-90deg)', transformOrigin: '50% 50%' }}
-            />
-          </svg>
-          {/* Count – absolute overlay for true centering */}
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-8xl font-bold text-foreground tabular-nums leading-none" style={{ transform: 'translateY(0.05em)' }}>
-              {counter.current_count}
-            </span>
-          </div>
+          <span className={`text-8xl font-bold tabular-nums leading-none transition-colors duration-300 ${countColor}`} style={{ transform: 'translateY(0.05em)' }}>
+            {counter.current_count}
+          </span>
+          {hasTarget && (
+            <p className={`mt-4 text-sm transition-colors duration-300 ${subtextColor}`}>
+              {counter.current_count} / {counter.target_count}
+            </p>
+          )}
         </button>
-
-        {/* Target label */}
-        {hasTarget && (
-          <p className="mt-4 text-sm text-muted-foreground">
-            {counter.current_count} / {counter.target_count}
-          </p>
-        )}
       </div>
 
       {/* Edit sheet */}
@@ -182,7 +169,7 @@ const TasbeehCounterPage: React.FC = () => {
         </AlertDialogContent>
       </AlertDialog>
       <ConfettiPortal />
-    </div>
+    </>
   );
 };
 
