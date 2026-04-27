@@ -109,13 +109,20 @@ const QazaNamaz: React.FC = () => {
             return (
               <div key={group.gregorianDate} className="rounded-xl border border-border bg-card overflow-hidden">
                 <div className="px-4 py-3 bg-muted/40 border-b border-border">
-                  <p
-                    dir="rtl"
-                    lang="ar"
-                    className="font-display text-2xl leading-tight text-foreground"
-                  >
-                    {formatHijriDate(group.preMaghribHijri, 'arabic')}
-                  </p>
+                  {(() => {
+                    const toArabicDigits = (n: number) =>
+                      String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[Number(d)]);
+                    const h = group.preMaghribHijri;
+                    return (
+                      <p
+                        dir="rtl"
+                        lang="ar"
+                        className="font-display text-2xl leading-tight text-foreground"
+                      >
+                        {`${toArabicDigits(h.day)} ${h.monthNameArabic} ${toArabicDigits(h.year)}`}
+                      </p>
+                    );
+                  })()}
                   <p className="text-xs text-muted-foreground mt-0.5">{group.dateLabel}</p>
                 </div>
                 <ul className="divide-y divide-border">
