@@ -111,7 +111,7 @@ const QazaNamaz: React.FC = () => {
                 <div className="px-4 py-2.5 bg-muted/40 border-b border-border">
                   <p className="text-sm font-medium text-foreground">{group.dateLabel}</p>
                   <p className="text-xs text-muted-foreground">
-                    {formatHijriDate(group.preMaghribHijri, { includeYear: true })}
+                    {formatHijriDate(group.preMaghribHijri, 'long')}
                   </p>
                 </div>
                 <ul className="divide-y divide-border">
