@@ -108,7 +108,8 @@ const QazaNamaz: React.FC = () => {
             if (visiblePrayers.length === 0) return null;
             return (
               <div key={group.gregorianDate} className="rounded-xl border border-border bg-card overflow-hidden">
-                <div className="px-4 py-3 bg-muted/40 border-b border-border">
+                <div className="px-4 py-3 bg-muted/40 border-b border-border flex items-center justify-between gap-3">
+                  <p className="text-xs text-muted-foreground">{group.dateLabel}</p>
                   {(() => {
                     const toArabicDigits = (n: number) =>
                       String(n).replace(/[0-9]/g, d => '٠١٢٣٤٥٦٧٨٩'[Number(d)]);
@@ -123,7 +124,6 @@ const QazaNamaz: React.FC = () => {
                       </p>
                     );
                   })()}
-                  <p className="text-xs text-muted-foreground mt-0.5">{group.dateLabel}</p>
                 </div>
                 <ul className="divide-y divide-border">
                   {visiblePrayers.map(item => {
