@@ -3,7 +3,7 @@
  * through yesterday. Provides actions to fulfill individually or clear all.
  */
 import { useMemo } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
 import { gregorianToBohra, advanceHijriDay, formatHijriDateKey, HijriDate } from '@/lib/hijri';
@@ -143,11 +143,8 @@ export function useMissedPrayers() {
     queryClient.invalidateQueries({ queryKey: ['month-prayer-logs'] });
   };
 
-  const fulfillMutation = useMutation({
-    mutationFn: async ({ gregorianDate, prayer }: { gregorianDate: string; prayer: PrayerName; hijri: HijriDate }) => {
-      if (!user) throw new Error('Not authenticated');
-    },
-  });
+
+
 
   const fulfillQaza = async (item: MissedPrayerItem) => {
     if (!user) return;
