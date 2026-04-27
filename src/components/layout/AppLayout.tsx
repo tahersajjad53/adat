@@ -100,7 +100,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             <div className="flex-1 flex justify-center">
               <img src={ibadatLogo} alt="Ibadat" className="h-6 w-auto logo-themed" />
             </div>
-            {/* Right: 3-dot menu on goals/namaz page, spacer otherwise */}
+            {/* Right: 3-dot menu on goals/calendar page, spacer otherwise */}
             {isGoalsPage ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
@@ -117,13 +117,29 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-            ) : isCalendarPage && (calendarInMonthView || !calendarShowingToday) ? (
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('calendar:goToToday'))}
-                className="text-sm font-medium text-primary w-10 text-right"
-              >
-                Today
-              </button>
+            ) : isCalendarPage ? (
+              <div className="flex items-center gap-1">
+                {(calendarInMonthView || !calendarShowingToday) && (
+                  <button
+                    onClick={() => window.dispatchEvent(new CustomEvent('calendar:goToToday'))}
+                    className="text-sm font-medium text-primary px-1"
+                  >
+                    Today
+                  </button>
+                )}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-10 w-10">
+                      <MoreHoriz className="h-5 w-5" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="bg-popover">
+                    <DropdownMenuItem onClick={() => navigate('/calendar/qaza')}>
+                      View Qaza Namaz
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
               <div className="w-10" />
             )}

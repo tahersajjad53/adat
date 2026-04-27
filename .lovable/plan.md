@@ -1,60 +1,49 @@
+## Add Calendar Header Menu + Qaza Namaz Page
 
+### Header changes (`src/components/layout/AppLayout.tsx`)
 
-## Liquid Fill Tasbeeh Counter
+Today, the Calendar mobile header right slot shows EITHER the "Today" CTA OR nothing. Replace with a row that can show both: `[Today CTA?] [3-dot menu]`.
 
-Replace the radial ring progress indicator with a full-page liquid fill effect that rises from the bottom based on completion percentage.
+- On `/calendar`, always render the 3-dot `MoreHoriz` `DropdownMenu` button on the right
+- When `calendarInMonthView || !calendarShowingToday`, render the "Today" text button immediately to the LEFT of the 3-dot menu (same row)
+- Dropdown contains one item: **View Qaza Namaz** → `navigate('/calendar/qaza')`
+- Wrap the right slot in a `flex items-center gap-1` container; widen its container width allowance so two controls fit (replace fixed `w-10` right slot)
 
-### Visual concept
+### New page (`src/pages/QazaNamaz.tsx`) + route `/calendar/qaza`
 
-```text
-┌──────────────────┐
-│  ← Title     ⋯   │  ← header (z-10, always on top)
-│                   │
-│                   │  ← unfilled area (page background)
-│       42          │  ← count number (contrast-aware text)
-│   42 / 100        │
-│▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│  ← fill rises from bottom
-│▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓│     (42% filled = 42% of viewport)
-└──────────────────┘
-```
+Recreate the previously-existing Qaza list view:
 
-### Changes to `src/pages/TasbeehCounter.tsx`
+- Header (page-level, below app header): Title "Qaza Namaz" + badge with unfulfilled count + "Clear All" action in a small overflow button (confirmation dialog before bulk fulfill)
+- Empty state when count is 0: "No missed prayers — alhamdulillah"
+- List grouped by Gregorian date (most recent first), each group shows:
+  - Date header: weekday + Gregorian date · Hijri date (using same Maghrib split logic as `useCalendarDay`)
+  - Each unfulfilled prayer row: prayer display name + "Ada" button on the right
+- Tapping "Ada" upserts a `prayer_logs` row with `qaza_completed_at = now()` (same pattern as `fulfillQaza` in `useCalendarDay.ts`), then removes the row from the list
+- Respects `useQazaMonitoring`: if disabled, page shows a notice "Qaza monitoring is disabled. Enable it in Profile."
 
-1. **Remove SVG ring** — delete the radial ring SVG and its size/stroke/circumference calculations
+### Data hook (`src/hooks/useMissedPrayers.ts`) — recreated
 
-2. **Add liquid fill background** — a `div` positioned `fixed inset-0` with `bottom: 0` and `height: {percentage}%`, using `hsl(var(--primary))` as fill color. Smooth CSS transition on height (`transition-all duration-300`). When no target is set, show a subtle 10% fill at 25% opacity (matching current ring behavior)
+Mirror the spec from `docs/rn-spec/05-namaz.md`:
 
-3. **Contrast-aware text color** — compute whether the count text sits above or below the fill line:
-   - Calculate the fill boundary as a percentage of viewport height from the bottom
-   - The count is positioned ~center of the page. If the fill level reaches the count position, switch text to white (`text-primary-foreground`); otherwise keep `text-foreground`
-   - Use a simple threshold: if `percentage > 45` the count is "inside" the liquid → use light text
-   - Header buttons also get contrast treatment when `percentage > 85`
+1. Read `profiles.created_at` for the user
+2. Generate every Gregorian day from `created_at + 1 day` through **yesterday**
+3. Fetch all `prayer_logs` in that range
+4. For each (day × required prayer in `['fajr','dhuhr','asr','maghrib','isha']`): missed if no row OR row has neither `completed_at` nor `qaza_completed_at`
+5. Group by date desc, prayers in canonical order
+6. Expose: `groups`, `unfulfilledCount`, `fulfillQaza(date, prayer)`, `clearAll()`
+7. Use react-query keys (`['missed-prayers', userId]`) so invalidation refreshes Calendar's `useWeekQazaIndicators` / `useMonthIndicators` automatically — call `queryClient.invalidateQueries({ queryKey: ['week-prayer-logs'] })` and `['month-prayer-logs']` after mutations so calendar dot indicators update
 
-4. **Make the entire page tappable** — the tap button expands to fill the viewport (the whole page is the tap target), removing the fixed 260×260 constraint
+### Cross-page sync
 
-5. **Keep existing behavior** — confetti, haptics, reset button, edit/delete dialogs, target label all remain unchanged
+`useWeekQazaIndicators` and `useMonthIndicators` already key off `prayer_logs`. Invalidating those query keys on Ada/clear-all in the new page makes the calendar dots disappear immediately when the user returns.
 
-### Layout structure
+### Routing (`src/App.tsx`)
 
-```tsx
-{/* Fixed liquid fill behind everything */}
-<div className="fixed inset-x-0 bottom-0 bg-primary transition-all duration-300"
-     style={{ height: `${percentage}%` }} />
+Add a protected route `/calendar/qaza` rendering `<QazaNamaz />` inside `<AppLayout>`.
 
-{/* Page content on top */}
-<div className="relative z-10 flex flex-col min-h-dvh">
-  {/* Header */}
-  {/* Full-page tap button (flex-1) with centered count */}
-  {/* Target label */}
-</div>
-```
+### Files touched
 
-### Text contrast logic
-
-```ts
-const isInFill = hasTarget && percentage > 45;
-const isHeaderInFill = hasTarget && percentage > 85;
-const countColor = isInFill ? 'text-primary-foreground' : 'text-foreground';
-const headerColor = isHeaderInFill ? 'text-primary-foreground' : '';
-```
-
+- `src/components/layout/AppLayout.tsx` — header right slot for `/calendar`
+- `src/pages/QazaNamaz.tsx` — new page
+- `src/hooks/useMissedPrayers.ts` — new hook
+- `src/App.tsx` — new route
