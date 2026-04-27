@@ -1,49 +1,37 @@
-## Add Calendar Header Menu + Qaza Namaz Page
+## Promote Hijri Date on Qaza Group Headers
 
-### Header changes (`src/components/layout/AppLayout.tsx`)
+Make the Hijri date the primary line on each date group card in the Qaza Namaz page, render it in Arabic using the Al-Kanz font at a larger size, and demote the Gregorian date to the secondary line.
 
-Today, the Calendar mobile header right slot shows EITHER the "Today" CTA OR nothing. Replace with a row that can show both: `[Today CTA?] [3-dot menu]`.
+### Change
 
-- On `/calendar`, always render the 3-dot `MoreHoriz` `DropdownMenu` button on the right
-- When `calendarInMonthView || !calendarShowingToday`, render the "Today" text button immediately to the LEFT of the 3-dot menu (same row)
-- Dropdown contains one item: **View Qaza Namaz** → `navigate('/calendar/qaza')`
-- Wrap the right slot in a `flex items-center gap-1` container; widen its container width allowance so two controls fit (replace fixed `w-10` right slot)
+**`src/pages/QazaNamaz.tsx`** — group header block (`<div className="px-4 py-2.5 bg-muted/40 border-b border-border">`):
 
-### New page (`src/pages/QazaNamaz.tsx`) + route `/calendar/qaza`
+Before:
+```tsx
+<p className="text-sm font-medium text-foreground">{group.dateLabel}</p>
+<p className="text-xs text-muted-foreground">
+  {formatHijriDate(group.preMaghribHijri, 'long')}
+</p>
+```
 
-Recreate the previously-existing Qaza list view:
+After:
+```tsx
+<p
+  dir="rtl"
+  lang="ar"
+  className="font-display text-2xl leading-tight text-foreground"
+>
+  {formatHijriDate(group.preMaghribHijri, 'arabic')}
+</p>
+<p className="text-xs text-muted-foreground mt-0.5">{group.dateLabel}</p>
+```
 
-- Header (page-level, below app header): Title "Qaza Namaz" + badge with unfulfilled count + "Clear All" action in a small overflow button (confirmation dialog before bulk fulfill)
-- Empty state when count is 0: "No missed prayers — alhamdulillah"
-- List grouped by Gregorian date (most recent first), each group shows:
-  - Date header: weekday + Gregorian date · Hijri date (using same Maghrib split logic as `useCalendarDay`)
-  - Each unfulfilled prayer row: prayer display name + "Ada" button on the right
-- Tapping "Ada" upserts a `prayer_logs` row with `qaza_completed_at = now()` (same pattern as `fulfillQaza` in `useCalendarDay.ts`), then removes the row from the list
-- Respects `useQazaMonitoring`: if disabled, page shows a notice "Qaza monitoring is disabled. Enable it in Profile."
+### Notes
 
-### Data hook (`src/hooks/useMissedPrayers.ts`) — recreated
+- `formatHijriDate(..., 'arabic')` already returns the day + Arabic month name + year (e.g. `9 ذو القعدة 1447`).
+- Al-Kanz is the project's default `font-sans` and `font-display`, and it renders Arabic glyphs via its `unicode-range` declaration — no extra font class needed beyond `font-display`.
+- Slight vertical padding bump on the header block (`py-3`) optional for breathing room with the larger text.
 
-Mirror the spec from `docs/rn-spec/05-namaz.md`:
+### Out of scope
 
-1. Read `profiles.created_at` for the user
-2. Generate every Gregorian day from `created_at + 1 day` through **yesterday**
-3. Fetch all `prayer_logs` in that range
-4. For each (day × required prayer in `['fajr','dhuhr','asr','maghrib','isha']`): missed if no row OR row has neither `completed_at` nor `qaza_completed_at`
-5. Group by date desc, prayers in canonical order
-6. Expose: `groups`, `unfulfilledCount`, `fulfillQaza(date, prayer)`, `clearAll()`
-7. Use react-query keys (`['missed-prayers', userId]`) so invalidation refreshes Calendar's `useWeekQazaIndicators` / `useMonthIndicators` automatically — call `queryClient.invalidateQueries({ queryKey: ['week-prayer-logs'] })` and `['month-prayer-logs']` after mutations so calendar dot indicators update
-
-### Cross-page sync
-
-`useWeekQazaIndicators` and `useMonthIndicators` already key off `prayer_logs`. Invalidating those query keys on Ada/clear-all in the new page makes the calendar dots disappear immediately when the user returns.
-
-### Routing (`src/App.tsx`)
-
-Add a protected route `/calendar/qaza` rendering `<QazaNamaz />` inside `<AppLayout>`.
-
-### Files touched
-
-- `src/components/layout/AppLayout.tsx` — header right slot for `/calendar`
-- `src/pages/QazaNamaz.tsx` — new page
-- `src/hooks/useMissedPrayers.ts` — new hook
-- `src/App.tsx` — new route
+No other Hijri/Gregorian pairs in the app are reordered — this change is scoped to the Qaza Namaz date group cards only.

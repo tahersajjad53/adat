@@ -108,11 +108,15 @@ const QazaNamaz: React.FC = () => {
             if (visiblePrayers.length === 0) return null;
             return (
               <div key={group.gregorianDate} className="rounded-xl border border-border bg-card overflow-hidden">
-                <div className="px-4 py-2.5 bg-muted/40 border-b border-border">
-                  <p className="text-sm font-medium text-foreground">{group.dateLabel}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatHijriDate(group.preMaghribHijri, 'long')}
+                <div className="px-4 py-3 bg-muted/40 border-b border-border">
+                  <p
+                    dir="rtl"
+                    lang="ar"
+                    className="font-display text-2xl leading-tight text-foreground"
+                  >
+                    {formatHijriDate(group.preMaghribHijri, 'arabic')}
                   </p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{group.dateLabel}</p>
                 </div>
                 <ul className="divide-y divide-border">
                   {visiblePrayers.map(item => {
