@@ -56,7 +56,8 @@ const Calendar: React.FC = () => {
     prayers, togglePrayer, fulfillQaza,
     isLoading: prayersLoading, isToday, isPast, isFuture,
     preMaghribHijri,
-  } = useCalendarDay(selectedDate);
+  const qazaDays = qazaMonitoringEnabled ? rawQazaDays : new Map<string, 'red' | 'black'>();
+
 
   const {
     allDayGoals, timedGoals, isLoading: goalsLoading,

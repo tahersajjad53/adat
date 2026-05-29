@@ -45,7 +45,7 @@ export function useWeekQazaIndicators(weekDates: Date[]) {
       if (!user || !startDate) return [];
       const { data, error } = await supabase
         .from('prayer_logs')
-        .select('gregorian_date, prayer, completed_at')
+        .select('gregorian_date, prayer, completed_at, qaza_completed_at')
         .eq('user_id', user.id)
         .gte('gregorian_date', startDate)
         .lte('gregorian_date', endDate);
@@ -62,8 +62,7 @@ export function useWeekQazaIndicators(weekDates: Date[]) {
   }, [profile]);
 
   const qazaDays = useMemo(() => {
-    const result = new Set<string>();
-    // Only check past days that are strictly after signup date
+    const result = new Map<string, 'red' | 'black'>();
     const pastDates = weekDates.filter(d => {
       const dk = formatDateKey(d);
       return dk < today && (!signupDateKey || dk > signupDateKey);
@@ -72,14 +71,20 @@ export function useWeekQazaIndicators(weekDates: Date[]) {
     for (const date of pastDates) {
       const dk = formatDateKey(date);
       const dayLogs = logs?.filter(l => l.gregorian_date === dk) || [];
-      const completedPrayers = new Set(
-        dayLogs.filter(l => l.completed_at).map(l => l.prayer)
+      const onTime = new Set(dayLogs.filter(l => l.completed_at).map(l => l.prayer));
+      const qaza = new Set(
+        dayLogs.filter(l => !l.completed_at && l.qaza_completed_at).map(l => l.prayer)
       );
-      const hasMissed = REQUIRED_PRAYERS.some(p => !completedPrayers.has(p));
-      if (hasMissed) result.add(dk);
+      const hasMissed = REQUIRED_PRAYERS.some(p => !onTime.has(p) && !qaza.has(p));
+      if (hasMissed) {
+        result.set(dk, 'red');
+      } else if (REQUIRED_PRAYERS.some(p => qaza.has(p))) {
+        result.set(dk, 'black');
+      }
     }
     return result;
   }, [logs, weekDates, today, signupDateKey]);
 
   return qazaDays;
 }
+
