@@ -50,9 +50,8 @@ const Calendar: React.FC = () => {
 
   const weekDates = useMemo(() => getWeekDates(weekCenter), [weekCenter]);
   const rawQazaDays = useWeekQazaIndicators(weekDates);
-  const qazaDays = qazaMonitoringEnabled ? rawQazaDays : new Set<string>();
-
   const qazaDays = qazaMonitoringEnabled ? rawQazaDays : new Map<string, 'red' | 'black'>();
+
 
   const {
     prayers, togglePrayer, fulfillQaza,
