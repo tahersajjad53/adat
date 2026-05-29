@@ -7,7 +7,8 @@ interface WeekRowProps {
   selectedDate: Date;
   onSelectDate: (date: Date) => void;
   onShiftWeek: (direction: -1 | 1) => void;
-  qazaDays: Set<string>;
+  qazaDays: Map<string, 'red' | 'black'>;
+
 }
 
 function formatDateKey(d: Date): string {
@@ -99,7 +100,7 @@ export const WeekRow: React.FC<WeekRowProps> = ({
           const dk = formatDateKey(date);
           const isSelected = dk === selectedKey;
           const isToday = dk === todayKey;
-          const hasQaza = qazaDays.has(dk);
+          const qazaState = qazaDays.get(dk);
           const hijri = hijriDates[i];
 
           return (
@@ -127,12 +128,17 @@ export const WeekRow: React.FC<WeekRowProps> = ({
               )}>
                 {toArabicNumerals(hijri.day)}
               </span>
-              {hasQaza && (
+              {qazaState && (
                 <span className={cn(
                   'absolute top-1 right-1 h-1.5 w-1.5 rounded-full',
-                  isSelected ? 'bg-primary-foreground/80' : 'bg-destructive'
+                  isSelected
+                    ? 'bg-primary-foreground/80'
+                    : qazaState === 'red'
+                      ? 'bg-destructive'
+                      : 'bg-foreground'
                 )} />
               )}
+
             </button>
           );
         })}

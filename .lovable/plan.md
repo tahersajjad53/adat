@@ -1,37 +1,27 @@
-## Promote Hijri Date on Qaza Group Headers
+## Goal
+Reflect qaza ada (fulfilled) state in the week calendar's date-tab dot:
+- Red dot = day has at least one unfulfilled (missed) required prayer
+- Black dot = all required prayers are accounted for, but at least one was fulfilled as qaza
+- No dot = all required prayers were prayed on time (or day is today/future/pre-signup)
 
-Make the Hijri date the primary line on each date group card in the Qaza Namaz page, render it in Arabic using the Al-Kanz font at a larger size, and demote the Gregorian date to the secondary line.
+## Changes
 
-### Change
+### 1. `src/hooks/useWeekQazaIndicators.ts`
+- Also select `qaza_completed_at` from `prayer_logs`.
+- Return `Map<string, 'red' | 'black'>` instead of `Set<string>`.
+- Per past day after signup:
+  - `onTime` = prayers with `completed_at`
+  - `qaza` = prayers with `qaza_completed_at` (and no `completed_at`)
+  - If any required prayer missing from both → `'red'`
+  - Else if any required prayer is in `qaza` → `'black'`
+  - Else → no entry (no dot)
 
-**`src/pages/QazaNamaz.tsx`** — group header block (`<div className="px-4 py-2.5 bg-muted/40 border-b border-border">`):
+### 2. `src/components/calendar/WeekRow.tsx`
+- Change `qazaDays` prop type to `Map<string, 'red' | 'black'>`.
+- Render dot using `bg-destructive` for `'red'` and `bg-foreground` for `'black'`.
+- When the day is selected, keep current contrast (`bg-primary-foreground/80`).
 
-Before:
-```tsx
-<p className="text-sm font-medium text-foreground">{group.dateLabel}</p>
-<p className="text-xs text-muted-foreground">
-  {formatHijriDate(group.preMaghribHijri, 'long')}
-</p>
-```
+### 3. `src/pages/Calendar.tsx`
+- Update local `qazaDays` (the monitoring-disabled fallback) from `new Set<string>()` to `new Map()` and pass through.
 
-After:
-```tsx
-<p
-  dir="rtl"
-  lang="ar"
-  className="font-display text-2xl leading-tight text-foreground"
->
-  {formatHijriDate(group.preMaghribHijri, 'arabic')}
-</p>
-<p className="text-xs text-muted-foreground mt-0.5">{group.dateLabel}</p>
-```
-
-### Notes
-
-- `formatHijriDate(..., 'arabic')` already returns the day + Arabic month name + year (e.g. `9 ذو القعدة 1447`).
-- Al-Kanz is the project's default `font-sans` and `font-display`, and it renders Arabic glyphs via its `unicode-range` declaration — no extra font class needed beyond `font-display`.
-- Slight vertical padding bump on the header block (`py-3`) optional for breathing room with the larger text.
-
-### Out of scope
-
-No other Hijri/Gregorian pairs in the app are reordered — this change is scoped to the Qaza Namaz date group cards only.
+No business logic, DB, or schema changes. Existing `fulfillQaza` already writes `qaza_completed_at`, and the `week-prayer-logs` query is invalidated on fulfill, so the dot updates automatically after marking ada from either the Calendar timeline or the Qaza Namaz page.
