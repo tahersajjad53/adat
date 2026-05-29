@@ -52,11 +52,14 @@ const Calendar: React.FC = () => {
   const rawQazaDays = useWeekQazaIndicators(weekDates);
   const qazaDays = qazaMonitoringEnabled ? rawQazaDays : new Set<string>();
 
+  const qazaDays = qazaMonitoringEnabled ? rawQazaDays : new Map<string, 'red' | 'black'>();
+
   const {
     prayers, togglePrayer, fulfillQaza,
     isLoading: prayersLoading, isToday, isPast, isFuture,
     preMaghribHijri,
-  const qazaDays = qazaMonitoringEnabled ? rawQazaDays : new Map<string, 'red' | 'black'>();
+  } = useCalendarDay(selectedDate);
+
 
 
   const {
