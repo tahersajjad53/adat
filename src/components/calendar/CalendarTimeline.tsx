@@ -63,6 +63,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
   isLoading,
   onTogglePrayer,
   onFulfillQaza,
+  onUndoQaza,
   onToggleGoal,
   onEditGoal,
   onDeleteGoal,
