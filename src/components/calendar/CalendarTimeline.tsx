@@ -34,6 +34,7 @@ interface CalendarTimelineProps {
   isLoading: boolean;
   onTogglePrayer: (prayer: AllPrayerName) => void;
   onFulfillQaza: (prayer: AllPrayerName) => void;
+  onUndoQaza: (prayer: AllPrayerName) => void;
   onToggleGoal: (goalId: string) => void;
   onEditGoal: (goal: GoalWithStatus) => void;
   onDeleteGoal?: (goalId: string) => void;
