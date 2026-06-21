@@ -180,6 +180,7 @@ export const CalendarTimeline: React.FC<CalendarTimelineProps> = ({
                   isFuture={isFuture}
                   onToggle={() => onTogglePrayer(item.prayer.name)}
                   onFulfillQaza={() => onFulfillQaza(item.prayer.name)}
+                  onUndoQaza={() => onUndoQaza(item.prayer.name)}
                   qazaMonitoringEnabled={qazaMonitoringEnabled}
                 />
               </div>
