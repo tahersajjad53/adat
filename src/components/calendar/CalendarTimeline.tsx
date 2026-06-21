@@ -217,6 +217,7 @@ function PrayerSlotCard({
   isFuture,
   onToggle,
   onFulfillQaza,
+  onUndoQaza,
   qazaMonitoringEnabled,
 }: {
   prayer: CalendarDayPrayer;
@@ -225,8 +226,11 @@ function PrayerSlotCard({
   isFuture: boolean;
   onToggle: () => void;
   onFulfillQaza: () => void;
+  onUndoQaza: () => void;
   qazaMonitoringEnabled?: boolean;
 }) {
+  const [undoOpen, setUndoOpen] = React.useState(false);
+
   // Past missed → qaza card (only if monitoring enabled)
   if (isPast && p.status === 'missed' && !p.isCompleted && !p.isQazaFulfilled && qazaMonitoringEnabled !== false) {
     return (
@@ -257,16 +261,43 @@ function PrayerSlotCard({
   // Past fulfilled qaza
   if (isPast && p.isQazaFulfilled && !p.isCompleted) {
     return (
-      <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-4">
-        <Check className="h-4 w-4 text-primary shrink-0" />
-        <div>
-          <span className="font-semibold text-base line-through text-muted-foreground">{p.displayName}</span>
-          <span className="text-sm text-muted-foreground ml-2">{p.time}</span>
-          <p className="text-xs text-primary">Qaza fulfilled</p>
+      <>
+        <div className="flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 px-4 py-4">
+          <Check className="h-4 w-4 text-primary shrink-0" />
+          <div className="flex-1 min-w-0">
+            <span className="font-semibold text-base line-through text-muted-foreground">{p.displayName}</span>
+            <span className="text-sm text-muted-foreground ml-2">{p.time}</span>
+            <p className="text-xs text-primary">Qaza fulfilled</p>
+          </div>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setUndoOpen(true)}
+            className="text-xs text-muted-foreground hover:text-foreground shrink-0"
+            aria-label="Move back to qaza"
+          >
+            Undo
+          </Button>
         </div>
-      </div>
+        <AlertDialog open={undoOpen} onOpenChange={setUndoOpen}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Move {p.displayName} back to qaza?</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will mark {p.displayName} as unfulfilled again so you can track it accurately.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={onUndoQaza}>Move to qaza</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </>
     );
   }
+
+
 
   // Normal prayer card with gradient
   const gradientClass = GRADIENT_MAP[p.name];
