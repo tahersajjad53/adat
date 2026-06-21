@@ -54,7 +54,7 @@ const Calendar: React.FC = () => {
 
 
   const {
-    prayers, togglePrayer, fulfillQaza,
+    prayers, togglePrayer, fulfillQaza, undoQaza,
     isLoading: prayersLoading, isToday, isPast, isFuture,
     preMaghribHijri,
   } = useCalendarDay(selectedDate);
