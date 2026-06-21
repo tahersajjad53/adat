@@ -175,6 +175,32 @@ export function useCalendarDay(selectedDate: Date) {
     }
   }, [user, isPast, dateKey, preMaghribHijri, postMaghribHijri]);
 
+  // Undo a previously-fulfilled qaza (revert back to missed/qaza state)
+  const undoQaza = useCallback(async (prayer: AllPrayerName) => {
+    if (!user || !isPast) return;
+    try {
+      await supabase.from('prayer_logs')
+        .update({ qaza_completed_at: null })
+        .eq('user_id', user.id)
+        .eq('gregorian_date', dateKey)
+        .eq('prayer', prayer);
+      setCompletedPrayers(prev => {
+        const next = new Map(prev);
+        const existing = next.get(prayer);
+        if (existing) {
+          if (existing.completedAt) {
+            next.set(prayer, { ...existing, qazaAt: null });
+          } else {
+            next.delete(prayer);
+          }
+        }
+        return next;
+      });
+    } catch (err) {
+      console.error('Error undoing qaza:', err);
+    }
+  }, [user, isPast, dateKey]);
+
   // Build prayer statuses
   const prayers: CalendarDayPrayer[] = useMemo(() => {
     if (!prayerTimes) return [];
