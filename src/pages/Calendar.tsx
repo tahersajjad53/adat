@@ -217,6 +217,11 @@ const Calendar: React.FC = () => {
             isLoading={prayersLoading || goalsLoading}
             onTogglePrayer={togglePrayer}
             onFulfillQaza={fulfillQaza}
+            onUndoQaza={async (prayer) => {
+              await undoQaza(prayer);
+              const { toast } = await import('sonner');
+              toast.success('Moved back to qaza');
+            }}
             onToggleGoal={toggleCompletion}
             onEditGoal={setEditingGoal}
             onDeleteGoal={deleteGoal}
