@@ -262,6 +262,7 @@ export function useCalendarDay(selectedDate: Date) {
     prayerTimes,
     togglePrayer,
     fulfillQaza,
+    undoQaza,
     isLoading: isLoading || !prayerTimes,
     isToday,
     isPast,
