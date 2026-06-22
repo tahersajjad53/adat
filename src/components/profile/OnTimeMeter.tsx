@@ -136,7 +136,7 @@ const OnTimeMeter: React.FC<OnTimeMeterProps> = ({ percentage, totalTracked }) =
           On Time
         </text>
       </svg>
-      <p className="text-xs text-muted-foreground">Based on {totalTracked} prayers tracked</p>
+      <p className="text-xs text-muted-foreground">Last 30 days · {totalTracked} prayer{totalTracked === 1 ? '' : 's'} tracked</p>
     </div>
   );
 };

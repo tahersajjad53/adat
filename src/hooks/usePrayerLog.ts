@@ -181,9 +181,11 @@ export function usePrayerLog(): UsePrayerLogReturn {
           return next;
         });
       }
+      window.dispatchEvent(new CustomEvent('prayer-log:changed'));
     } catch (err) {
       console.error('Error toggling prayer:', err);
     }
+
   }, [user, gregorianDate, currentDate, completedPrayers]);
 
   // Build prayers list with status
