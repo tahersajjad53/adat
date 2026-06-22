@@ -144,9 +144,11 @@ export function useCalendarDay(selectedDate: Date) {
           return next;
         });
       }
+      window.dispatchEvent(new CustomEvent('prayer-log:changed'));
     } catch (err) {
       console.error('Error toggling prayer:', err);
     }
+
   }, [user, isToday, dateKey, preMaghribHijri, postMaghribHijri, completedPrayers]);
 
   // Fulfill qaza (for past missed prayers)
