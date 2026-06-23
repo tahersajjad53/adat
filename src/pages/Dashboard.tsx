@@ -36,6 +36,17 @@ const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: stri
   nisfulLayl: HalfMoon,
 };
 
+const GRADIENT_CLASSES: Record<AllPrayerName | 'default', string> = {
+  fajr: 'gradient-fajr',
+  dhuhr: 'gradient-zuhr',
+  asr: 'gradient-asr',
+  maghrib: 'gradient-maghrib',
+  isha: 'gradient-isha',
+  nisfulLayl: 'gradient-nisful-layl',
+  default: 'gradient-fajr',
+};
+
+
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const { location, requestLocationPermission } = useCalendar();
