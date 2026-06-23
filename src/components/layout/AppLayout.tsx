@@ -155,7 +155,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         </header>
         
         {/* Main content */}
-        <main>{children}</main>
+        <main className="relative z-10">{children}</main>
+
         
         {/* Bottom navigation */}
         <MobileBottomNav onAddGoal={handleAddGoal} onAddTasbeeh={() => setTasbeehFormOpen(true)} />
