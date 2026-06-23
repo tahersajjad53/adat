@@ -8,7 +8,7 @@ import { MapPin, SunLight, HalfMoon, Check } from 'iconoir-react';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendar } from '@/contexts/CalendarContext';
 
-import { AllPrayerName as _AllPrayerName } from '@/hooks/usePrayerTimes';
+
 import { usePrayerLog } from '@/hooks/usePrayerLog';
 import { usePrayerTimes, getCurrentPrayerWindow, AllPrayerName } from '@/hooks/usePrayerTimes';
 import { useTodayProgress } from '@/hooks/useTodayProgress';
