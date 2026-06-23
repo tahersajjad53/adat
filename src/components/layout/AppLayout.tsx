@@ -77,11 +77,19 @@ export function AppLayout({ children }: AppLayoutProps) {
     );
   }
 
+  const isDashboard = location.pathname === '/today';
+
   if (isMobile) {
     return (
       <div className="min-h-screen bg-background pb-20">
         {/* Mobile Header */}
-        <header className="sticky top-0 z-40 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50 pt-safe-min">
+        <header
+          className={
+            isDashboard
+              ? 'sticky top-0 z-40 bg-transparent pt-safe-min'
+              : 'sticky top-0 z-40 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50 pt-safe-min'
+          }
+        >
           <div className="container flex h-14 items-center">
             {/* Left spacer */}
             {isCalendarPage && calendarMonth ? (
@@ -147,7 +155,8 @@ export function AppLayout({ children }: AppLayoutProps) {
         </header>
         
         {/* Main content */}
-        <main>{children}</main>
+        <main className="relative z-10">{children}</main>
+
         
         {/* Bottom navigation */}
         <MobileBottomNav onAddGoal={handleAddGoal} onAddTasbeeh={() => setTasbeehFormOpen(true)} />

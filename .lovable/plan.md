@@ -1,30 +1,63 @@
-## Make the "Namaz on time" stat live and meaningful
+## Goal
 
-### What's wrong today
-- The Profile meter calls `useOnTimePrayerStats`, which loads prayer logs **once on mount** and never refreshes — marking a prayer doesn't update the percentage until the page is reloaded.
-- It also aggregates **every prayer log ever recorded** for the user. A user with months of history barely sees newer prayers move the needle, so the number feels stale and inaccurate.
+Transform the Today page from a card-based namaz block into a seamless, immersive surface where the time-of-day gradient flows from behind the status bar and header down through the prayer section, then fades softly into the page background before the goals list begins.
 
-### Proposed window
-Use a **rolling 30-day window** (last 30 calendar days, including today). Rationale:
-- Large enough to be statistically meaningful (≈150 prayers at full adherence).
-- Small enough that recent behavior visibly moves the number — a few on-time prayers today shift it.
-- Matches common "recent habit" framing users intuitively expect from a live stat.
+## Visual Concept
 
-The meter label will be updated to read "Last 30 days" under the percentage so the user knows the scope.
+```text
+┌─────────────────────────┐
+│ status bar (gradient)   │ ← safe-area tinted with prayer gradient
+│ header (transparent)    │
+│                         │
+│   date · location       │  prayer gradient
+│   progress bar          │  (e.g. pastel blue for Fajr)
+│   Current Namaz · Fajr  │
+│                         │
+│  ╲ soft fade to bg ╱    │ ← seamless transition
+│                         │
+│   Today's Goals         │  normal background
+│   • goal 1              │
+│   • goal 2              │
+└─────────────────────────┘
+```
 
-### Make it live
-- Refetch the stat whenever a prayer log changes for the current user (mark on-time, mark qaza, undo qaza, log from the calendar, etc.).
-- Re-query on window focus so returning to the Profile tab always reflects the latest state.
+No card border, no rounded box, no shadow — the prayer info sits directly on the painted background.
 
-### Files to change
-1. **`src/hooks/useOnTimePrayerStats.ts`**
-   - Filter `prayer_logs` by `prayer_date >= today − 30 days`.
-   - Add a refresh mechanism: listen for a custom `prayer-log:changed` event and re-run the fetch; also re-run on `window` focus.
-2. **Prayer mutation sites** — dispatch `prayer-log:changed` after every successful prayer insert/update/delete so the stat refreshes immediately:
-   - `src/hooks/usePrayerLog.ts` (today's prayer marking)
-   - `src/hooks/useMissedPrayers.ts` (qaza fulfillment)
-   - `src/hooks/useCalendarDay.ts` (calendar marking + undo qaza)
-3. **`src/components/profile/OnTimeMeter.tsx`** — show a small "Last 30 days" caption beneath the percentage so the window is transparent to the user.
+## Scope of Changes
 
-### Out of scope
-No schema changes, no changes to how on-time vs. late is determined (still the existing prayer-window comparison), no changes to the meter's visual design beyond the new caption.
+### 1. New: page-level gradient backdrop
+Render the active prayer gradient as a fixed/absolute layer at the top of the Today page that:
+- starts at the very top of the viewport (covers safe-area / status bar region)
+- extends down past the prayer info
+- fades to `hsl(var(--background))` via a mask/gradient overlay so the goals list sits on the normal page surface with no visible seam
+
+### 2. `src/pages/Dashboard.tsx`
+- Replace the `<TimeOfDayCard>` wrapper with an inline, borderless layout: same children (DateDisplay, progress bar, current/next namaz row) rendered directly on the gradient backdrop, no card padding box.
+- Add the backdrop layer (a div using the chosen `gradient-*` class + a bottom-fade mask).
+- Keep tap-to-navigate-to-calendar behavior on the prayer section only.
+
+### 3. `src/components/layout/AppLayout.tsx` (mobile only)
+- On the Dashboard route, make the mobile header transparent (remove `bg-background/40 backdrop-blur` border) so the gradient shows through behind it.
+- Keep the header sticky and keep `pt-safe-min` so the status-bar area is also tinted by the gradient sitting beneath it.
+- Other routes keep current header styling.
+
+### 4. `src/components/namaz/TimeOfDayCard.tsx`
+- Either retire usage on Dashboard (keep the file for other consumers if any) or add a `variant="seamless"` that drops padding/rounding/overflow. Quick audit will confirm; component will stay backward compatible.
+
+### 5. Existing gradient tokens — reused as-is
+The six `gradient-fajr` / `gradient-zuhr` / `gradient-asr` / `gradient-maghrib` / `gradient-isha` / `gradient-nisful-layl` classes in `src/index.css` (lines 218-270, including `.theme-bhukur` overrides) are the gradient source — no color changes.
+
+## Technical Notes
+
+- Fade-out uses a CSS mask: `mask-image: linear-gradient(to bottom, black 60%, transparent 100%)` on the backdrop layer, so the gradient dissolves into the page background instead of ending in a hard line.
+- Backdrop is `position: absolute` inside a Dashboard-level relative wrapper, `top: 0`, full width, height tuned so the fade completes just above the goals list (≈ 420px on mobile).
+- Header transparency is scoped to the Dashboard route via a prop (`transparentHeader`) or `useLocation` check inside `AppLayout`.
+- Text inside the gradient region keeps using `text-foreground` / `text-foreground/70` tokens — gradients already provide adequate contrast in both Oudh and Bhukur themes.
+- Desktop layout: gradient backdrop also applies inside the main content area on the Dashboard route, behind the same prayer block; sidebar/header chrome unchanged.
+
+## Out of Scope
+
+- No changes to gradient colors themselves.
+- No changes to prayer/goal data or logic.
+- No changes to goals list visual styling.
+- No changes to other pages.
