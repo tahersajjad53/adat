@@ -240,6 +240,9 @@ const Dashboard: React.FC = () => {
             )}
           </section>
 
+          <div className="h-8" />
+
+
 
         {/* Tasbeeh Counters */}
         {tasbeehCounters.length > 0 && (
