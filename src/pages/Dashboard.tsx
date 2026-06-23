@@ -158,69 +158,88 @@ const Dashboard: React.FC = () => {
     );
   }
 
+  const gradientClass = currentPrayerName
+    ? GRADIENT_CLASSES[currentPrayerName]
+    : GRADIENT_CLASSES.default;
+
   return (
-    <div className="container py-8">
-      <div className="max-w-2xl mx-auto space-y-8">
-        {/* Unified Time-Aware Card */}
-        <div onClick={() => navigate('/calendar')} className="cursor-pointer">
-        <TimeOfDayCard currentPrayer={currentPrayerName}>
-          <DateDisplay showLocation compact variant="light" />
+    <div className="relative">
+      {/* Seamless time-of-day gradient backdrop: flows behind status bar + header,
+          fades softly into page background before the goals list */}
+      <div
+        aria-hidden
+        className={`pointer-events-none fixed inset-x-0 top-0 h-[520px] ${gradientClass}`}
+        style={{
+          WebkitMaskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)',
+          maskImage: 'linear-gradient(to bottom, black 55%, transparent 100%)',
+          zIndex: 0,
+        }}
+      />
 
-          {!location?.city && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={requestLocationPermission}
-              className="mt-3 gap-2 border-foreground/20 text-foreground hover:bg-foreground/10 hover:text-foreground"
-            >
-              <MapPin className="h-4 w-4" />
-              Set your location
-            </Button>
-          )}
+      <div className="container pt-6 pb-8 relative">
+        <div className="max-w-2xl mx-auto space-y-8">
+          {/* Seamless Namaz Section (no card chrome) */}
+          <section
+            onClick={() => navigate('/calendar')}
+            className="cursor-pointer px-1"
+          >
+            <DateDisplay showLocation compact variant="light" />
 
-          {/* Inline percentage + progress bar */}
-          <div className="flex items-center gap-3 mt-3 mb-4">
-            <span className="shrink-0 text-2xl font-bold font-display text-foreground">
-              {overallPercentage}%
-            </span>
-            <div className="meter-track h-2 w-full rounded-full overflow-hidden flex-1">
-              <div
-                className="meter-fill h-full rounded-full transition-all"
-                style={{
-                  width: `${overallPercentage}%`,
-                  backgroundImage:
-                    'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 6px)',
-                }}
-              />
-            </div>
-          </div>
+            {!location?.city && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={requestLocationPermission}
+                className="mt-3 gap-2 border-foreground/20 text-foreground hover:bg-foreground/10 hover:text-foreground"
+              >
+                <MapPin className="h-4 w-4" />
+                Set your location
+              </Button>
+            )}
 
-          {prayerToShow ? (
-          <div>
-              <span className="text-xs uppercase tracking-widest text-foreground/60 font-normal">
-                {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
+            {/* Inline percentage + progress bar */}
+            <div className="flex items-center gap-3 mt-3 mb-4">
+              <span className="shrink-0 text-2xl font-bold font-display text-foreground">
+                {overallPercentage}%
               </span>
-              <div className="flex items-center gap-3 mt-1">
-                <div onClick={(e) => e.stopPropagation()}>
-                  <Checkbox
-                    checked={prayerToShow.isCompleted}
-                    onCheckedChange={() => togglePrayer(prayerToShow.name)}
-                    className="h-6 w-6 border-foreground/30 data-[state=checked]:bg-foreground/20 data-[state=checked]:text-foreground"
-                  />
-                </div>
-                <div className="flex items-baseline gap-2">
-                  <h3 className="text-2xl font-bold text-foreground font-display">
-                    {prayerToShow.displayName}
-                  </h3>
-                  <span className="text-sm text-foreground/70">{prayerToShow.time}</span>
-                </div>
+              <div className="meter-track h-2 w-full rounded-full overflow-hidden flex-1">
+                <div
+                  className="meter-fill h-full rounded-full transition-all"
+                  style={{
+                    width: `${overallPercentage}%`,
+                    backgroundImage:
+                      'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 6px)',
+                  }}
+                />
               </div>
             </div>
-          ) : (
-            <p className="text-foreground/70 text-sm font-medium">Reflect, rest, renew.</p>
-          )}
-        </TimeOfDayCard>
-        </div>
+
+            {prayerToShow ? (
+              <div>
+                <span className="text-xs uppercase tracking-widest text-foreground/60 font-normal">
+                  {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
+                </span>
+                <div className="flex items-center gap-3 mt-1">
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <Checkbox
+                      checked={prayerToShow.isCompleted}
+                      onCheckedChange={() => togglePrayer(prayerToShow.name)}
+                      className="h-6 w-6 border-foreground/30 data-[state=checked]:bg-foreground/20 data-[state=checked]:text-foreground"
+                    />
+                  </div>
+                  <div className="flex items-baseline gap-2">
+                    <h3 className="text-2xl font-bold text-foreground font-display">
+                      {prayerToShow.displayName}
+                    </h3>
+                    <span className="text-sm text-foreground/70">{prayerToShow.time}</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <p className="text-foreground/70 text-sm font-medium">Reflect, rest, renew.</p>
+            )}
+          </section>
+
 
         {/* Tasbeeh Counters */}
         {tasbeehCounters.length > 0 && (
