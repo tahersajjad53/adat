@@ -296,9 +296,11 @@ const Dashboard: React.FC = () => {
         />
 
         <WhatsNewPopup />
+        </div>
       </div>
     </div>
   );
+
 };
 
 export default Dashboard;
