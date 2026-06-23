@@ -240,7 +240,7 @@ const Dashboard: React.FC = () => {
             )}
           </section>
 
-          <div className="h-8" />
+          <div className="h-16" />
 
 
 
