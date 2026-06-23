@@ -241,7 +241,7 @@ const Dashboard: React.FC = () => {
           </section>
 
           <div className="flex items-center justify-center h-16" aria-hidden>
-            <Flower2 className="w-4 h-4 text-foreground/30" strokeWidth={1.5} />
+            <Flower className="w-4 h-4 text-foreground/30" strokeWidth={1.5} />
           </div>
 
 
