@@ -179,54 +179,80 @@ const Dashboard: React.FC = () => {
       <div className="container pt-6 pb-8 relative">
         <div className="max-w-2xl mx-auto space-y-8">
           {/* Seamless Namaz Section (no card chrome) */}
-          <section
-            onClick={() => navigate('/calendar')}
-            className="cursor-pointer px-1"
-          >
-            <DateDisplay showLocation compact variant="light" />
+          <section className="px-1">
+            {/* Chunky day-progress meter */}
+            <div
+              onClick={() => navigate('/calendar')}
+              role="button"
+              tabIndex={0}
+              className="cursor-pointer relative overflow-hidden rounded-3xl border border-foreground/15 bg-foreground/[0.04] backdrop-blur-sm h-44 sm:h-48 p-5 flex flex-col justify-between"
+            >
+              {/* Low-opacity fill tied to the time-of-day gradient */}
+              <div
+                aria-hidden
+                className={`absolute inset-y-0 left-0 ${gradientClass} transition-[width] duration-700 ease-out`}
+                style={{
+                  width: `${overallPercentage}%`,
+                  opacity: 0.55,
+                  WebkitMaskImage:
+                    'linear-gradient(to right, black 0%, black 85%, transparent 100%)',
+                  maskImage:
+                    'linear-gradient(to right, black 0%, black 85%, transparent 100%)',
+                }}
+              />
+              {/* subtle diagonal texture across the fill */}
+              <div
+                aria-hidden
+                className="absolute inset-y-0 left-0 pointer-events-none"
+                style={{
+                  width: `${overallPercentage}%`,
+                  backgroundImage:
+                    'repeating-linear-gradient(135deg, transparent, transparent 6px, rgba(255,255,255,0.06) 6px, rgba(255,255,255,0.06) 12px)',
+                }}
+              />
+
+              {/* Top-left: date */}
+              <div className="relative z-10">
+                <DateDisplay showLocation compact variant="light" />
+              </div>
+
+              {/* Bottom-left: big percentage */}
+              <div className="relative z-10 flex items-end justify-between gap-3">
+                <div className="flex flex-col leading-none">
+                  <span className="text-5xl sm:text-6xl font-bold font-display text-foreground tracking-tight">
+                    {overallPercentage}%
+                  </span>
+                  <span className="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-foreground/60 font-medium">
+                    Today's progress
+                  </span>
+                </div>
+              </div>
+            </div>
 
             {!location?.city && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={requestLocationPermission}
-                className="mt-3 gap-2 border-foreground/20 text-foreground hover:bg-foreground/10 hover:text-foreground"
+                className="mt-4 gap-2 border-foreground/20 text-foreground hover:bg-foreground/10 hover:text-foreground"
               >
                 <MapPin className="h-4 w-4" />
                 Set your location
               </Button>
             )}
 
-            {/* Inline percentage + progress bar */}
-            <div className="flex items-center gap-3 mt-3 mb-4">
-              <span className="shrink-0 text-2xl font-bold font-display text-foreground">
-                {overallPercentage}%
-              </span>
-              <div className="meter-track h-2 w-full rounded-full overflow-hidden flex-1">
-                <div
-                  className="meter-fill h-full rounded-full transition-all"
-                  style={{
-                    width: `${overallPercentage}%`,
-                    backgroundImage:
-                      'repeating-linear-gradient(135deg, transparent, transparent 3px, rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 6px)',
-                  }}
-                />
-              </div>
-            </div>
-
+            {/* Next / Current Namaz — below the meter */}
             {prayerToShow ? (
-              <div>
+              <div className="mt-5">
                 <span className="text-xs uppercase tracking-widest text-foreground/60 font-normal">
                   {currentPrayer ? 'Current Namaz' : 'Next Namaz'}
                 </span>
                 <div className="flex items-center gap-3 mt-1">
-                  <div onClick={(e) => e.stopPropagation()}>
-                    <Checkbox
-                      checked={prayerToShow.isCompleted}
-                      onCheckedChange={() => togglePrayer(prayerToShow.name)}
-                      className="h-6 w-6 border-foreground/30 data-[state=checked]:bg-foreground/20 data-[state=checked]:text-foreground"
-                    />
-                  </div>
+                  <Checkbox
+                    checked={prayerToShow.isCompleted}
+                    onCheckedChange={() => togglePrayer(prayerToShow.name)}
+                    className="h-6 w-6 border-foreground/30 data-[state=checked]:bg-foreground/20 data-[state=checked]:text-foreground"
+                  />
                   <div className="flex items-baseline gap-2">
                     <h3 className="text-2xl font-bold text-foreground font-display">
                       {prayerToShow.displayName}
@@ -236,7 +262,7 @@ const Dashboard: React.FC = () => {
                 </div>
               </div>
             ) : (
-              <p className="text-foreground/70 text-sm font-medium">Reflect, rest, renew.</p>
+              <p className="mt-5 text-foreground/70 text-sm font-medium">Reflect, rest, renew.</p>
             )}
           </section>
 
