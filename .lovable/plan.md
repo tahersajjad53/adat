@@ -1,63 +1,39 @@
-## Goal
+## Problem
 
-Transform the Today page from a card-based namaz block into a seamless, immersive surface where the time-of-day gradient flows from behind the status bar and header down through the prayer section, then fades softly into the page background before the goals list begins.
+iOS Safari (including installed PWAs) auto-zooms the viewport whenever a user taps a form field whose font-size is below 16px. Pinch-to-zoom-out is then required. Our current viewport meta tag is correct and accessibility-friendly (it allows user zoom), so the real fix is making sure every form control renders at ≥16px on mobile.
 
-## Visual Concept
+Audit findings:
+- `Input` — renders at `text-base` (16px) on mobile, shrinks to `text-sm` only on `md+`. Safe.
+- `Textarea` — renders at `text-sm` (14px) on all sizes. **Triggers zoom.**
+- Native `<select>`, search inputs, and any ad-hoc inputs styled with `text-sm` / `text-xs` will also trigger zoom.
 
-```text
-┌─────────────────────────┐
-│ status bar (gradient)   │ ← safe-area tinted with prayer gradient
-│ header (transparent)    │
-│                         │
-│   date · location       │  prayer gradient
-│   progress bar          │  (e.g. pastel blue for Fajr)
-│   Current Namaz · Fajr  │
-│                         │
-│  ╲ soft fade to bg ╱    │ ← seamless transition
-│                         │
-│   Today's Goals         │  normal background
-│   • goal 1              │
-│   • goal 2              │
-└─────────────────────────┘
+## Fix
+
+Add a single mobile-only safeguard in `src/index.css` that forces all form controls to 16px below the `md` breakpoint, regardless of Tailwind classes applied. Keeps desktop typography untouched.
+
+```css
+@media (max-width: 767px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px;
+  }
+}
 ```
 
-No card border, no rounded box, no shadow — the prayer info sits directly on the painted background.
+Also bump the `Textarea` component's base class from `text-sm` to `text-base md:text-sm` so its intent matches `Input` and the styling stays consistent if the global rule is ever scoped tighter later.
 
-## Scope of Changes
+## Why not change the viewport tag
 
-### 1. New: page-level gradient backdrop
-Render the active prayer gradient as a fixed/absolute layer at the top of the Today page that:
-- starts at the very top of the viewport (covers safe-area / status bar region)
-- extends down past the prayer info
-- fades to `hsl(var(--background))` via a mask/gradient overlay so the goals list sits on the normal page surface with no visible seam
+Adding `maximum-scale=1` or `user-scalable=no` would also stop the zoom, but it disables pinch-zoom everywhere — an accessibility regression. The CSS approach removes the trigger without taking zoom away from users who need it.
 
-### 2. `src/pages/Dashboard.tsx`
-- Replace the `<TimeOfDayCard>` wrapper with an inline, borderless layout: same children (DateDisplay, progress bar, current/next namaz row) rendered directly on the gradient backdrop, no card padding box.
-- Add the backdrop layer (a div using the chosen `gradient-*` class + a bottom-fade mask).
-- Keep tap-to-navigate-to-calendar behavior on the prayer section only.
+## Files to change
 
-### 3. `src/components/layout/AppLayout.tsx` (mobile only)
-- On the Dashboard route, make the mobile header transparent (remove `bg-background/40 backdrop-blur` border) so the gradient shows through behind it.
-- Keep the header sticky and keep `pt-safe-min` so the status-bar area is also tinted by the gradient sitting beneath it.
-- Other routes keep current header styling.
+- `src/index.css` — add the mobile form-control font-size rule.
+- `src/components/ui/textarea.tsx` — change `text-sm` to `text-base md:text-sm`.
 
-### 4. `src/components/namaz/TimeOfDayCard.tsx`
-- Either retire usage on Dashboard (keep the file for other consumers if any) or add a `variant="seamless"` that drops padding/rounding/overflow. Quick audit will confirm; component will stay backward compatible.
+## Verification
 
-### 5. Existing gradient tokens — reused as-is
-The six `gradient-fajr` / `gradient-zuhr` / `gradient-asr` / `gradient-maghrib` / `gradient-isha` / `gradient-nisful-layl` classes in `src/index.css` (lines 218-270, including `.theme-bhukur` overrides) are the gradient source — no color changes.
-
-## Technical Notes
-
-- Fade-out uses a CSS mask: `mask-image: linear-gradient(to bottom, black 60%, transparent 100%)` on the backdrop layer, so the gradient dissolves into the page background instead of ending in a hard line.
-- Backdrop is `position: absolute` inside a Dashboard-level relative wrapper, `top: 0`, full width, height tuned so the fade completes just above the goals list (≈ 420px on mobile).
-- Header transparency is scoped to the Dashboard route via a prop (`transparentHeader`) or `useLocation` check inside `AppLayout`.
-- Text inside the gradient region keeps using `text-foreground` / `text-foreground/70` tokens — gradients already provide adequate contrast in both Oudh and Bhukur themes.
-- Desktop layout: gradient backdrop also applies inside the main content area on the Dashboard route, behind the same prayer block; sidebar/header chrome unchanged.
-
-## Out of Scope
-
-- No changes to gradient colors themselves.
-- No changes to prayer/goal data or logic.
-- No changes to goals list visual styling.
-- No changes to other pages.
+- Open the installed PWA on iOS, tap a textarea (e.g. goal notes), confirm no zoom.
+- Tap inputs across Today, Goals, Profile, and Auth pages — no zoom.
+- Desktop layout unchanged (still `text-sm` from `md` upward).
