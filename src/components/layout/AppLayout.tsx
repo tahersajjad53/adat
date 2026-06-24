@@ -78,6 +78,15 @@ export function AppLayout({ children }: AppLayoutProps) {
   }
 
   const isDashboard = location.pathname === '/today';
+  const [scrolled, setScrolled] = useState(false);
+
+  React.useEffect(() => {
+    if (!isDashboard) return;
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, [isDashboard]);
 
   if (isMobile) {
     return (
@@ -86,7 +95,7 @@ export function AppLayout({ children }: AppLayoutProps) {
         <header
           className={
             isDashboard
-              ? 'sticky top-0 z-40 bg-transparent pt-safe-min'
+              ? `sticky top-0 z-40 pt-safe-min transition-colors duration-200 ${scrolled ? 'bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50' : 'bg-transparent'}`
               : 'sticky top-0 z-40 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50 pt-safe-min'
           }
         >
