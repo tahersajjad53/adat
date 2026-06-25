@@ -96,14 +96,14 @@ export function AppLayout({ children }: AppLayoutProps) {
           {/* Feathered frosted backdrop layer */}
           <div
             aria-hidden
-            className={`pointer-events-none absolute inset-x-0 top-0 h-[calc(100%+24px)] bg-background/40 backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-200 ${
+            className={`pointer-events-none absolute inset-x-0 top-0 h-[calc(100%+48px)] bg-background/40 backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-200 ${
               isDashboard && !scrolled ? 'opacity-0' : 'opacity-100'
             }`}
             style={{
               WebkitMaskImage:
-                'linear-gradient(to bottom, hsl(0 0% 0%) 0%, hsl(0 0% 0%) 65%, transparent 100%)',
+                'linear-gradient(to bottom, hsl(0 0% 0%) 0%, hsl(0 0% 0%) 45%, transparent 100%)',
               maskImage:
-                'linear-gradient(to bottom, hsl(0 0% 0%) 0%, hsl(0 0% 0%) 65%, transparent 100%)',
+                'linear-gradient(to bottom, hsl(0 0% 0%) 0%, hsl(0 0% 0%) 45%, transparent 100%)',
             }}
           />
           <div className="relative container flex h-14 items-center">
