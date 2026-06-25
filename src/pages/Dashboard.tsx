@@ -263,7 +263,7 @@ const Dashboard: React.FC = () => {
                 <span className="text-[10px] uppercase tracking-[0.18em] text-foreground/60 font-medium pb-2">
                   Today's progress
                 </span>
-                <span className="text-5xl sm:text-6xl font-bold font-display text-foreground tracking-tight leading-none">
+                <span className="text-5xl sm:text-6xl font-light font-display text-foreground tracking-tight leading-none">
                   {overallPercentage}%
                 </span>
               </div>
