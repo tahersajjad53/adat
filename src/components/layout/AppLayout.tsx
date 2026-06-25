@@ -92,14 +92,21 @@ export function AppLayout({ children }: AppLayoutProps) {
     return (
       <div className="min-h-screen bg-background pb-20">
         {/* Mobile Header */}
-        <header
-          className={
-            isDashboard
-              ? `sticky top-0 z-40 pt-safe-min transition-colors duration-200 ${scrolled ? 'bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50' : 'bg-transparent'}`
-              : 'sticky top-0 z-40 bg-background/40 backdrop-blur-xl backdrop-saturate-150 border-b border-border/50 pt-safe-min'
-          }
-        >
-          <div className="container flex h-14 items-center">
+        <header className="sticky top-0 z-40 pt-safe-min">
+          {/* Feathered frosted backdrop layer */}
+          <div
+            aria-hidden
+            className={`pointer-events-none absolute inset-x-0 top-0 h-[calc(100%+24px)] bg-background/40 backdrop-blur-xl backdrop-saturate-150 transition-opacity duration-200 ${
+              isDashboard && !scrolled ? 'opacity-0' : 'opacity-100'
+            }`}
+            style={{
+              WebkitMaskImage:
+                'linear-gradient(to bottom, hsl(0 0% 0%) 0%, hsl(0 0% 0%) 65%, transparent 100%)',
+              maskImage:
+                'linear-gradient(to bottom, hsl(0 0% 0%) 0%, hsl(0 0% 0%) 65%, transparent 100%)',
+            }}
+          />
+          <div className="relative container flex h-14 items-center">
             {/* Left spacer */}
             {isCalendarPage && calendarMonth ? (
               <button
