@@ -200,14 +200,56 @@ const Dashboard: React.FC = () => {
                     'linear-gradient(to right, black 0%, black 85%, transparent 100%)',
                 }}
               />
-              {/* subtle diagonal texture across the fill */}
+              {/* random starry texture across the fill */}
               <div
                 aria-hidden
-                className="absolute inset-y-0 left-0 pointer-events-none"
+                className="absolute inset-y-0 left-0 pointer-events-none overflow-hidden"
                 style={{
                   width: `${overallPercentage}%`,
-                  backgroundImage:
-                    'repeating-linear-gradient(135deg, transparent, transparent 6px, rgba(255,255,255,0.06) 6px, rgba(255,255,255,0.06) 12px)',
+                  backgroundImage: `url("data:image/svg+xml;utf8,${encodeURIComponent(
+                    `<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'>${
+                      (() => {
+                        const star = (cx: number, cy: number, r: number, o: number) => {
+                          const pts: string[] = [];
+                          for (let i = 0; i < 10; i++) {
+                            const ang = (Math.PI / 5) * i - Math.PI / 2;
+                            const rad = i % 2 === 0 ? r : r * 0.42;
+                            pts.push(`${(cx + Math.cos(ang) * rad).toFixed(2)},${(cy + Math.sin(ang) * rad).toFixed(2)}`);
+                          }
+                          return `<polygon points='${pts.join(' ')}' fill='white' fill-opacity='${o}'/>`;
+                        };
+                        const dot = (cx: number, cy: number, r: number, o: number) =>
+                          `<circle cx='${cx}' cy='${cy}' r='${r}' fill='white' fill-opacity='${o}'/>`;
+                        // deterministic pseudo-random positions
+                        const stars = [
+                          [18, 24, 4.5, 0.32], [62, 12, 3, 0.22], [110, 38, 5, 0.28],
+                          [168, 18, 3.5, 0.26], [200, 60, 4, 0.3], [40, 70, 3, 0.24],
+                          [92, 88, 4, 0.3], [148, 76, 3, 0.22], [22, 122, 5, 0.32],
+                          [78, 140, 3.5, 0.26], [130, 130, 4, 0.28], [180, 118, 3, 0.22],
+                          [50, 178, 4, 0.3], [104, 192, 3, 0.24], [162, 168, 5, 0.32],
+                          [200, 200, 3.5, 0.26], [8, 90, 3, 0.22], [120, 60, 3, 0.2],
+                        ] as const;
+                        const dots = [
+                          [10, 50, 0.8, 0.4], [55, 40, 0.6, 0.3], [88, 20, 0.7, 0.35],
+                          [140, 50, 0.6, 0.3], [185, 90, 0.8, 0.4], [70, 110, 0.7, 0.35],
+                          [125, 100, 0.6, 0.28], [30, 150, 0.8, 0.4], [98, 160, 0.6, 0.3],
+                          [155, 145, 0.7, 0.35], [195, 180, 0.6, 0.3], [15, 200, 0.8, 0.4],
+                          [75, 195, 0.6, 0.28], [135, 175, 0.7, 0.32], [180, 30, 0.6, 0.3],
+                          [45, 100, 0.7, 0.32], [115, 25, 0.6, 0.28], [165, 200, 0.8, 0.4],
+                        ] as const;
+                        return [
+                          ...stars.map(([x, y, r, o]) => star(x, y, r, o)),
+                          ...dots.map(([x, y, r, o]) => dot(x, y, r, o)),
+                        ].join('');
+                      })()
+                    }</svg>`
+                  )}")`,
+                  backgroundSize: '220px 220px',
+                  backgroundRepeat: 'repeat',
+                  WebkitMaskImage:
+                    'linear-gradient(to right, black 0%, black 85%, transparent 100%)',
+                  maskImage:
+                    'linear-gradient(to right, black 0%, black 85%, transparent 100%)',
                 }}
               />
 
@@ -216,16 +258,14 @@ const Dashboard: React.FC = () => {
                 <DateDisplay showLocation compact variant="light" />
               </div>
 
-              {/* Bottom-left: big percentage */}
+              {/* Bottom row: label left, percentage right (aligned to label baseline) */}
               <div className="relative z-10 flex items-end justify-between gap-3">
-                <div className="flex flex-col leading-none">
-                  <span className="text-5xl sm:text-6xl font-bold font-display text-foreground tracking-tight">
-                    {overallPercentage}%
-                  </span>
-                  <span className="mt-1.5 text-[10px] uppercase tracking-[0.18em] text-foreground/60 font-medium">
-                    Today's progress
-                  </span>
-                </div>
+                <span className="text-[10px] uppercase tracking-[0.18em] text-foreground/60 font-medium pb-2">
+                  Today's progress
+                </span>
+                <span className="text-5xl sm:text-6xl font-bold font-display text-foreground tracking-tight leading-none">
+                  {overallPercentage}%
+                </span>
               </div>
             </div>
 
