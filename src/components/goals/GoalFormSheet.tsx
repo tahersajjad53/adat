@@ -222,7 +222,49 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
               {t.label}
             </button>
           ))}
+          {showNewTagInput ? (
+            <div className="flex items-center gap-1">
+              <Input
+                autoFocus
+                value={newTagLabel}
+                onChange={(e) => setNewTagLabel(e.target.value)}
+                onKeyDown={async (e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    if (!newTagLabel.trim() || creatingTag) return;
+                    try {
+                      const created = await createPersonalTag(newTagLabel);
+                      setTag(created.slug);
+                      setNewTagLabel('');
+                      setShowNewTagInput(false);
+                    } catch {
+                      /* toast handled in hook */
+                    }
+                  } else if (e.key === 'Escape') {
+                    setNewTagLabel('');
+                    setShowNewTagInput(false);
+                  }
+                }}
+                onBlur={() => {
+                  if (!newTagLabel.trim()) setShowNewTagInput(false);
+                }}
+                maxLength={24}
+                placeholder="Tag name"
+                disabled={creatingTag}
+                className="h-7 w-32 rounded-full px-3 py-0 text-xs"
+              />
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setShowNewTagInput(true)}
+              className="rounded-full px-3 py-1.5 text-xs leading-none font-medium border border-dashed border-border text-muted-foreground hover:bg-accent transition-colors"
+            >
+              + New
+            </button>
+          )}
         </div>
+
       </div>
 
       {/* Description: Add placeholder when empty */}
