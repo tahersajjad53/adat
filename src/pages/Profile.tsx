@@ -14,6 +14,8 @@ import { CITIES, type City } from '@/data/cities';
 import { Refresh, FloppyDisk, LogOut, NavArrowRight, NavArrowLeft, User, DesignPencil, Bell, Archery, Clock } from 'iconoir-react';
 import ThemeSelector from '@/components/profile/ThemeSelector';
 import TagOrderPreferences from '@/components/profile/TagOrderPreferences';
+import MyTagsManager from '@/components/profile/MyTagsManager';
+import { Separator } from '@/components/ui/separator';
 import { initPushNotifications } from '@/utils/pushNotifications';
 import OnTimeMeter from '@/components/profile/OnTimeMeter';
 import { useOnTimePrayerStats } from '@/hooks/useOnTimePrayerStats';
@@ -408,6 +410,8 @@ const Profile: React.FC = () => {
             <p className="text-base text-muted-foreground mt-1 font-normal">Customise how your goals are displayed.</p>
           </div>
 
+          <MyTagsManager />
+          <Separator />
           <TagOrderPreferences />
         </div>
       </div>
