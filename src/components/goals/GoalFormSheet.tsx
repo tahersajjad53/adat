@@ -89,7 +89,10 @@ const GoalFormSheet: React.FC<GoalFormSheetProps> = ({
   const isMobile = useIsMobile();
   const sheetRef = useRef<HTMLDivElement>(null);
   const keyboardOffset = useKeyboardOffset({ enabled: isMobile && open, containerRef: sheetRef });
-  const { tags: dbTags } = useTags();
+  const { tags: dbTags, createPersonalTag, isCreating: creatingTag } = useTags();
+  const [showNewTagInput, setShowNewTagInput] = useState(false);
+  const [newTagLabel, setNewTagLabel] = useState('');
+
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
