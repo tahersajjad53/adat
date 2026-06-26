@@ -126,7 +126,7 @@ const AdminGoalForm: React.FC<AdminGoalFormProps> = ({
 
       {/* Tag selector */}
       <div className="flex flex-wrap gap-2 pt-1">
-        {dbTags.map((t) => (
+        {dbTags.filter((t) => !t.isPersonal).map((t) => (
           <button
             key={t.value}
             type="button"
