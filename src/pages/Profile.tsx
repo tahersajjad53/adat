@@ -410,6 +410,8 @@ const Profile: React.FC = () => {
             <p className="text-base text-muted-foreground mt-1 font-normal">Customise how your goals are displayed.</p>
           </div>
 
+          <MyTagsManager />
+          <Separator />
           <TagOrderPreferences />
         </div>
       </div>
