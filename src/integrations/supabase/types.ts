@@ -565,6 +565,77 @@ export type Database = {
         }
         Relationships: []
       }
+      text_lines: {
+        Row: {
+          arabic_text: string
+          id: string
+          line_no: number
+          text_id: string
+          translation: string | null
+          transliteration: string | null
+        }
+        Insert: {
+          arabic_text: string
+          id?: string
+          line_no: number
+          text_id: string
+          translation?: string | null
+          transliteration?: string | null
+        }
+        Update: {
+          arabic_text?: string
+          id?: string
+          line_no?: number
+          text_id?: string
+          translation?: string | null
+          transliteration?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "text_lines_text_id_fkey"
+            columns: ["text_id"]
+            isOneToOne: false
+            referencedRelation: "texts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      texts: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          source_kitab: string | null
+          surah: number | null
+          title: string
+          title_ar: string | null
+          type: string
+          verified: boolean
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          source_kitab?: string | null
+          surah?: number | null
+          title: string
+          title_ar?: string | null
+          type: string
+          verified?: boolean
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          source_kitab?: string | null
+          surah?: number | null
+          title?: string
+          title_ar?: string | null
+          type?: string
+          verified?: boolean
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           dynamic_goals_enabled: boolean
