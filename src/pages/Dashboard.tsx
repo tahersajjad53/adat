@@ -174,6 +174,43 @@ const Dashboard: React.FC = () => {
     ? GRADIENT_CLASSES[currentPrayerName]
     : GRADIENT_CLASSES.default;
 
+  const pillTabs = (
+    <div className="container pt-2 pb-1 relative z-20">
+      <div className="max-w-2xl mx-auto flex justify-center">
+        <div
+          role="tablist"
+          className="inline-flex items-center gap-1 rounded-full border border-foreground/15 bg-background/50 backdrop-blur-md p-1"
+        >
+          {(['feed', 'calendar'] as const).map((t) => (
+            <button
+              key={t}
+              role="tab"
+              aria-selected={tab === t}
+              onClick={() => setTab(t)}
+              className={cn(
+                'px-5 py-1.5 text-sm font-medium rounded-full transition-colors capitalize',
+                tab === t
+                  ? 'bg-foreground text-background'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (tab === 'calendar') {
+    return (
+      <div className="relative">
+        {pillTabs}
+        <Calendar />
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       {/* Seamless time-of-day gradient backdrop: flows behind status bar + header,
@@ -187,6 +224,8 @@ const Dashboard: React.FC = () => {
           zIndex: 0,
         }}
       />
+      {pillTabs}
+
 
       <div className="container pt-6 pb-8 relative">
         <div className="max-w-2xl mx-auto space-y-8">
