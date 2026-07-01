@@ -233,7 +233,7 @@ const Dashboard: React.FC = () => {
           <section className="px-1">
             {/* Chunky day-progress meter */}
             <div
-              onClick={() => navigate('/calendar')}
+              onClick={() => setTab('calendar')}
               role="button"
               tabIndex={0}
               className="cursor-pointer relative overflow-hidden rounded-3xl border border-foreground/15 bg-foreground/[0.04] backdrop-blur-sm h-44 sm:h-48 p-5 flex flex-col justify-between"
