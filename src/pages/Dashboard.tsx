@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { MapPin, SunLight, HalfMoon, Check, Flower } from 'iconoir-react';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendar } from '@/contexts/CalendarContext';
+import { cn } from '@/lib/utils';
 
 
 import { usePrayerLog } from '@/hooks/usePrayerLog';
@@ -26,6 +27,8 @@ import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 import { TasbeehCard } from '@/components/tasbeeh/TasbeehCard';
 import type { Goal, GoalWithStatus } from '@/types/goals';
 import WhatsNewPopup from '@/components/WhatsNewPopup';
+import Calendar from '@/pages/Calendar';
+
 
 const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
   fajr: SunLight,
