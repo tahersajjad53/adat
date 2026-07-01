@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Home, Clock, User, Archery, Plus, Calendar as CalendarIcon } from 'iconoir-react';
+import { Home, Clock, User, Archery, Plus, Book } from 'iconoir-react';
 import { NavLink } from '@/components/NavLink';
 import { cn } from '@/lib/utils';
 import { InstallBanner } from '@/components/pwa/InstallBanner';
@@ -9,7 +9,7 @@ import {
 
 const leftItems = [
   { title: 'Today', url: '/today', icon: Home },
-  { title: 'Calendar', url: '/calendar', icon: CalendarIcon },
+  { title: 'Dua', url: '/dua', icon: Book },
 ];
 
 const rightItems = [

@@ -30,7 +30,21 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const navigate = useNavigate();
   const isGoalsPage = location.pathname === '/goals';
-  const isCalendarPage = location.pathname === '/calendar';
+  const [todayTab, setTodayTab] = useState<'feed' | 'calendar'>(() => {
+    if (typeof window === 'undefined') return 'feed';
+    return (sessionStorage.getItem('today:tab') as 'feed' | 'calendar') || 'feed';
+  });
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail?.tab === 'feed' || detail?.tab === 'calendar') setTodayTab(detail.tab);
+    };
+    window.addEventListener('today:tabChanged', handler);
+    return () => window.removeEventListener('today:tabChanged', handler);
+  }, []);
+  const isCalendarPage =
+    location.pathname === '/calendar' ||
+    (location.pathname === '/today' && todayTab === 'calendar');
   const [calendarShowingToday, setCalendarShowingToday] = useState(true);
   const [calendarMonth, setCalendarMonth] = useState('');
   const [calendarInMonthView, setCalendarInMonthView] = useState(false);

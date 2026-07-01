@@ -7,6 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { MapPin, SunLight, HalfMoon, Check, Flower } from 'iconoir-react';
 import { DateDisplay } from '@/components/calendar/DateDisplay';
 import { useCalendar } from '@/contexts/CalendarContext';
+import { cn } from '@/lib/utils';
 
 
 import { usePrayerLog } from '@/hooks/usePrayerLog';
@@ -26,6 +27,8 @@ import { useTasbeehCounters } from '@/hooks/useTasbeehCounters';
 import { TasbeehCard } from '@/components/tasbeeh/TasbeehCard';
 import type { Goal, GoalWithStatus } from '@/types/goals';
 import WhatsNewPopup from '@/components/WhatsNewPopup';
+import Calendar from '@/pages/Calendar';
+
 
 const PRAYER_ICONS: Record<AllPrayerName, React.ComponentType<{ className?: string }>> = {
   fajr: SunLight,
@@ -52,6 +55,15 @@ const Dashboard: React.FC = () => {
   const { location, requestLocationPermission } = useCalendar();
   const navigate = useNavigate();
   const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
+  const [tab, setTab] = useState<'feed' | 'calendar'>(() => {
+    if (typeof window === 'undefined') return 'feed';
+    return (sessionStorage.getItem('today:tab') as 'feed' | 'calendar') || 'feed';
+  });
+  useEffect(() => {
+    sessionStorage.setItem('today:tab', tab);
+    window.dispatchEvent(new CustomEvent('today:tabChanged', { detail: { tab } }));
+  }, [tab]);
+
   const { prayers, togglePrayer, currentPrayer, nextPrayer, isLoading: prayersLoading } = usePrayerLog();
   const { prayerTimes } = usePrayerTimes();
   const { isCompleted, toggleCompletion, isToggling } = useGoalCompletions();
@@ -162,6 +174,43 @@ const Dashboard: React.FC = () => {
     ? GRADIENT_CLASSES[currentPrayerName]
     : GRADIENT_CLASSES.default;
 
+  const pillTabs = (
+    <div className="container pt-2 pb-1 relative z-20">
+      <div className="max-w-2xl mx-auto flex justify-center">
+        <div
+          role="tablist"
+          className="inline-flex items-center gap-1 rounded-full border border-foreground/15 bg-background/50 backdrop-blur-md p-1"
+        >
+          {(['feed', 'calendar'] as const).map((t) => (
+            <button
+              key={t}
+              role="tab"
+              aria-selected={tab === t}
+              onClick={() => setTab(t)}
+              className={cn(
+                'px-5 py-1.5 text-sm font-medium rounded-full transition-colors capitalize',
+                tab === t
+                  ? 'bg-foreground text-background'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              {t}
+            </button>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  if (tab === 'calendar') {
+    return (
+      <div className="relative">
+        {pillTabs}
+        <Calendar />
+      </div>
+    );
+  }
+
   return (
     <div className="relative">
       {/* Seamless time-of-day gradient backdrop: flows behind status bar + header,
@@ -175,6 +224,8 @@ const Dashboard: React.FC = () => {
           zIndex: 0,
         }}
       />
+      {pillTabs}
+
 
       <div className="container pt-6 pb-8 relative">
         <div className="max-w-2xl mx-auto space-y-8">
@@ -182,7 +233,7 @@ const Dashboard: React.FC = () => {
           <section className="px-1">
             {/* Chunky day-progress meter */}
             <div
-              onClick={() => navigate('/calendar')}
+              onClick={() => setTab('calendar')}
               role="button"
               tabIndex={0}
               className="cursor-pointer relative overflow-hidden rounded-3xl border border-foreground/15 bg-foreground/[0.04] backdrop-blur-sm h-44 sm:h-48 p-5 flex flex-col justify-between"
