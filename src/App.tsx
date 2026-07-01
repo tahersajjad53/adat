@@ -106,6 +106,17 @@ const App = () => (
                 }
               />
               <Route
+                path="/dua"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Dua />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
                 path="/calendar/qaza"
                 element={
                   <ProtectedRoute>
