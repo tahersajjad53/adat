@@ -55,6 +55,15 @@ const Dashboard: React.FC = () => {
   const { location, requestLocationPermission } = useCalendar();
   const navigate = useNavigate();
   const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null);
+  const [tab, setTab] = useState<'feed' | 'calendar'>(() => {
+    if (typeof window === 'undefined') return 'feed';
+    return (sessionStorage.getItem('today:tab') as 'feed' | 'calendar') || 'feed';
+  });
+  useEffect(() => {
+    sessionStorage.setItem('today:tab', tab);
+    window.dispatchEvent(new CustomEvent('today:tabChanged', { detail: { tab } }));
+  }, [tab]);
+
   const { prayers, togglePrayer, currentPrayer, nextPrayer, isLoading: prayersLoading } = usePrayerLog();
   const { prayerTimes } = usePrayerTimes();
   const { isCompleted, toggleCompletion, isToggling } = useGoalCompletions();
