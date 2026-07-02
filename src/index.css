@@ -187,6 +187,18 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
     @apply text-xs font-semibold uppercase tracking-widest text-muted-foreground;
   }
 
+  /* Reader Arabic body — Kanz al Marjaan with generous line-height so tashkeel
+     is never clipped. Always pair with dir="rtl" lang="ar" on the container. */
+  .arabic-body {
+    font-family: 'Al-Kanz', serif;
+    line-height: 2.1;
+    unicode-bidi: plaintext;
+    padding-block: 0.35em;
+    text-align: right;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+
+
   .scrollbar-none {
     -ms-overflow-style: none;
     scrollbar-width: none;
