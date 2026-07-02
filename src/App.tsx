@@ -20,6 +20,7 @@ import Goals from "./pages/Goals";
 import CompletedGoals from "./pages/CompletedGoals";
 import Calendar from "./pages/Calendar";
 import Dua from "./pages/Dua";
+import Reader from "./pages/Reader";
 import QazaNamaz from "./pages/QazaNamaz";
 import DynamicGoalsSettings from "./pages/DynamicGoalsSettings";
 import TasbeehCounterPage from "./pages/TasbeehCounter";
@@ -115,6 +116,17 @@ const App = () => (
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/dua/:textId"
+                element={
+                  <ProtectedRoute>
+                    <AppLayout>
+                      <Reader />
+                    </AppLayout>
+                  </ProtectedRoute>
+                }
+              />
+
 
               <Route
                 path="/calendar/qaza"
