@@ -1,72 +1,17 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useTextLines } from '@/hooks/useTextLines';
 import { useText } from '@/hooks/useTextsLibrary';
 import { useReaderPrefs } from '@/hooks/useReaderPrefs';
-import { useLastRead } from '@/hooks/useLastRead';
 import { ReaderHeader } from '@/components/reader/ReaderHeader';
-import { VerseBlock } from '@/components/reader/VerseBlock';
 import { ReaderSkeleton } from '@/components/reader/ReaderSkeleton';
+import { toArabicIndic } from '@/lib/arabicDigits';
 
 const Reader: React.FC = () => {
   const { textId } = useParams<{ textId: string }>();
   const { data: text } = useText(textId);
   const { data: lines, isLoading, error } = useTextLines(textId);
-  const { prefs, fontSizePx } = useReaderPrefs();
-  const { lastReadLine, setLastRead } = useLastRead(textId);
-
-  const restoredRef = useRef(false);
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  // Resume at last-read verse once lines land.
-  useEffect(() => {
-    if (restoredRef.current) return;
-    if (!lines || lines.length === 0) return;
-    if (!lastReadLine || lastReadLine <= 1) {
-      restoredRef.current = true;
-      return;
-    }
-    const el = document.getElementById(`verse-${lastReadLine}`);
-    if (el) {
-      el.scrollIntoView({ behavior: 'auto', block: 'start' });
-      restoredRef.current = true;
-    }
-  }, [lines, lastReadLine]);
-
-  // Track current visible verse to persist as last-read.
-  useEffect(() => {
-    if (!lines || lines.length === 0) return;
-    const node = containerRef.current;
-    if (!node) return;
-
-    let ticking = false;
-    let currentTop = -1;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (!entry.isIntersecting) continue;
-          const raw = (entry.target as HTMLElement).id.replace('verse-', '');
-          const n = Number.parseInt(raw, 10);
-          if (Number.isFinite(n) && n !== currentTop) {
-            currentTop = n;
-            if (!ticking) {
-              ticking = true;
-              window.setTimeout(() => {
-                setLastRead(currentTop);
-                ticking = false;
-              }, 400);
-            }
-          }
-        }
-      },
-      { root: null, rootMargin: '-20% 0px -70% 0px', threshold: 0 },
-    );
-
-    const els = node.querySelectorAll('[id^="verse-"]');
-    els.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
-  }, [lines, setLastRead]);
+  const { fontSizePx } = useReaderPrefs();
 
   return (
     <div className="px-4 md:px-6 pb-24 max-w-2xl mx-auto">
@@ -97,17 +42,24 @@ const Reader: React.FC = () => {
       )}
 
       {lines && lines.length > 0 && (
-        <div ref={containerRef} className="pt-4">
+        <p
+          dir="rtl"
+          lang="ar"
+          className="arabic-body text-foreground pt-6"
+          style={{ fontSize: `${fontSizePx}px` }}
+        >
           {lines.map((line) => (
-            <VerseBlock
-              key={line.id}
-              line={line}
-              fontSizePx={fontSizePx}
-              showTransliteration={prefs.showTransliteration}
-              showTranslation={prefs.showTranslation}
-            />
+            <React.Fragment key={line.id}>
+              <span id={`verse-${line.line_no}`}>{line.arabic_text}</span>
+              <span aria-hidden="true" className="ayah-marker">
+                {' '}
+                ﴿{toArabicIndic(line.line_no)}﴾
+              </span>
+              <span className="sr-only">Verse {line.line_no}. </span>
+              {' '}
+            </React.Fragment>
           ))}
-        </div>
+        </p>
       )}
     </div>
   );
