@@ -5,21 +5,13 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Switch } from '@/components/ui/switch';
 import { useReaderPrefs, READER_FONT_SIZES } from '@/hooks/useReaderPrefs';
 
 export const ReaderPreferencesMenu: React.FC = () => {
-  const {
-    prefs,
-    setPrefs,
-    increaseFont,
-    decreaseFont,
-    canIncrease,
-    canDecrease,
-  } = useReaderPrefs();
+  const { prefs, increaseFont, decreaseFont, canIncrease, canDecrease } =
+    useReaderPrefs();
 
   return (
     <DropdownMenu>
@@ -68,25 +60,6 @@ export const ReaderPreferencesMenu: React.FC = () => {
           >
             <Plus className="h-4 w-4" strokeWidth={2} />
           </Button>
-        </div>
-
-        <DropdownMenuSeparator className="my-3" />
-
-        <div className="flex items-center justify-between gap-3 px-1 py-1.5">
-          <span className="text-sm">Transliteration</span>
-          <Switch
-            checked={prefs.showTransliteration}
-            onCheckedChange={(v) => setPrefs({ showTransliteration: v })}
-            aria-label="Show transliteration"
-          />
-        </div>
-        <div className="flex items-center justify-between gap-3 px-1 py-1.5">
-          <span className="text-sm">Translation</span>
-          <Switch
-            checked={prefs.showTranslation}
-            onCheckedChange={(v) => setPrefs({ showTranslation: v })}
-            aria-label="Show translation"
-          />
         </div>
       </DropdownMenuContent>
     </DropdownMenu>

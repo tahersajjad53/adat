@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 
 const STORAGE_KEY = 'ibadat:reader:prefs';
+const EVENT = 'ibadat:reader:prefs-changed';
 
 /** 5 discrete Arabic font sizes, in px. Index 2 = default (medium). */
 export const READER_FONT_SIZES = [22, 28, 34, 40, 46] as const;
@@ -33,24 +34,30 @@ function readPrefs(): ReaderPrefs {
   }
 }
 
-/** Global reader preferences persisted in localStorage. */
+/** Global reader preferences persisted in localStorage; shared across components. */
 export function useReaderPrefs() {
   const [prefs, setPrefsState] = useState<ReaderPrefs>(DEFAULTS);
 
   useEffect(() => {
     setPrefsState(readPrefs());
+    const handler = () => setPrefsState(readPrefs());
+    window.addEventListener(EVENT, handler);
+    window.addEventListener('storage', handler);
+    return () => {
+      window.removeEventListener(EVENT, handler);
+      window.removeEventListener('storage', handler);
+    };
   }, []);
 
   const update = useCallback((patch: Partial<ReaderPrefs>) => {
-    setPrefsState((prev) => {
-      const next = { ...prev, ...patch };
-      try {
-        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-      } catch {
-        /* ignore */
-      }
-      return next;
-    });
+    const next = { ...readPrefs(), ...patch };
+    try {
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
+    setPrefsState(next);
+    window.dispatchEvent(new Event(EVENT));
   }, []);
 
   const increaseFont = useCallback(
