@@ -1,46 +1,58 @@
-# Phase 2 — Library Screen
+## Phase 3 — Reader Screen
 
-Replace the "coming soon" placeholder on the Dua page with a browsable library of reader texts, sourced from the Phase 1 hooks. No reader UI yet — tapping an item is a no-op stub until Phase 3 wires up routing.
+Replace the placeholder Reader route with the real reading view for a selected text (Surah Yaseen for launch). Mushaf-inspired: RTL, generous vertical rhythm, Al-Kanz for Arabic, no chrome distractions. Mobile-first.
 
-## What the user sees
+### What the user sees
 
-The Dua tab (`/dua`) becomes a scrollable library:
+Route: `/dua/:textId` (already wired).
 
-- **Header:** "Ibadat" title in the app's display font, with a short subtitle like "Read and reflect."
-- **Sections grouped by category** (e.g. "Quran", then "Duas"). Category name uses the standard section-header style already in the app (`font-display tracking-tight text-xl`).
-- **Cards, one per text**, listed vertically inside each section:
-  - Arabic title on the right, rendered RTL in Kanz al Marjaan via the new `.arabic-body` utility (currently: يس).
-  - Latin title on the left in the app's body font (currently: "Surah Yaseen").
-  - A small type badge ("Quran" or "Dua") and, when present, the source (`source_kitab`).
-  - A subtle verified tick when `verified = true`.
-  - Whole card is tappable, with the standard cozy card treatment used elsewhere in the app (rounded, soft border, muted hover).
-- **Loading state:** three skeleton cards.
-- **Empty state:** a calm message ("No texts available yet") reusing the visual language of the existing empty states, so it feels intentional rather than broken.
+- **Compact top bar** (sticky, subtle frosted background matching the app pattern):
+  - Left: back chevron → `/dua`, labelled "Library".
+  - Center: Latin title (small) with Arabic title beneath in Al-Kanz.
+  - Right: 3-dot menu with reader preferences (see below).
+- **Verse column** (RTL, single centered column, max-width comfortable for reading):
+  - One block per line from `text_lines`, ordered by `line_no`.
+  - `arabic_text` rendered **verbatim** in the `.arabic-body` utility (Al-Kanz, RTL, plaintext bidi, generous line-height so tashkeel isn't clipped).
+  - After each verse, an inline ayah marker `﴿n﴾` rendered as a **sibling span** — never concatenated into `arabic_text`. The number inside the marker uses Arabic-Indic digits (٠–٩) to match the Mushaf aesthetic already used on the Qaza page.
+  - If reader prefs enable them, transliteration and translation appear beneath each verse in the app's body font, muted color, LTR. Hidden entirely when their toggle is off (not just faded).
+- **Font-size control:** live in the top-bar menu. 5 discrete steps (already defined in `useReaderPrefs`), with A− / A+ buttons and a small indicator. Only the Arabic scales; transliteration/translation stay at their default body size.
+- **Toggles:** Show transliteration, Show translation — both off by default, persisted in `localStorage` via existing `useReaderPrefs`.
+- **Last-read resume:** on mount, if `useLastRead(textId)` has a value, scroll to that verse smoothly after render. As the user scrolls, the currently-visible verse updates last-read (debounced, no DB writes).
+- **Loading state:** a few skeleton verse blocks matching the Arabic rhythm.
+- **Empty / error state:** calm message ("This text has no verses yet" / "Couldn't load this text") with a link back to Library.
 
-Because only Surah Yaseen exists in the database today (and it's still `verified = false`), production users will see the empty state until the flag is flipped. In the preview/dev build the dev bypass from Phase 1 keeps Yaseen visible so we can review the layout.
+### Ayah marker
 
-## What tapping a card does
+Rendered as: `<span aria-hidden="true" class="ayah-marker">﴿{arabicIndic(line_no)}﴾</span>` — inline, sized proportional to Arabic font, muted color, non-selectable. Screen readers get an `aria-label` like "Verse 5".
 
-For Phase 2, tapping a card is a stub — it will simply mark that text as the "intended target" (no navigation, no toast). Phase 3 replaces this with real navigation to `/dua/:textId`. This keeps Phase 2 fully non-destructive: no routes added, no reader shell to maintain twice.
+### Visual direction
 
-If you'd prefer we skip the stub and leave cards visually tappable but inert, that's a one-line change — happy either way.
+- Uses existing semantic tokens; works in all three themes.
+- No new fonts. Al-Kanz already loaded via `@font-face`.
+- Reader body is deliberately minimal — no cards around verses, just breathing space and a hairline separator (`border-b border-border/40`) between verses. This matches the "closer to a printed Mushaf than a typical app screen" brief.
+- Top bar uses the same frosted-blur pattern as the Today header for consistency.
 
-## Visual direction
+### Technical notes
 
-Follows the app's existing cozy, card-based sequential layout. No new color tokens, no new fonts beyond Al-Kanz (already loaded). Works in all three themes (Oudh, Bhukur, Khalaf) because everything uses semantic tokens.
+- **Edited:** `src/pages/Reader.tsx` — replaces placeholder.
+- **New files:**
+  - `src/components/reader/ReaderHeader.tsx` — sticky top bar with title + preferences menu.
+  - `src/components/reader/ReaderPreferencesMenu.tsx` — font stepper + two toggles, using existing `useReaderPrefs`.
+  - `src/components/reader/VerseBlock.tsx` — one verse: Arabic + inline marker, optional transliteration/translation.
+  - `src/components/reader/ReaderSkeleton.tsx` — loading placeholders.
+  - `src/lib/arabicDigits.ts` — small helper converting a Latin integer to Arabic-Indic digits (reused from the QazaNamaz pattern; extracted for reuse).
+- **Data:** consumes existing `useTextLines(textId)`, `useReaderPrefs()`, `useLastRead(textId)`, and reads the parent `texts` row via a lightweight `useText(textId)` addition to `useTextsLibrary.ts` (single-row query, cached), so the header can show the correct title without waiting on the full library list.
+- **Untouched:** database, RLS, routing map, bottom nav, Library screen, Phase 1 hooks' public API.
 
-## Technical notes
+### Out of scope for Phase 3
 
-- **New files:** `src/components/reader/LibraryList.tsx`, `src/components/reader/LibraryCard.tsx`, `src/components/reader/LibrarySkeleton.tsx`.
-- **Edited:** `src/pages/Dua.tsx` — replace placeholder with `<LibraryList />`, keep the page container and top padding consistent with other pages.
-- **Data:** consumes `useTextsLibrary()` from Phase 1. No new queries.
-- **Arabic rendering:** titles use `<span dir="rtl" lang="ar" className="arabic-body">{title_ar}</span>`, rendered directly from the database string with no transforms.
-- **Untouched:** routing (`App.tsx`), bottom nav, database, `text_lines`, all Phase 1 hooks.
+Search within a text, bookmarks beyond last-read, audio recitation, verse sharing, cross-text navigation ("next surah"), translation source selector — these are Phase 4 candidates.
 
-## Out of scope for Phase 2
+### Verification
 
-Reader route, verse rendering, ayah markers, font-size controls, transliteration/translation toggles, last-read resume, search/filter within the library. All arrive in Phases 3 and 4.
-
-## One decision needed before build
-
-Should tapping a card in Phase 2 be a no-op, or should we go ahead and add the `/dua/:textId` route now with a minimal placeholder screen so the navigation feels alive during review? Either is quick; the placeholder route is slightly nicer for QA but adds a file we'll rewrite in Phase 3.
+- Open Surah Yaseen → 83 verse blocks render in order, RTL, each ending in `﴿n﴾` with the number matching `line_no`.
+- Tashkeel (fatha, kasra, shadda, etc.) fully visible top and bottom of every line.
+- Font A+ / A− scales only Arabic and persists after refresh.
+- Transliteration and translation toggles are off by default; turning them on reveals the stored strings verbatim.
+- Copying an Arabic verse pastes exactly the `arabic_text` string with no marker digits mixed in.
+- Scrolling past a verse and returning to the library → reopening the text scrolls back to that verse.
