@@ -198,6 +198,18 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   }
 
+  /* Ornamental ayah marker rendered as a sibling to the verse text so it
+     never enters copy/paste of the arabic_text. */
+  .ayah-marker {
+    color: hsl(var(--muted-foreground));
+    font-size: 0.75em;
+    margin-inline-start: 0.35em;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+
+
 
   .scrollbar-none {
     -ms-overflow-style: none;
