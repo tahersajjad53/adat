@@ -52,3 +52,21 @@ export function useTextsLibrary() {
     staleTime: 10 * 60 * 1000,
   });
 }
+
+/** Fetches a single text row by id. Cached alongside the library query. */
+export function useText(textId: string | undefined) {
+  return useQuery({
+    queryKey: ['text', textId],
+    queryFn: async (): Promise<LibraryText | null> => {
+      const { data, error } = await supabase
+        .from('texts')
+        .select('*')
+        .eq('id', textId!)
+        .maybeSingle();
+      if (error) throw error;
+      return (data as LibraryText | null) ?? null;
+    },
+    enabled: !!textId,
+    staleTime: 10 * 60 * 1000,
+  });
+}
