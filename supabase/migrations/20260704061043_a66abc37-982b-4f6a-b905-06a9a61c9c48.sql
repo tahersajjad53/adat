@@ -1,0 +1,1 @@
+UPDATE public.texts SET verified = true WHERE id = '36000000-0000-4000-8000-000000000036';

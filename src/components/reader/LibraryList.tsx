@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useState } from 'react';
 import { Book } from 'iconoir-react';
 import { useTextsLibrary } from '@/hooks/useTextsLibrary';
 import { LibraryCard } from './LibraryCard';
@@ -6,10 +6,19 @@ import { LibrarySkeleton } from './LibrarySkeleton';
 
 export const LibraryList: React.FC = () => {
   const { data: groups, isLoading, error } = useTextsLibrary();
+  const [activeCategory, setActiveCategory] = useState<string | null>(null);
 
-  if (isLoading) {
-    return <LibrarySkeleton />;
-  }
+  const categories = useMemo(() => (groups ?? []).map((g) => g.category), [groups]);
+
+  const visibleItems = useMemo(() => {
+    if (!groups) return [];
+    const source = activeCategory
+      ? groups.filter((g) => g.category === activeCategory)
+      : groups;
+    return source.flatMap((g) => g.items);
+  }, [groups, activeCategory]);
+
+  if (isLoading) return <LibrarySkeleton />;
 
   if (error) {
     return (
@@ -35,19 +44,42 @@ export const LibraryList: React.FC = () => {
   }
 
   return (
-    <div className="space-y-8">
-      {groups.map((group) => (
-        <section key={group.category} className="space-y-3">
-          <h2 className="font-display tracking-tight text-xl font-normal">
-            {group.category}
-          </h2>
-          <div className="space-y-3">
-            {group.items.map((text) => (
-              <LibraryCard key={text.id} text={text} />
-            ))}
-          </div>
-        </section>
-      ))}
+    <div className="space-y-4">
+      {categories.length > 1 && (
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+          <button
+            onClick={() => setActiveCategory(null)}
+            className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+              activeCategory === null
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+            }`}
+          >
+            All
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() =>
+                setActiveCategory(activeCategory === cat ? null : cat)
+              }
+              className={`shrink-0 rounded-full px-3 py-1 text-sm font-medium transition-colors ${
+                activeCategory === cat
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+              }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {visibleItems.map((text) => (
+          <LibraryCard key={text.id} text={text} />
+        ))}
+      </div>
     </div>
   );
 };
