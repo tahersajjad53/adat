@@ -10,6 +10,16 @@
                  U+FB50-FDFF, U+FE70-FEFF;
 }
 
+@font-face {
+  font-family: 'Amiri Quran';
+  src: url('@/assets/fonts/AmiriQuran-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0600-06FF, U+0750-077F, U+08A0-08FF, U+0870-089F,
+                 U+FB50-FDFF, U+FE70-FEFF;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
