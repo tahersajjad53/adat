@@ -208,12 +208,27 @@ Adat - Minimal black and white theme with Zilla Slab font (Zalando Sans alternat
     font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
   }
 
+  /* Quran / dua body — Amiri Quran covers the full Uthmani mark set
+     (small-high sukun, superscript hamza, rounded tanwīn, waqf marks)
+     which the display-only Al-Kanz face is missing. Using Al-Kanz for
+     verse bodies causes the browser to swap fonts mid-word for those
+     marks and breaks letter joining. */
+  .arabic-quran {
+    font-family: 'Amiri Quran', 'Scheherazade New', 'Noto Naskh Arabic', serif;
+    line-height: 2.2;
+    unicode-bidi: plaintext;
+    padding-block: 0.4em;
+    text-align: right;
+    font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+  }
+
   /* Ornamental ayah marker rendered as a sibling to the verse text so it
      never enters copy/paste of the arabic_text. */
   .ayah-marker {
+    font-family: inherit;
     color: hsl(var(--muted-foreground));
     font-size: 0.75em;
-    margin-inline-start: 0.35em;
+    margin-inline: 0.2em;
     user-select: none;
     white-space: nowrap;
   }
