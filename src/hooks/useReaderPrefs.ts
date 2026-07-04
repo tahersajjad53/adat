@@ -4,7 +4,7 @@ const STORAGE_KEY = 'ibadat:reader:prefs';
 const EVENT = 'ibadat:reader:prefs-changed';
 
 /** 5 discrete Arabic font sizes, in px. Index 2 = default (medium). */
-export const READER_FONT_SIZES = [22, 28, 34, 40, 46] as const;
+export const READER_FONT_SIZES = [24, 28, 32, 38, 46] as const;
 export type ReaderFontStep = 0 | 1 | 2 | 3 | 4;
 
 export interface ReaderPrefs {
