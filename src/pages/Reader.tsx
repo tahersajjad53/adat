@@ -45,7 +45,7 @@ const Reader: React.FC = () => {
         <p
           dir="rtl"
           lang="ar"
-          className="arabic-body text-foreground pt-6"
+          className="arabic-quran text-foreground pt-6"
           style={{ fontSize: `${fontSizePx}px` }}
         >
           {lines.map((line) => (

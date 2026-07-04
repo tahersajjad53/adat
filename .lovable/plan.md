@@ -1,58 +1,44 @@
-## Phase 3 — Reader Screen
+## What's actually happening
 
-Replace the placeholder Reader route with the real reading view for a selected text (Surah Yaseen for launch). Mushaf-inspired: RTL, generous vertical rhythm, Al-Kanz for Arabic, no chrome distractions. Mobile-first.
+The Supabase data is correct. Every verse is stored in proper Uthmani script, character-for-character. The problem is the font.
 
-### What the user sees
+The reader currently uses **Al-Kanz**, a decorative Arabic display font. I inspected its character set and it is missing almost every Quran-specific mark used in Surah Yaseen:
 
-Route: `/dua/:textId` (already wired).
+- Small high sukun ۡ (U+06E1)
+- Small high seen, meem, waqf marks (U+06D6–U+06ED)
+- Superscript hamza / maddah ٓ ٔ ٕ ٖ ٗ (U+0653–U+0657)
+- Rounded fathatan / kasratan / dammatan ࣰ ࣱ ࣲ (U+08F0–U+08F2)
 
-- **Compact top bar** (sticky, subtle frosted background matching the app pattern):
-  - Left: back chevron → `/dua`, labelled "Library".
-  - Center: Latin title (small) with Arabic title beneath in Al-Kanz.
-  - Right: 3-dot menu with reader preferences (see below).
-- **Verse column** (RTL, single centered column, max-width comfortable for reading):
-  - One block per line from `text_lines`, ordered by `line_no`.
-  - `arabic_text` rendered **verbatim** in the `.arabic-body` utility (Al-Kanz, RTL, plaintext bidi, generous line-height so tashkeel isn't clipped).
-  - After each verse, an inline ayah marker `﴿n﴾` rendered as a **sibling span** — never concatenated into `arabic_text`. The number inside the marker uses Arabic-Indic digits (٠–٩) to match the Mushaf aesthetic already used on the Qaza page.
-  - If reader prefs enable them, transliteration and translation appear beneath each verse in the app's body font, muted color, LTR. Hidden entirely when their toggle is off (not just faded).
-- **Font-size control:** live in the top-bar menu. 5 discrete steps (already defined in `useReaderPrefs`), with A− / A+ buttons and a small indicator. Only the Arabic scales; transliteration/translation stay at their default body size.
-- **Toggles:** Show transliteration, Show translation — both off by default, persisted in `localStorage` via existing `useReaderPrefs`.
-- **Last-read resume:** on mount, if `useLastRead(textId)` has a value, scroll to that verse smoothly after render. As the user scrolls, the currently-visible verse updates last-read (debounced, no DB writes).
-- **Loading state:** a few skeleton verse blocks matching the Arabic rhythm.
-- **Empty / error state:** calm message ("This text has no verses yet" / "Couldn't load this text") with a link back to Library.
+When even one mark in a word is missing from the primary font, the browser silently falls back to a different font just for that character. That fallback breaks Al-Kanz's shaping engine mid-word, so the letters on either side of the mark drop back to their isolated forms — this is what looks like "words that should be joined are not joined." It is not a rendering bug in our code; the font simply cannot render Quranic text.
 
-### Ayah marker
+Al-Kanz is fine for headings and titles (surah names, page chrome). It is not usable as the body font for Quran or any tashkeel-heavy dua.
 
-Rendered as: `<span aria-hidden="true" class="ayah-marker">﴿{arabicIndic(line_no)}﴾</span>` — inline, sized proportional to Arabic font, muted color, non-selectable. Screen readers get an `aria-label` like "Verse 5".
+## The fix
 
-### Visual direction
+Introduce a second Arabic font dedicated to reader body text, chosen specifically for full Uthmani coverage, and route only the verse body through it. Al-Kanz stays for titles and app chrome so the visual identity is preserved.
 
-- Uses existing semantic tokens; works in all three themes.
-- No new fonts. Al-Kanz already loaded via `@font-face`.
-- Reader body is deliberately minimal — no cards around verses, just breathing space and a hairline separator (`border-b border-border/40`) between verses. This matches the "closer to a printed Mushaf than a typical app screen" brief.
-- Top bar uses the same frosted-blur pattern as the Today header for consistency.
+**Font choice: Amiri Quran** (SIL OFL, free, ~400 KB woff2). It is the reference open-source Uthmani font, covers every mark above, and matches the printed Mushaf aesthetic we're aiming for. Amiri Quran is a single-weight family purpose-built for the Quran — no styling variants needed.
 
-### Technical notes
+Fallback stack for safety: `'Amiri Quran', 'Scheherazade New', 'Noto Naskh Arabic', serif`.
 
-- **Edited:** `src/pages/Reader.tsx` — replaces placeholder.
-- **New files:**
-  - `src/components/reader/ReaderHeader.tsx` — sticky top bar with title + preferences menu.
-  - `src/components/reader/ReaderPreferencesMenu.tsx` — font stepper + two toggles, using existing `useReaderPrefs`.
-  - `src/components/reader/VerseBlock.tsx` — one verse: Arabic + inline marker, optional transliteration/translation.
-  - `src/components/reader/ReaderSkeleton.tsx` — loading placeholders.
-  - `src/lib/arabicDigits.ts` — small helper converting a Latin integer to Arabic-Indic digits (reused from the QazaNamaz pattern; extracted for reuse).
-- **Data:** consumes existing `useTextLines(textId)`, `useReaderPrefs()`, `useLastRead(textId)`, and reads the parent `texts` row via a lightweight `useText(textId)` addition to `useTextsLibrary.ts` (single-row query, cached), so the header can show the correct title without waiting on the full library list.
-- **Untouched:** database, RLS, routing map, bottom nav, Library screen, Phase 1 hooks' public API.
+## Changes
 
-### Out of scope for Phase 3
+1. **Add the font file.** Drop `AmiriQuran-Regular.woff2` into `src/assets/fonts/` and register it via `@font-face` in `src/index.css` with the same Arabic `unicode-range` we use today so it only loads when Arabic is on screen. Keep `font-display: swap`.
+2. **Split the utility classes in `src/index.css`.**
+   - Keep `.arabic-body` using Al-Kanz — used only by the reader header's Arabic title and other short display strings.
+   - Add a new `.arabic-quran` utility: Amiri Quran, `line-height: 2.2`, `unicode-bidi: plaintext`, `text-align: right`, `font-feature-settings` unchanged. This is what verses render in.
+   - Tune `.ayah-marker` to inherit the same font so the ornamental parentheses match the verse weight.
+3. **Update `src/pages/Reader.tsx`** to apply `.arabic-quran` on the verse paragraph instead of `.arabic-body`. No structural change — same single flowing paragraph, same ayah markers, same font-size stepper. The header keeps `.arabic-body` (Al-Kanz) for the surah title.
+4. **Re-tune the font-size steps in `src/hooks/useReaderPrefs.ts`.** Amiri Quran has a smaller x-height than Al-Kanz, so today's default (index 2) reads about one step too small once we swap. Shift the 5-step ladder up by ~2 px per step (roughly 24 / 28 / 32 / 38 / 46) so the default still feels like comfortable reading size on mobile.
+5. **Verify.** Open Surah Yaseen and confirm every ayah renders with joined letters, tashkeel sitting cleanly above/below without clipping, and the ﴿n﴾ markers still inline. Spot-check ayah 8 (`أَعۡنَٰقِهِمۡ`, `أَغۡلَٰلٗا`) and ayah 9 (`فَأَغۡشَيۡنَٰهُمۡ`) — these are the words that were breaking, because they each contain a small-high sukun plus fathatan-with-tail.
 
-Search within a text, bookmarks beyond last-read, audio recitation, verse sharing, cross-text navigation ("next surah"), translation source selector — these are Phase 4 candidates.
+## Why not other options
 
-### Verification
+- **Force Al-Kanz to render the missing marks via CSS or feature flags** — impossible, the glyphs aren't in the font file.
+- **Strip the Quranic marks from the DB text** — destructive and religiously incorrect; loses the Uthmani reading.
+- **Ship a full Uthmanic font like KFGQPC Uthman Taha** — better coverage than Amiri Quran in some edge cases but licensing is restrictive and the file is ~1 MB. Not worth it for the current scope; Amiri Quran covers 100% of Yaseen.
+- **Rely on system fonts** — inconsistent across iOS / Android / desktop; the whole point of shipping our own font is a predictable Mushaf look.
 
-- Open Surah Yaseen → 83 verse blocks render in order, RTL, each ending in `﴿n﴾` with the number matching `line_no`.
-- Tashkeel (fatha, kasra, shadda, etc.) fully visible top and bottom of every line.
-- Font A+ / A− scales only Arabic and persists after refresh.
-- Transliteration and translation toggles are off by default; turning them on reveals the stored strings verbatim.
-- Copying an Arabic verse pastes exactly the `arabic_text` string with no marker digits mixed in.
-- Scrolling past a verse and returning to the library → reopening the text scrolls back to that verse.
+## Out of scope
+
+Search, bookmarks, audio, verse-level sharing, transliteration/translation display (already removed), typography theming per surah. Those stay Phase 4+.
