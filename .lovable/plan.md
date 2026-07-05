@@ -1,44 +1,63 @@
-## What's actually happening
+## Audio Playback for Dua Reader
 
-The Supabase data is correct. Every verse is stored in proper Uthmani script, character-for-character. The problem is the font.
+Add an audio bar fixed to the bottom of the dua detail page. Ship YouTube first, with a schema that also supports self-hosted MP3 later. Bottom nav is hidden on `/dua/:textId` and replaced by the audio bar.
 
-The reader currently uses **Al-Kanz**, a decorative Arabic display font. I inspected its character set and it is missing almost every Quran-specific mark used in Surah Yaseen:
+### Data model
 
-- Small high sukun ۡ (U+06E1)
-- Small high seen, meem, waqf marks (U+06D6–U+06ED)
-- Superscript hamza / maddah ٓ ٔ ٕ ٖ ٗ (U+0653–U+0657)
-- Rounded fathatan / kasratan / dammatan ࣰ ࣱ ࣲ (U+08F0–U+08F2)
+Add two nullable columns to `texts`:
+- `youtube_id` (text) — e.g. `hlB8xUaNDfk`
+- `audio_url` (text) — reserved for future self-hosted MP3
 
-When even one mark in a word is missing from the primary font, the browser silently falls back to a different font just for that character. That fallback breaks Al-Kanz's shaping engine mid-word, so the letters on either side of the mark drop back to their isolated forms — this is what looks like "words that should be joined are not joined." It is not a rendering bug in our code; the font simply cannot render Quranic text.
+Populate Yaseen's row with `youtube_id = 'hlB8xUaNDfk'`. Other texts leave both null → no audio bar, normal nav.
 
-Al-Kanz is fine for headings and titles (surah names, page chrome). It is not usable as the body font for Quran or any tashkeel-heavy dua.
+### UX
 
-## The fix
+**Audio bar (fixed bottom, replaces mobile nav on dua detail):**
+- Left: play/pause button (primary circle, matches FAB style).
+- Middle: text label ("Recitation" + reciter name if we add one later) and a slim scrubber showing progress with current / total time.
+- Right: speed pill (`1×` → tap opens popover with 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2) and a chevron to expand the mini-player.
+- Same glass/blur styling as the current bottom nav for visual continuity.
 
-Introduce a second Arabic font dedicated to reader body text, chosen specifically for full Uthmani coverage, and route only the verse body through it. Al-Kanz stays for titles and app chrome so the visual identity is preserved.
+**Expandable mini-player:**
+- Collapsed by default: audio bar only, YouTube iframe mounted but hidden (height 0). Playback works.
+- Tap chevron: a small 16:9 video tile slides up above the bar (roughly 220px wide, right-aligned). Satisfies YouTube's visibility requirement while keeping the reader dominant.
+- Tap again or a close affordance: collapses back to audio-only.
 
-**Font choice: Amiri Quran** (SIL OFL, free, ~400 KB woff2). It is the reference open-source Uthmani font, covers every mark above, and matches the printed Mushaf aesthetic we're aiming for. Amiri Quran is a single-weight family purpose-built for the Quran — no styling variants needed.
+**Nav handling:**
+- On `/dua/:textId`, `AppLayout` hides `MobileBottomNav` and renders the audio bar in its place. If the text has no audio configured, keep the normal nav.
+- Reader page bottom padding stays the same (`pb-24`) so verses aren't obscured.
 
-Fallback stack for safety: `'Amiri Quran', 'Scheherazade New', 'Noto Naskh Arabic', serif`.
+### Playback engine
 
-## Changes
+- Use YouTube IFrame Player API (`https://www.youtube.com/iframe_api`). Load the script once, lazily, only when a dua detail page with a `youtube_id` mounts.
+- Wrap in a small `useYouTubePlayer(videoId)` hook exposing: `isReady`, `isPlaying`, `currentTime`, `duration`, `play()`, `pause()`, `seek(t)`, `setPlaybackRate(r)`, `availableRates`.
+- Speed options come from `player.getAvailablePlaybackRates()` (matches YouTube's native menu).
+- Progress: `setInterval` polling `getCurrentTime()` at 500 ms while playing.
+- Cleanup: destroy player on unmount / when leaving the route.
 
-1. **Add the font file.** Drop `AmiriQuran-Regular.woff2` into `src/assets/fonts/` and register it via `@font-face` in `src/index.css` with the same Arabic `unicode-range` we use today so it only loads when Arabic is on screen. Keep `font-display: swap`.
-2. **Split the utility classes in `src/index.css`.**
-   - Keep `.arabic-body` using Al-Kanz — used only by the reader header's Arabic title and other short display strings.
-   - Add a new `.arabic-quran` utility: Amiri Quran, `line-height: 2.2`, `unicode-bidi: plaintext`, `text-align: right`, `font-feature-settings` unchanged. This is what verses render in.
-   - Tune `.ayah-marker` to inherit the same font so the ornamental parentheses match the verse weight.
-3. **Update `src/pages/Reader.tsx`** to apply `.arabic-quran` on the verse paragraph instead of `.arabic-body`. No structural change — same single flowing paragraph, same ayah markers, same font-size stepper. The header keeps `.arabic-body` (Al-Kanz) for the surah title.
-4. **Re-tune the font-size steps in `src/hooks/useReaderPrefs.ts`.** Amiri Quran has a smaller x-height than Al-Kanz, so today's default (index 2) reads about one step too small once we swap. Shift the 5-step ladder up by ~2 px per step (roughly 24 / 28 / 32 / 38 / 46) so the default still feels like comfortable reading size on mobile.
-5. **Verify.** Open Surah Yaseen and confirm every ayah renders with joined letters, tashkeel sitting cleanly above/below without clipping, and the ﴿n﴾ markers still inline. Spot-check ayah 8 (`أَعۡنَٰقِهِمۡ`, `أَغۡلَٰلٗا`) and ayah 9 (`فَأَغۡشَيۡنَٰهُمۡ`) — these are the words that were breaking, because they each contain a small-high sukun plus fathatan-with-tail.
+### Feasibility notes (already discussed with user)
 
-## Why not other options
+- **iOS background/lock-screen:** YouTube iframes pause when the phone locks or the tab backgrounds. Acceptable trade-off for v1; self-hosted MP3 (Phase 2) will fix this via MediaSession API.
+- **ToS:** expandable mini-player keeps the video reachable, satisfying YouTube's visibility requirement.
+- **Schema is source-agnostic:** the audio bar reads `text.youtube_id ?? text.audio_url` and picks the engine. When we swap to MP3 later, only the engine hook changes.
 
-- **Force Al-Kanz to render the missing marks via CSS or feature flags** — impossible, the glyphs aren't in the font file.
-- **Strip the Quranic marks from the DB text** — destructive and religiously incorrect; loses the Uthmani reading.
-- **Ship a full Uthmanic font like KFGQPC Uthman Taha** — better coverage than Amiri Quran in some edge cases but licensing is restrictive and the file is ~1 MB. Not worth it for the current scope; Amiri Quran covers 100% of Yaseen.
-- **Rely on system fonts** — inconsistent across iOS / Android / desktop; the whole point of shipping our own font is a predictable Mushaf look.
+### Files
 
-## Out of scope
+**New**
+- `src/components/reader/AudioBar.tsx` — the fixed bar + expandable video tile.
+- `src/components/reader/YouTubePlayer.tsx` — hidden/visible iframe container controlled by the hook.
+- `src/hooks/useYouTubePlayer.ts` — IFrame API wrapper.
+- Migration: add `youtube_id` and `audio_url` to `texts`; set Yaseen's `youtube_id`.
 
-Search, bookmarks, audio, verse-level sharing, transliteration/translation display (already removed), typography theming per surah. Those stay Phase 4+.
+**Edited**
+- `src/components/layout/AppLayout.tsx` — on `/dua/:textId`, swap `MobileBottomNav` for `AudioBar` when the text has an audio source.
+- `src/pages/Reader.tsx` — read `text.youtube_id` / `text.audio_url` and mount `AudioBar`.
+- `src/hooks/useTextsLibrary.ts` — include the two new fields in the `useText` query.
+
+### Out of scope (Phase 2+)
+
+- Self-hosted MP3 upload flow and Supabase Storage bucket.
+- MediaSession API / lock-screen controls.
+- Per-verse timestamp highlighting synced with audio.
+- Multiple reciter choices.
+- Loop / repeat modes, sleep timer.
