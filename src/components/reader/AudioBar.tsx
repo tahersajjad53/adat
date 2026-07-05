@@ -48,8 +48,8 @@ export function AudioBar({ youtubeId, label = 'Recitation' }: AudioBarProps) {
       </div>
 
 
-      <div className="bg-background/80 backdrop-blur-xl backdrop-saturate-150 border-t border-border/50 shadow-[0_-1px_12px_rgba(0,0,0,0.06)]">
-        <div className="flex items-center gap-3 px-3 py-2.5 min-h-16">
+      <div className="mx-3 mb-3 rounded-full bg-background/80 backdrop-blur-xl backdrop-saturate-150 border border-border/50 shadow-[0_4px_20px_rgba(0,0,0,0.10)]">
+        <div className="flex items-center gap-3 pl-1.5 pr-2 py-1.5 min-h-14">
           {/* Play / pause */}
           <button
             onClick={toggle}
