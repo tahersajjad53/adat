@@ -1,0 +1,2 @@
+ALTER TABLE public.texts ADD COLUMN IF NOT EXISTS youtube_id text, ADD COLUMN IF NOT EXISTS audio_url text;
+UPDATE public.texts SET youtube_id = 'hlB8xUaNDfk' WHERE id = '36000000-0000-4000-8000-000000000036';

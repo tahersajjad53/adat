@@ -602,6 +602,7 @@ export type Database = {
       }
       texts: {
         Row: {
+          audio_url: string | null
           category: string | null
           created_at: string
           id: string
@@ -611,8 +612,10 @@ export type Database = {
           title_ar: string | null
           type: string
           verified: boolean
+          youtube_id: string | null
         }
         Insert: {
+          audio_url?: string | null
           category?: string | null
           created_at?: string
           id?: string
@@ -622,8 +625,10 @@ export type Database = {
           title_ar?: string | null
           type: string
           verified?: boolean
+          youtube_id?: string | null
         }
         Update: {
+          audio_url?: string | null
           category?: string | null
           created_at?: string
           id?: string
@@ -633,6 +638,7 @@ export type Database = {
           title_ar?: string | null
           type?: string
           verified?: boolean
+          youtube_id?: string | null
         }
         Relationships: []
       }

@@ -5,6 +5,7 @@ import { useText } from '@/hooks/useTextsLibrary';
 import { useReaderPrefs } from '@/hooks/useReaderPrefs';
 import { ReaderHeader } from '@/components/reader/ReaderHeader';
 import { ReaderSkeleton } from '@/components/reader/ReaderSkeleton';
+import { AudioBar } from '@/components/reader/AudioBar';
 import { toArabicIndic } from '@/lib/arabicDigits';
 
 const Reader: React.FC = () => {
