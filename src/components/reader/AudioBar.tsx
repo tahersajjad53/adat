@@ -27,24 +27,26 @@ export function AudioBar({ youtubeId, label = 'Recitation' }: AudioBarProps) {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 pb-safe-min">
-      {/* Expandable video tile */}
+      {/* Player container — always mounted; styled as visible tile or hidden pixel */}
       <div
         className={cn(
-          'flex justify-end px-3 transition-all duration-200',
-          expanded ? 'opacity-100 mb-2' : 'opacity-0 pointer-events-none h-0 overflow-hidden',
+          'transition-all duration-200',
+          expanded
+            ? 'flex justify-end px-3 mb-2'
+            : 'absolute w-px h-px overflow-hidden opacity-0 pointer-events-none',
         )}
       >
-        <div className="w-[220px] aspect-video rounded-lg overflow-hidden shadow-lg bg-black">
+        <div
+          className={cn(
+            expanded
+              ? 'w-[220px] aspect-video rounded-lg overflow-hidden shadow-lg bg-black'
+              : 'w-full h-full',
+          )}
+        >
           <div ref={containerRef} className="w-full h-full" />
         </div>
       </div>
 
-      {/* Hidden player container (used when collapsed) */}
-      {!expanded && (
-        <div className="absolute w-px h-px overflow-hidden opacity-0 pointer-events-none">
-          <div ref={containerRef} className="w-full h-full" />
-        </div>
-      )}
 
       <div className="bg-background/80 backdrop-blur-xl backdrop-saturate-150 border-t border-border/50 shadow-[0_-1px_12px_rgba(0,0,0,0.06)]">
         <div className="flex items-center gap-3 px-3 py-2.5 min-h-16">
