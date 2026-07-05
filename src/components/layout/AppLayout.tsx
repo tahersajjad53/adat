@@ -188,8 +188,10 @@ export function AppLayout({ children }: AppLayoutProps) {
         <main className="relative z-10">{children}</main>
 
         
-        {/* Bottom navigation */}
-        <MobileBottomNav onAddGoal={handleAddGoal} onAddTasbeeh={() => setTasbeehFormOpen(true)} />
+        {/* Bottom navigation — hidden on dua reader (replaced by audio bar) */}
+        {!location.pathname.startsWith('/dua/') && (
+          <MobileBottomNav onAddGoal={handleAddGoal} onAddTasbeeh={() => setTasbeehFormOpen(true)} />
+        )}
         <GoalFormSheet open={goalFormOpen} onOpenChange={setGoalFormOpen} onSubmit={handleGoalSubmit} isLoading={isCreating} />
         <TasbeehFormSheet open={tasbeehFormOpen} onOpenChange={setTasbeehFormOpen} onSubmit={async (data) => { await createCounter(data); }} isLoading={isCreatingTasbeeh} />
       </div>
