@@ -1,5 +1,5 @@
-import React from 'react';
-import { useParams, Link } from 'react-router-dom';
+import React, { useEffect, useRef, useState } from 'react';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { useTextLines } from '@/hooks/useTextLines';
 import { useText } from '@/hooks/useTextsLibrary';
 import { useReaderPrefs } from '@/hooks/useReaderPrefs';
@@ -13,6 +13,28 @@ const Reader: React.FC = () => {
   const { data: text } = useText(textId);
   const { data: lines, isLoading, error } = useTextLines(textId);
   const { fontSizePx } = useReaderPrefs();
+  const location = useLocation();
+  const jumpedRef = useRef<string | null>(null);
+
+  // After lines load, if the URL has #verse-N, scroll to it and flash.
+  useEffect(() => {
+    if (!lines || lines.length === 0) return;
+    const hash = location.hash;
+    if (!hash || !hash.startsWith('#verse-')) return;
+    if (jumpedRef.current === hash) return;
+
+    const id = hash.slice(1);
+    // Wait a tick for layout + fonts.
+    const t = window.setTimeout(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('verse-flash');
+      window.setTimeout(() => el.classList.remove('verse-flash'), 1600);
+      jumpedRef.current = hash;
+    }, 80);
+    return () => window.clearTimeout(t);
+  }, [lines, location.hash]);
 
   return (
     <>
