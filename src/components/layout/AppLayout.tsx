@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { MoreHoriz } from 'iconoir-react';
+import { MoreHoriz, Search } from 'iconoir-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   const navigate = useNavigate();
   const isGoalsPage = location.pathname === '/goals';
+  const isDuaLibraryPage = location.pathname === '/dua';
   const [todayTab, setTodayTab] = useState<'feed' | 'calendar'>(() => {
     if (typeof window === 'undefined') return 'feed';
     return (sessionStorage.getItem('today:tab') as 'feed' | 'calendar') || 'feed';
@@ -178,6 +179,16 @@ export function AppLayout({ children }: AppLayoutProps) {
                   </DropdownMenuContent>
                 </DropdownMenu>
               </div>
+            ) : isDuaLibraryPage ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-10 w-10"
+                aria-label="Search library"
+                onClick={() => window.dispatchEvent(new CustomEvent('dua:toggleSearch'))}
+              >
+                <Search className="h-5 w-5" strokeWidth={2} />
+              </Button>
             ) : (
               <div className="w-10" />
             )}
