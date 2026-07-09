@@ -28,7 +28,7 @@ const Dua: React.FC = () => {
   }, [query]);
 
   const shouldSearch = searchOpen && debouncedQuery.trim().length >= 2;
-  const { data: results, isFetching } = useTextSearch(shouldSearch ? debouncedQuery : '');
+  const { data: results, isLoading, limitReached } = useTextSearch(shouldSearch ? debouncedQuery : '');
 
   return (
     <div className="container py-6 max-w-2xl mx-auto">
@@ -70,8 +70,8 @@ const Dua: React.FC = () => {
         <SearchResults
           query={debouncedQuery}
           results={results ?? []}
-          isLoading={isFetching}
-          limitReached={(results?.length ?? 0) >= 50}
+          isLoading={isLoading}
+          limitReached={limitReached}
         />
       ) : (
         <LibraryList />
