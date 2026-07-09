@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
-import { highlightMatch } from '@/lib/translitSearch';
+import { findMatch } from '@/lib/translitSearch';
 import type { SearchHit } from '@/hooks/useTextSearch';
 
 interface SearchResultsProps {
@@ -40,7 +40,8 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
   return (
     <div className="space-y-3">
       {results.map((hit) => {
-        const parts = highlightMatch(hit.snippet, query);
+        const parts = findMatch(hit.snippet, query);
+        const isFuzzy = hit.tier === 'fuzzy';
         return (
           <Link
             key={hit.id}
@@ -52,9 +53,16 @@ export const SearchResults: React.FC<SearchResultsProps> = ({
                 <h3 className="font-display tracking-tight text-base font-normal truncate">
                   {hit.textTitle}
                 </h3>
-                <span className="text-xs text-muted-foreground shrink-0">
-                  Verse {hit.lineNo}
-                </span>
+                <div className="flex items-baseline gap-2 shrink-0">
+                  {isFuzzy && (
+                    <span className="text-[10px] uppercase tracking-wide text-muted-foreground/80 border border-border/60 rounded-full px-1.5 py-0.5">
+                      similar
+                    </span>
+                  )}
+                  <span className="text-xs text-muted-foreground">
+                    Verse {hit.lineNo}
+                  </span>
+                </div>
               </div>
               <p className="mt-1.5 text-sm text-muted-foreground italic leading-snug line-clamp-2">
                 {parts ? (
