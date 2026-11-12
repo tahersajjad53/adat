@@ -1,58 +1,32 @@
+# Hijri Calendar Rebuild Document
 
-## Forgiving transliteration search
+A single, self-contained document you can paste into a new Claude project to rebuild the Ibadat Hijri calendar accurately. Saved to your Files as `hijri-calendar-spec.md` (plus a PDF copy if you want one).
 
-Yes, this is very feasible. The library is small (a handful of surahs/duas, at most a few thousand verses), so we can afford a smarter matcher that runs client-side without any schema changes.
+## What the document will cover
 
-### Approach
+1. **Overview** — what the calendar is (Dawoodi Bohra / Misri tabular calendar, not moon-sighting), and why it's predictable.
+2. **The calculation rules**
+   - 12 month names (English + Arabic, exactly as used in the app)
+   - Month lengths (30/29 alternating, Zilhaj gets 30 in leap years)
+   - The 30-year leap cycle and the exact leap-year positions
+   - Starting reference point and the conversion method between Gregorian and Hijri, written as step-by-step formulas with the real code included
+3. **When the day changes**
+   - Hijri day advances at Maghrib (sunset), not midnight
+   - "Daytime" vs "evening" Hijri date and which prayers belong to each
+   - 12 AM progress reset and 4 AM qaza rollover
+   - How Maghrib time is fetched (Aladhan, Method 1) and the fallback
+4. **Display rules** — Arabic digits (١٤٤٧), Al-Kanz font, Hijri as primary and Gregorian as secondary, header layout.
+5. **Calendar screens**
+   - Week strip: swiping, today highlight, red/black/no dot rules for missed qaza
+   - Month view: two-calendar grid, split header, activity dots
+   - Day timeline: prayer cards, goals, undo qaza, "Add goal" action
+   - Hijri date picker used in goal forms
+6. **Data it relies on** — what's stored per day (prayer logs, goals) and the date format rules (`YYYY-MM-DD` comparisons, Gregorian storage).
+7. **Test dates** — a table of known Gregorian ↔ Hijri pairs (including leap years and month edges) so the new build can be checked against this one.
+8. **Edge cases & gotchas** — timezones, users near the date line / far south (NZ), before/after Maghrib, leap-year end of Zilhaj.
 
-Replace the current strict `ilike` with a **phonetic-skeleton match**. Both the stored transliteration and the user's query are reduced to the same simplified "skeleton" before comparing, so common spelling swaps ("lakad" vs "laqad", "dhalika" vs "zalika", "thumma" vs "summa") all collapse to the same key.
-
-**Skeleton rules (applied in order):**
-1. Lowercase + strip diacritics (ā, ī, ū, ṣ, ḍ, ṭ, ẓ, ḥ, ġ …).
-2. Strip apostrophes, hyphens, dots.
-3. Collapse Arabic-transliteration digraphs to a single canonical letter:
-   - `kh`, `q`, `ck` → `k`
-   - `gh` → `g`
-   - `sh`, `th`, `ṣ` → `s`
-   - `dh`, `z`, `ẓ` → `z`
-   - `ch` → `s`
-4. Collapse doubled consonants (`ll` → `l`, `mm` → `m`, …).
-5. Optionally strip short vowels (`a`, `e`, `i`, `o`, `u`) to match consonant skeletons — this is what lets "lakad"/"laqad"/"laqaad" all reduce to `lkd`. We'll keep the first letter's vowel to reduce false positives at word starts.
-6. Collapse whitespace.
-
-So `laqad` → `lkd`, `lakad` → `lkd`, `dhālika` → `zlk`, `zalika` → `zlk`, `inni izā` → `nz` (matches "inni eza"), etc.
-
-**Match tiers (best first, stop at first tier that returns results):**
-1. **Exact normalized** — current behaviour (lowercase + diacritics stripped). Highest confidence.
-2. **Skeleton substring** — the forgiving match above.
-
-Results from tier 2 get a small "similar match" tag so the user knows it's a fuzzy hit vs an exact one.
-
-### Where the search runs
-
-Because the skeleton transform can't be expressed inside a plain SQL `ilike`, the fair-play options are:
-
-- **Client-side over the full library.** Load every `text_lines` row once (per session, cached via React Query), run the matcher in memory. For the current library size this is a single ~small payload and gives us instant, forgiving search with zero DB work.
-- Alternative: add a generated `translit_key` column + GIN index. More work, only worth it if the library grows to tens of thousands of lines. Not needed today.
-
-Going with the client-side approach.
-
-### Snippet highlighting
-
-The existing highlighter uses the raw normalized query, which won't find "laqad" inside a snippet when the user typed "lakad". Extend `highlightMatch` so it walks the snippet building both a normalized-index map **and** a skeleton-index map, and highlights whichever tier matched. If the skeleton spans across characters that don't line up (e.g. "kh" collapsed to "k"), highlight the full covering original substring.
-
-### Files
-
-**Edited**
-- `src/lib/translitSearch.ts` — Add `toSkeleton(str)` and a two-tier `findMatch(snippet, query)` that returns `{ before, match, after, tier: 'exact' | 'fuzzy' }`.
-- `src/hooks/useTextSearch.ts` — Switch to a single library-wide query (`text_lines` + `texts!inner`, verified filter as today) cached under one key. In the `select`/post-processing step, iterate rows and keep those whose transliteration matches at tier 1 or tier 2. Sort exact matches before fuzzy, then by text title and line number. Cap at 50 with the existing "refine" hint.
-- `src/components/reader/SearchResults.tsx` — Use the new `findMatch` result. Show a small muted "similar" pill on fuzzy hits so exact vs fuzzy is transparent.
-
-**Unchanged**
-- Search-icon entry point, page layout, debounce, keyboard handling, jump-to-verse behaviour.
-
-### Trade-offs (called out for the design brief)
-
-- **False positives:** vowel-stripping is aggressive. A three-letter query like "kd" would match a lot. We already require ≥ 2 characters; bumping the skeleton-tier minimum to 3 characters keeps noise down while still catching the "lakad" case.
-- **Payload size:** loading the full library into memory is fine now (~kilobytes). If the library grows past a few thousand lines we should revisit the generated-column approach.
-- **Ranking:** exact matches always show first, so users who type the "correct" spelling still get precise results at the top.
+## How it will be made
+- Read every calendar-related file in the app and copy the exact rules and formulas, not paraphrases.
+- Generate the test-date table by running the app's own conversion code, so the numbers are guaranteed correct.
+- Written in plain language with code blocks Claude can use directly.
+- No changes to the app itself.
